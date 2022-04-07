@@ -1,0 +1,141 @@
+<?php
+
+	$select = "select case_id, case_investigative_unit_id, exhibit_report_investigative_unit, exhibit_report_id, exhibit_report_assigned_member, exhibit_report_intake_date, exhibit_report_priority, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator from exhibit_report, case_info  where exhibit_report_pros = case_pros_id order by exhibit_report_number asc";
+	$query = mysql_query($select);
+
+	$exhibit_report_status = new exhibit_report_status();
+	$member = new member();
+	$investigative_unit = new investigative_unit();
+	$exhibit_report_status = new exhibit_report_status();
+	
+	$iu_name = new investigative_unit();
+
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+	
+  		// Start the shovelling
+		while ($fetch=mysql_fetch_array($query)) {
+			$case_status = $exhibit_report_status->get_open_close_status($fetch["exhibit_report_id"]);
+			if ($case_status == "In Progress") {
+				$inprogressfiles[] = $fetch;
+				$InProgress++;
+			}
+			if ($case_status == "Close") {
+				$closefiles[] = $fetch;
+				$Close++;
+			}
+			if ($case_status == "Open") {
+				$openfiles[] = $fetch;
+				$Open++;
+			}
+		}
+		echo '<div id="accordion-example" data-collapse="accordion">';
+		
+// Dump In Progress Files		
+		if (count($inprogressfiles) > 0) {
+		echo '<h3>In Progress Files</h3>';
+		echo '<div>';
+		echo '<p>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">CSER #</th>';
+		echo '<th style="width: 100px">CASE #</th>';
+		echo '<th >Caption</th>';
+		echo '<th>Investigative Team</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">CSER Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($inprogressfiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$inprogressfiles[$j]["case_id"].'&erid='.$inprogressfiles[$j]["exhibit_report_id"].'">'.$inprogressfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_pros"].'</td>';
+	  		echo '<td>'.$inprogressfiles[$j]["exhibit_report_caption"].'</td>';
+			$iu_name = $investigative_unit->get_value("investigative_unit_name", $inprogressfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_intake_date"].'</td>';
+			$tcu_primary = $member->get_value('member_login', $inprogressfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#66CCFF">In Progress</td>';
+      		
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Closed Files
+		if (count($closefiles) > 0) {
+		echo '<h3>Completed Files</h3>';
+		echo '<div>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">CSER #</th>';
+		echo '<th style="width: 100px">CASE #</th>';
+		echo '<th >Caption</th>';
+		echo '<th>Investigative Team</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">CSER Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($closefiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$closefiles[$j]["case_id"].'&erid='.$closefiles[$j]["exhibit_report_id"].'">'.$closefiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$closefiles[$j]["exhibit_report_pros"].'</td>';
+	  		echo '<td>'.$closefiles[$j]["exhibit_report_caption"].'</td>';
+			$iu_name = $investigative_unit->get_value("investigative_unit_name", $closefiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$closefiles[$j]["exhibit_report_intake_date"].'</td>';
+			$tcu_primary = $member->get_value('member_login', $closefiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#FF9999">Close</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Open Files		
+		if (count($openfiles) > 0) {
+		echo '<h3 class="open">Open Files</h3>';
+		echo '<div>';
+		echo '<p>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">CSER #</th>';
+		echo '<th style="width: 100px">CASE #</th>';
+		echo '<th >Caption</th>';
+		echo '<th>Investigative Team</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">CSER Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($openfiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$openfiles[$j]["case_id"].'&erid='.$openfiles[$j]["exhibit_report_id"].'">'.$openfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$openfiles[$j]["exhibit_report_pros"].'</td>';
+	  		echo '<td>'.$openfiles[$j]["exhibit_report_caption"].'</td>';
+			$iu_name = $investigative_unit->get_value("investigative_unit_name", $openfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$openfiles[$j]["exhibit_report_intake_date"].'</td>';
+			$tcu_primary = $member->get_value('member_login', $openfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#99FF99">Open</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+		echo '</div>'; // end accordion
+	echo '<br>';
+    echo '<br>Case Statistics ';
+    echo '<br>';
+    echo '<br>There are '.$Open.' case Open ';
+    echo '<br>There are '.$InProgress.' case In Progress';
+    echo '<br>There are '.$Close.' case Close';
+    echo '<br>';
+		
+//	} else {
+//		echo 'NO CSER Exhibit Report(s) found';
+//	}
+	}
+?>
+

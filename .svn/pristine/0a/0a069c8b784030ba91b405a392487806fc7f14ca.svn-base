@@ -1,0 +1,20 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+
+$member_id = $_GET["elid"];
+include('./location/location_info_table.php');
+
+
+
+?>

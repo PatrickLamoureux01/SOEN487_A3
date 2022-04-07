@@ -1,0 +1,55 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class db {
+
+	function db() {
+
+//		echo "New Class Instance";
+
+	}
+
+	function db_connect($db_host, $db_username, $db_password) {
+		$link = mysql_connect($db_host, $db_username, $db_password);
+
+		if (!$link) {
+
+			die('Error 001: Could not connect: '. mysql_error());
+
+		}
+		
+//			echo 'Database Connection Established<br \>';
+	}
+
+	function db_select($db_name) {
+
+		$select = mysql_select_db($db_name);
+
+		if (!$select) {
+			die('Error 002: Could not connect to DB'. $db_name);
+
+		}
+
+//			echo 'Selected '.$db_name.'<br \>';
+
+	}
+	
+//	function db_close() {
+		
+//		mysql_close();	
+	
+//	}
+
+}
+
+?>

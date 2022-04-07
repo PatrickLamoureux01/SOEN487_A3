@@ -1,0 +1,44 @@
+<?php
+
+//include('./include/exhibit_report.php');
+$exhibit_report = new exhibit_report();
+$exhibit_report_list = $exhibit_report->list_exhibit_report_by_case_id($case_id);
+$number_of_rows = $exhibit_report->number_of_rows("exhibit_report_case_id", $case_id);
+$member = new member();
+$exhibit_report_priority = new exhibit_report_priority();
+
+
+
+
+echo "<br><h2>CSER Exhibit Report(s)</h2>";
+
+echo '<form name="create_exhibit_report" method="post" action="./index.php?cmd=cer">';
+echo '<input type="hidden" name="prosnum" value="'.$case_info->get_value("case_pros_id", $case_id).'">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+//echo '<a href="javascript: submitform()">Add Exhibit Report</a> ';
+echo '</form>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sAddExRep">[ <a href="javascript: submitform()">Add Report</a> ]</span>';
+
+if ($number_of_rows < 1) {
+	echo '<p>No Report was found in the system</p>';
+} else {
+	echo '<table width="100%" id="PROSNum">';
+	echo '<tr><th>CSER Exhibit Report #</th><th>Create Date</th><th>Intake Member</th><th>Assigned to</th><th>Investigator</th><th>Priority</th></tr>';
+	for ($i=0; $i < count($exhibit_report_list); $i++) {
+		$member_name = $member->get_value("member_login", $exhibit_report_list[$i][7]);
+		$assigned_member_name = $member->get_value("member_login", $exhibit_report_list[$i][8]);
+		$priority = $exhibit_report_priority->get_value("exhibit_report_priority_name", $exhibit_report_list[$i][12]);
+		echo '<tr>';
+		echo '<td><a href="./index.php?cmd=ers&id='.$case_id.'&erid='.$exhibit_report_list[$i][0].'">'.$exhibit_report_list[$i][1].'</a></td>';
+		echo '<td>'.$exhibit_report_list[$i][5].'</td>';
+		echo '<td>'.$member_name.'</td>';
+		echo '<td>'.$assigned_member_name.'</td>';
+		echo '<td>'.$exhibit_report_list[$i][10].'</td>';
+		echo '<td>'.$priority.'</td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+}
+  echo '</div>';
+?>

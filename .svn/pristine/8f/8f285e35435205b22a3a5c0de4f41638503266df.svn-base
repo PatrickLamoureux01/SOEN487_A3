@@ -1,0 +1,100 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class investigative_unit {
+
+	function investigative_unit() {
+
+	}
+
+
+	function insert_investigative_unit($value, $desc) {
+
+		$select = "select * from investigative_unit where investigative_unit_name = '$value'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into investigative_unit(investigative_unit_name, investigative_unit_other) values ('$value','$desc')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_investigative_unit()');
+		} else {
+			//echo 'Duplicate Existed';
+		}
+	}
+
+	function delete_investigative_unit($id) {
+
+		$select = "update investigative_unit set delete_flag='1' where investigative_unit_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_investigative_unit()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update investigative_unit set ".$tbl_col."='$value' where investigative_unit_id='$rowid'";
+		//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','investigative unit set_value()');
+
+	}
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from investigative_unit where investigative_unit_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','investigative unit get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	function list_investigative_unit() {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from investigative_unit";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_investigative_unit()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+	
+	function generate_combo_box($select_name) {
+		
+		$select = "select investigative_unit_id, investigative_unit_name from investigative_unit order by investigative_unit_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+	
+	function generate_combo_box_select($select_name, $id) {
+
+		$select = "select investigative_unit_id, investigative_unit_name from investigative_unit order by investigative_unit_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+		
+		
+	}
+}
+?>

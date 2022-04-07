@@ -1,0 +1,57 @@
+
+<ul id="navigation">
+<li><a href="./index.php" tabindex="-1">Home</a></li>
+<li>Member
+        <ul>
+        	<li><a href="./index.php?cmd=ms&mid=<?php echo $_SESSION['mid']; ?>" tabindex="-1">Profile</a></li>
+<!--  			<li><a href="./index.php?cmd=myact">My Activities</a> -->
+		</ul>
+</li>
+<li>Dashboard
+		<ul><li><a href="./index.php?cmd=cl" tabindex="-1">All Cases</a></li>
+			<li><a href="./index.php?cmd=tl" tabindex="-1">All Reports</a></li>
+			<li><a href="./index.php?cmd=dbm&tk=all" tabindex="-1">All Reports by Member</a></li>
+			<li><a href="./index.php?cmd=dbm&tk=me" tabindex="-1">My Cases</a></li>
+			<li><a href="./index.php?cmd=dbm&tk=nobody" tabindex="-1">Unassigned Reports</a></li>
+		</ul>		
+</li>
+<li>Action
+	<ul>
+		<li><a href="./index.php?cmd=p1625" tabindex="-1">Print Exhibit(s)</a></li>
+		<li><a href="./index.php?cmd=rete" tabindex="-1">Return Exhibit(s)</a></li>
+		<li><a href="./index.php?cmd=amoe" tabindex="-1">Move Exhibit(s)</a></li>
+		<li><a href="./index.php?cmd=aer" tabindex="-1">Amend Exhibit Report</a></li>
+		<li><a href="./index.php?cmd=dec" tabindex="-1">Delete Empty Case</a></li>
+	</ul>
+</li>
+
+<li>Search
+	<ul>
+<!-- 		<li><a href="./index.php?cmd=search&stype=1" tabindex="-1">by PROS</a></li>
+		<li><a href="./index.php?cmd=search&stype=2" tabindex="-1">by TCU</a></li>
+ -->		<li><a href="./index.php?cmd=search&stype=3" tabindex="-1">by Exhibit Model</a></li>
+		<li><a href="./index.php?cmd=search&stype=4" tabindex="-1">by Exhibit S/N</a></li>
+		<li><a href="./index.php?cmd=search&stype=5" tabindex="-1">by Case Caption</a></li>
+		<li><a href="./index.php?cmd=search&stype=6" tabindex="-1">by Investigator Name</a></li>
+	</ul>
+</li>
+
+<li>System Admin
+        <ul>
+		<?php if (($_SESSION["ac"] == 1) || ($_SESSION["ac"] == 5 )){ ?>		
+        	<li><a href="./index.php?cmd=ml" tabindex="-1">Member</a></li>
+        	<li><a href="./index.php?cmd=fileman" tabindex="-1">File Manager</a></li>
+        <?php } ?>
+		<li><a href="./index.php?cmd=diu" tabindex="-1">Investigative Team</a></li>
+		<li><a href="./index.php?cmd=del" tabindex="-1">Exhibit Location</a></li>
+		<li><a href="./index.php?cmd=det" tabindex="-1">Exhibit Type</a></li>
+        </ul>
+</li>
+<li><a href="./index.php?cmd=reports" tabindex="-1">Reports</a>
+</li>
+<li>
+<a href="./index.php?cmd=Help" tabindex=-1">Help</a>
+</li>
+<li><a href="./logout.php" tabindex="-1">Logout</a>
+
+</ul>

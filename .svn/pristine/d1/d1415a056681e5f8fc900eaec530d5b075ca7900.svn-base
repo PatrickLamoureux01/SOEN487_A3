@@ -1,0 +1,52 @@
+<?php 
+/*	$connection = new db();
+	$connection->db_connect($db_host, $db_username, $db_password);
+	$connection->db_select($db_name);
+*/	
+	$select = "select * from investigative_unit order by investigative_unit_name asc";
+
+	$query = mysql_query($select);
+
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+
+ echo '<form name="create_iu" method="post" action="./index.php?cmd=aiu"></form>';
+echo '<script type="text/javascript">';
+echo 'function submitform(){document.create_iu.submit()}';
+echo '</script>'; 
+
+echo '<h2>Investigative Team</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submitform()">Add Investigative Team</a> ]</span>';
+
+
+/*
+ echo '<form name="create_iu" method="post" action="index.php?cmd=aiu">';
+//echo '<a href="javascript: submitform()">Add Exhibit Report</a> ';
+echo '<hr style="margin:-11px 0px 8px 0px;"><span class="sAddExRep">[ <a href="javascript: submitform()">Add Investigative Team</a> ]</span>';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submitform()';
+echo '{';
+echo 'document.create_iu.submit()';
+echo '}';
+echo '</script>';     
+*/
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th>Investigative Team</th>';
+		echo '<th>Description</th>';
+		echo '</tr>';
+		while ($fetch = mysql_fetch_array($query)) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=siu&iuid='.$fetch["investigative_unit_id"].'">'.$fetch["investigative_unit_name"].'</a></td>';		
+      echo '<td>'.$fetch["investigative_unit_other"].'</td>';
+			echo '<tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+	}
+	//}
+	//echo ($mylist[0][0]);
+	
+?>

@@ -1,0 +1,111 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit_report.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_report_counter.php');
+include('../include/exhibit_report_status.php');
+include('../include/exhibit.php');
+
+//$case_id = $_POST["case_id"];
+
+$erid = $_POST["erid"];
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$exhibit_report_status = new exhibit_report_status();
+$exhibit_report = new exhibit_report();
+$exhibit = new exhibit();
+		// check if report exist
+		$erexist = $exhibit_report_status->check_report_status_exist($erid);
+		if ($erexist == false) {
+			$exhibit_report_status->insert_exhibit_report_status($erid);
+		}
+		$exhibit_report_status_id = $exhibit_report_status->get_report_status_id($erid);
+
+switch($_POST["analysis_date_update"]) {
+	
+	case "Start":
+		$exhibit_report_status->set_value("exhibit_report_status_analysis_start_date", date("Y-m-d"), $exhibit_report_status_id);
+		$current_member = $exhibit_report->get_value("exhibit_report_assigned_member", $erid);
+		if ($current_member == "0") {
+			$exhibit_report->set_value("exhibit_report_assigned_member" , $_SESSION["mid"], $erid);
+		}
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $erid);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $erid);
+		$exhibit_report_status->set_value("exhibit_report_status_case_status", "In Progress", $exhibit_report_status_id);
+		$myexhibitlist = $exhibit->list_exhibit_id_by_report_id($erid);
+		for ($i=0; $i < count($myexhibitlist); $i++) {
+			$current_exhibit_assignment = $exhibit->get_value("exhibit_assigned_to", $myexhibitlist[$i][0]);
+			if ($current_exhibit_assignment == "0") {
+				$exhibit->set_value("exhibit_assigned_to" , $_SESSION["mid"], $myexhibitlist[$i][0]);
+				$exhibit->set_value("exhibit_assigned_date", date("Y-m-d"), $myexhibitlist[$i][0]);
+			}
+		}
+		break;
+	case "End":
+		$exhibit_report_status->set_value("exhibit_report_status_analysis_end_date", date("Y-m-d"), $exhibit_report_status_id);
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $erid);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $erid);
+		
+		break;
+	case "Forward Report":
+		$exhibit_report_status->set_value("exhibit_report_status_forward_date", date("Y-m-d"), $exhibit_report_status_id);
+//		$exhibit_report_status->set_value("exhibit_report_status_case_status", "Close", $exhibit_report_status_id);
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $erid);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $erid);
+		
+		break;
+
+	case "Close Report":
+		$exhibit_report_status->set_value("exhibit_report_status_close_date", date("Y-m-d"), $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_case_status", "Close", $exhibit_report_status_id);
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $erid);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $erid);
+		
+		break;
+		
+		
+		
+	case "Unanalyzed":
+//		$exhibit_report_status->set_value("exhibit_report_status_forward_date", date("Y-m-d"), $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_case_status", "Close", $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_unanalyzed", '1', $erid);
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $erid);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $erid);
+		
+		break;
+}
+
+$referer = $_POST["analysis_referer"];
+echo '<meta http-equiv="refresh" content="0;url='.$referer.'">';
+
+?>

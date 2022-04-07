@@ -1,0 +1,191 @@
+<?php
+
+if(isset($_GET["id"])) $case_id=$_GET["id"];
+if(isset($_POST["case_id"])) $case_id=$_POST["case_id"];
+if(isset($_GET["erid"])) $erid = $_GET["erid"];
+if(isset($_POST["erid"])) $erid = $_POST["erid"];
+if(isset($_GET["ul"])) $_POST["mode"] = "edit";
+$mode = "New";
+
+if (isset($_POST["edit_mode"])) {
+
+	$edit_mode = true;
+
+}
+
+include('./case/case_info_table.php');
+
+
+
+if (isset($_POST["mode"])) {
+
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+		$exhibit_report = new exhibit_report();
+
+		$exhibit_report_caption = $exhibit_report->get_value("exhibit_report_caption", $erid);
+		$exhibit_report_project_name = $exhibit_report->get_value("exhibit_report_project_name", $erid);
+		$exhibit_report_pros = $exhibit_report->get_value("exhibit_report_pros", $erid);
+		$exhibit_report_investigative_unit = $exhibit_report->get_value("exhibit_report_investigative_unit", $erid);
+		$exhibit_report_intake_member = $exhibit_report->get_value("exhibit_report_intake_member", $erid);
+		$exhibit_report_assigned_member = $exhibit_report->get_value("exhibit_report_assigned_member", $erid);
+//		$exhibit_report_initiative = $exhibit_report->get_value("exhibit_report_initiative", $erid);
+		$exhibit_report_investigator = $exhibit_report->get_value("exhibit_report_investigator", $erid);
+		$exhibit_report_investigator_email = $exhibit_report->get_value("exhibit_report_investigator_email", $erid);
+		$exhibit_report_priority = $exhibit_report->get_value("exhibit_report_priority", $erid);
+		$exhibit_report_task = $exhibit_report->get_value("exhibit_report_task", $erid);
+		$exhibit_report_action = $exhibit_report->get_value("exhibit_report_action", $erid);
+		$exhibit_report_issues = $exhibit_report->get_value("exhibit_report_issues", $erid);
+		$exhibit_report_resolutions = $exhibit_report->get_value("exhibit_report_resolutions", $erid);
+		$exhibit_report_misc_comments = $exhibit_report->get_value("exhibit_report_misc_comments", $erid);
+		$exhibit_report_status = $exhibit_report->get_value("exhibit_report_status", $erid);
+		$exhibit_report_intake_date = $exhibit_report->get_value("exhibit_report_intake_date", $erid);
+		$exhibit_report_sw_date = $exhibit_report->get_value("exhibit_report_sw_date", $erid);
+	}
+} else {
+
+	$case_info = new case_info();
+	$exhibit_report_caption = $case_info->get_value("case_caption", $case_id);
+	$exhibit_report_pros = $case_info->get_value("case_pros_id", $case_id);
+	$exhibit_report_project_name = $case_info->get_value("case_project_name", $case_id);
+	$exhibit_report_investigative_unit = $case_info->get_value("case_investigative_unit_id", $case_id);
+//	$exhibit_report_initiative = $case_info->get_value("case_initiative_id", $case_id);
+	$exhibit_report_investigator = $case_info->get_value("case_lead_investigator", $case_id);
+	$exhibit_report_investigator_email = $case_info->get_value("case_lead_investigator_email", $case_id);
+	$exhibit_report_intake_member = $_SESSION["mid"];
+
+
+}
+$investigative_unit = new investigative_unit();
+$initiative = new initiative();
+$priority = new exhibit_report_priority();
+
+
+?>
+    <script src="./_style/js/formValidation.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $('form[name="exhibit_report_processor"]').submit(function() {
+        var reason = "";
+            reason += validateEmpty($("#exhibit_report_caption"));
+            reason += validateEmpty($("#exhibit_report_investigative_unit"));
+            reason += validateEmpty($("#exhibit_report_investigator"));
+            reason += validateEmpty($("#exhibit_report_intake_member"));
+            reason += validateEmpty($("#exhibit_report_priority"));
+            reason += validateEmpty($("#exhibit_report_sw_date"));
+            
+        if (reason != "") {
+          alert("Some fields need correction:\n" + reason);
+          return false;
+        }
+        return true;
+      });
+    });
+    </script>   
+
+<br>
+<h2><?php echo $mode; ?> Exhibit Report <?php if(isset($erid)) { 
+	$exhibit_report_number = $exhibit_report->get_value('exhibit_report_number', $erid);
+	echo '- '.$exhibit_report_number;
+}?></h2>
+<hr style="margin: -11px 0px 8px 0px;">
+
+<form method="post"
+	action="./exhibit_report/exhibit_report_processor.php"
+	name="exhibit_report_processor">
+
+<fieldset class="submitform"><input type="hidden" name="case_id"
+	id="case_id" value="<?php echo $case_id; ?>"> <label
+	for="exhibit_report_date">Date: </label> <input type="text"
+	name="exhibit_report_date" id="exhibit_report_date"
+	value="<?php echo date("Y-m-d"); ?>" disabled="disabled"> <input
+	type="hidden" name="exhibit_report_entry_date"
+	id="exhibit_report_entry_date" value="<?php date("Y-m-d H:i:s")?>"> <input
+	type="hidden" name="exhibit_report_pros" id="exhibit_report_pros"
+	value="<?php echo $exhibit_report_pros; ?>"> <label
+	for="exhibit_report_caption">Exhibit Report Caption</label> <input
+	type="text" name="exhibit_report_caption" id="exhibit_report_caption"
+	value="<?php echo $exhibit_report_caption; ?>">
+	<label
+	for="exhibit_report_project_name">Project Name</label> <input
+	type="text" name="exhibit_report_project_name" id="exhibit_report_project_name"
+	value="<?php echo $exhibit_report_project_name; ?>">
+	 <label
+	for="exhibit_report_investigative_unit">Investigative Team</label> <?php $investigative_unit->generate_combo_box_select("exhibit_report_investigative_unit", $exhibit_report_investigative_unit)?>
+
+<label for="exhibit_report_investigator">Investigator</label> <input
+	type="text" name="exhibit_report_investigator"
+	id="exhibit_report_investigator"
+	value="<?php echo $exhibit_report_investigator?>"> <label
+	for="exhibit_report_investigator_email">Investigator E-mail</label> <input
+	type="text" name="exhibit_report_investigator_email"
+	id="exhibit_report_investigator_email"
+	value="<?php echo $exhibit_report_investigator_email?>"> 
+<label for="exhibit_report_intake_member">Intake Member</label> <?php 
+if ($mode == "Edit") {
+	$member->generate_combo_box_select("exhibit_report_intake_member", $exhibit_report_intake_member);
+} else {
+	$member->generate_combo_box_select("exhibit_report_intake_member", $_SESSION["mid"]);
+}
+?> <label for="exhibit_report_intake_date">Intake Date</label> <input
+	type="text" name="exhibit_report_intake_date" id="exhibit_report_intake_date" readonly value="<?php 
+		if (isset($exhibit_report_intake_date)) { echo $exhibit_report_intake_date; } else { echo date("Y-m-d"); } ?>">
+
+<?php $curdate = date("Y-m-d"); $nintydays = date("Y-m-d",strtotime($curdate) + (24*3600*90)); ?>
+<label for="exhibit_report_sw_date">Search Warrant Expiry Date</label> <input
+	type="text" name="exhibit_report_sw_date" id="exhibit_report_sw_date" readonly value="<?php 
+		if (isset($exhibit_report_sw_date)) { echo $exhibit_report_sw_date; } 
+		
+		/*else { echo $nintydays; } */ ?>">
+
+
+<label for="exhibit_report_assigned_member">CSER Primary Investigator</label> <?php 
+if ($mode == "Edit") {
+	$member->generate_combo_box_select("exhibit_report_assigned_member", $exhibit_report_assigned_member);
+} else {
+	$member->generate_combo_box("exhibit_report_assigned_member");
+}
+?> <label for="exhibit_report_task">Task(s)/Instruction(s): </label> <textarea
+	name="exhibit_report_task" id="exhibit_report_task" COLS=50 ROWS=4><?php if (isset($exhibit_report_task)) echo $exhibit_report_task; ?></TEXTAREA>
+
+<label for="exhibit_report_action">Action Taken / Objectives Achieved: </label> <textarea
+	name="exhibit_report_action" id="exhibit_report_action" COLS=50 ROWS=4><?php if (isset($exhibit_report_action)) echo $exhibit_report_action; ?></TEXTAREA>
+<label for="exhibit_report_issues">Issues: </label> <textarea
+	name="exhibit_report_issues" id="exhibit_report_issues" COLS=50 ROWS=4><?php if (isset($exhibit_report_issues)) echo $exhibit_report_issues; ?></TEXTAREA>
+<label for="exhibit_report_resolutions">Resolutions: </label> <textarea
+	name="exhibit_report_resolutions" id="exhibit_report_resolutions" COLS=50 ROWS=4><?php if (isset($exhibit_report_resolutions)) echo $exhibit_report_resolutions; ?></TEXTAREA>
+<label for="exhibit_report_misc_comments">Misc. Comments: </label> <textarea
+	name="exhibit_report_misc_comments" id="exhibit_report_misc_comments" COLS=50 ROWS=4><?php if (isset($exhibit_report_misc_comments)) echo $exhibit_report_misc_comments; ?></TEXTAREA>
+		
+<label for="exhibit_report_priority">Priority</label> <?php 
+if ($mode == "Edit") {
+	$priority->generate_combo_box_select("exhibit_report_priority", $exhibit_report_priority);
+} else {
+	$priority->generate_combo_box_select("exhibit_report_priority", "20");
+}
+?> <?php
+include('exhibit_report_status_form.php');
+?> <?php if ($mode == "Edit") { ?> <input type="hidden" name="case_id"
+	value="<?php echo $case_id; ?>"> <input type="hidden" name="erid"
+	value="<?php echo $erid; ?>"> <input type="hidden" name="mode"
+	value="edit">
+
+<p class="fclrBoth"><br>
+<label for="Submit"></label> <input type="submit" id="submit"
+	value="Update Exhibit Report" name="Submit" class="button" /> <input
+	type=button value="Cancel"
+	onClick="location.href='./index.php?cmd=ers&id=<?php echo $case_id; ?>&erid=<?php echo $erid; ?>'"
+	class="button"> <?php } else { ?>
+
+
+<br><br><br>
+<label for="Submit"></label> <input type="submit" id="submit"
+	value="Create Exhibit Report" name="Submit" class="button" /> <input
+	type=button value="Cancel"
+	onClick="location.href='./index.php?cmd=cs&id=<?php echo $case_id; ?>'"
+	class="button"> <?php } ?>
+
+</fieldset>
+
+
+</form>

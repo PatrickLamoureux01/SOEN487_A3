@@ -1,0 +1,51 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/exhibit_location.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+$exhibit_location = new exhibit_location();
+$exhibit_location_name = $_POST['exhibit_location_name'];
+$exhibit_location_other = $_POST['exhibit_location_other'];
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+
+		$elid = $_POST['elid'];
+		$exhibit_location->set_value('exhibit_location_name', $exhibit_location_name, $elid);
+		$exhibit_location->set_value('exhibit_location_other', $exhibit_location_other, $elid);
+	}
+} else {
+
+		$exhibit_location->insert_exhibit_location($exhibit_location_name, $exhibit_location_other);
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=del">';
+
+?>

@@ -1,0 +1,51 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/investigative_unit.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$investigative_unit = new investigative_unit();
+$investigative_unit_name = $_POST['investigative_unit_name'];
+$investigative_unit_other = $_POST['investigative_unit_other'];
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+
+		$iuid = $_POST['iuid'];
+		$investigative_unit->set_value('investigative_unit_name', $investigative_unit_name, $iuid);
+		$investigative_unit->set_value('investigative_unit_other', $investigative_unit_other, $iuid);
+	}
+} else {
+
+		$investigative_unit->insert_investigative_unit($investigative_unit_name, $investigative_unit_other);
+}
+	echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=diu">';
+
+?>

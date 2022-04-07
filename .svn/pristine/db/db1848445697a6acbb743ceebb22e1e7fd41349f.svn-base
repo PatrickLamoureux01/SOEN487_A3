@@ -1,0 +1,37 @@
+<?php
+
+
+if (isset($_GET["iuid"])) $iuid = $_GET["iuid"];
+if (isset($_POST["iuid"])) $iuid = $_POST["iuid"];
+$investigative_unit = new investigative_unit();
+$investigative_unit_name = $investigative_unit->get_value('investigative_unit_name', $iuid);
+$investigative_unit_other = $investigative_unit->get_value('investigative_unit_other', $iuid);
+
+
+
+echo '<h2>Investigative Team</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submiteditiuform()">Edit</a> &nbsp;|&nbsp; <a href="./index.php?cmd=diu&id='.$iuid.'">Investigative Team List</a> ]</span>';
+
+echo '<form name="edit_iu" id="edit_iu" method="post" action="./index.php?cmd=eiu">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="iuid" value="'.$iuid.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditiuform()';
+echo '{';
+echo 'document.edit_iu.submit()';
+echo '}';
+echo '</script>'; 
+
+
+echo '<table><tr>';
+echo '<td><strong>Investigative Team</strong></td><td>'.$investigative_unit_name.'</td>';
+echo '</tr><tr>';
+echo '<td nowrap><strong>Investigative Team Member(s)</strong></td><td>'.$investigative_unit_other.'</td>';
+echo '</tr>';
+echo '</table>';
+
+echo '</div>';
+
+?>

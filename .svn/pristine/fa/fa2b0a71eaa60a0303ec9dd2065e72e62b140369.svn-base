@@ -1,0 +1,218 @@
+<?php
+include('header.php');
+include('include/config.inc');
+
+if (isset($_POST["erid"])) $erid =$_POST["erid"];
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+
+
+$exhibit_report = new exhibit_report();
+$investigative_unit = new investigative_unit();
+$initiative = new initiative();
+$erp = new exhibit_report_priority();
+$member = new member();
+$exhibit_report_number = $exhibit_report->get_value("exhibit_report_number", $erid);
+$exhibit_report_pros = $exhibit_report->get_value("exhibit_report_pros", $erid);
+$exhibit_report_caption = $exhibit_report->get_value("exhibit_report_caption", $erid);
+$exhibit_report_investigative_unit = $investigative_unit->get_value("investigative_unit_name", $exhibit_report->get_value("exhibit_report_investigative_unit", $erid));
+$exhibit_report_entry_date = $exhibit_report->get_value("exhibit_report_entry_date", $erid);
+$exhibit_report_entry_person = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_assigned_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_assigned_member", $erid));
+$exhibit_report_initiative = $initiative->get_value("initiative_name", $exhibit_report->get_value("exhibit_report_initiative", $erid));
+$exhibit_report_investigator = $exhibit_report->get_value("exhibit_report_investigator", $erid);
+$exhibit_report_investigator_email = $exhibit_report->get_value("exhibit_report_investigator_email", $erid);
+$exhibit_report_priority = $erp->get_value("exhibit_report_priority_name", $exhibit_report->get_value("exhibit_report_priority", $erid));
+$exhibit_report_task = $exhibit_report->get_value("exhibit_report_task", $erid);
+$exhibit_report_status = $exhibit_report->get_value("exhibit_report_status", $erid);
+$exhibit_report_intake_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_intake_date = $exhibit_report->get_value("exhibit_report_intake_date", $erid);
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+$return_date = $_GET["date"];
+$exhibit = new exhibit();
+$exhibit_list = $exhibit->list_returned_exhibit_by_report_id($erid, $return_status_id, $return_date);
+$number_of_rows = $exhibit->number_of_rows("exhibit_report_id", $erid);
+$member = new member();
+
+
+$exhibit_type = new exhibit_type();
+$exhibit_location = new exhibit_location();
+$to_tcb = new to_tcb();
+$to_tcb_id = $to_tcb->get_to_tcb();
+
+
+$exhibit_released_to = $exhibit_list[0][19];
+$exhibit_return_date = $exhibit_list[0][18];
+?>
+
+<html>
+
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<!--
+  keep title clear for print purposes, that way it wont be on the top of page twice. 
+  EXHIBIT REPORT  :  RAPPORT SUR LES PIECES A CONVICTION
+-->
+<title></title> 
+<style>
+* { padding: 0; margin: 0; }
+body {
+ font-family: Arial, Helvetica, sans-serif;
+ font-size: 13px;
+}
+table{padding:0px;}
+td {padding:0px;}
+
+table {width:99%;}
+td, th {vertical-align:top;padding:3px 3px 3px 3px;}
+thead {text-align:left;}
+
+p, h4, ul, ol, td, a { font-size: 10pt; }
+h1 { font-size: 24pt; } 
+h2 { font-size: 18pt; } 
+h3 { font-size: 14pt; } 
+h5 { font-size: 10pt; }
+
+/*
+pt = page title
+hd = form section head
+ct = align cell center
+cd = cell data
+*/
+
+.pt {font-size: 12pt;font-weight:bold;}
+.hd {background-color:#ccc;font-size: 8pt;}
+.ct {text-align:center;}
+.cd {font-size: 11pt;font-weight:bold;}
+.vm {vertical-align:middle}
+.bd {font-weight:bold;}
+
+.bb2 {border-bottom: double 2px; border-top:0px; border-right:0px; border-left:0px;}
+.bt2 {border-bottom: 0px; border-top:double 2px; border-right:0px; border-left:0px;}
+.br2 {border-right:double 2px;}
+.bl2 {border-left:double 2px;}
+.br {border-right:solid 1px;}
+.bl {border-left:solid 1px;}
+.bt {border-top:solid 1px;}
+.bb {border-bottom:solid 1px;}
+.bbA {border-bottom:solid 1px #aaa;}
+
+.pd5 {padding:5px 3px 5px 3px}
+.pd10 {padding:10px 3px 10px 3px}
+.pd15 {padding:15px 3px 15px 3px}
+.pdr30 {padding-right:30px}
+
+</style>
+</head> 
+<body> 
+  
+  <table cellpadding=0 cellspacing=0><tr>
+    <td class="pt bb2" width="39%" rowspan=2>EXHIBIT REPORT<BR></td>
+    <td class="pt br2 bb2" width="39%" rowspan=2>RETURNED EXHIBIT(S)</td>
+    <td class="hd br bt2" width="6%" nowrap>DIVISION</td>
+    <td class="hd br bt2" width="10%" nowrap>SUB-DIVISION</td>
+    <td class="hd br2 bt2" width="6%" nowrap>UNIT</td>
+
+  </tr><tr>
+    <td class="br ct bd"><?php echo $ORG_DIVISION; ?></td>
+    <td class="br ct bd"><?php echo $ORG_SUB_DIVISION; ?></td>
+    <td class="br2 ct bd"><?php echo $ORG_UNIT; ?></td>
+  </tr></table>
+  <table cellpadding=0 cellspacing=0><tr>
+    <td class="hd br bl2 bt bb" width="18%" nowrap>CSER EXHIBIT REPORT No.</td>
+    <td class="cd br bt bb vm"><?php echo $exhibit_report_number; ?></td>
+    <td class="hd br bt bb" width="18%" nowrap>CASE No.</td>
+    <td class="cd br2 bt bb vm"><?php echo $exhibit_report_pros; ?></td>
+  </tr></table>
+
+  <table cellpadding=0 cellspacing=0><tr>
+    <td class="hd br bl2 bb" nowrap>NATURE OF EVENT</td>
+  </tr><tr>
+    <td class="br2 bb bl2 vm pd15"><b><?php echo $exhibit_report_caption; ?></b></td>
+  </tr></table>
+
+  <table cellpadding=0 cellspacing=0><tr>
+    <td class="hd bl2 br bb" nowrap>EXHIBITS RELEASED TO:</td>
+    <td class="hd bb" nowrap>INVESTIGATIVE TEAM:</td>
+    <td class="hd br2 bl bb" width="15%" nowrap>DATE RELEASED</td>
+  </tr><tr>
+    <td class="br bb2 bl2 vm bd pd10"><?php echo $exhibit_released_to; ?></td>
+      <td class="bb2 vm bd"><?php echo $exhibit_report_investigative_unit; ?></td>
+    <td class="bb2 br2 bl vm bd"><?php echo $exhibit_return_date; ?></td>
+  </table>
+  <BR>
+  <?php 
+  	echo '<table cellspacing="0" cellpadding="0" class="bb2">';
+    echo '<td class="hd pt bl2 bt2 bb">CSER Exhibit #</td>';
+    echo '<td class="hd pt bl bt2 bb">Description</td>';
+    echo '<td class="hd pt bl br2 bt2 bb">Type</td>';
+/*    echo '<td class="hd pt bl br2 bt2 bb" width="10%" nowrap>Items Returned</td>';
+*/ 
+    for ($i=0; $i < count($exhibit_list); $i++) {
+       
+		$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_list[$i][1]);
+		$item_num = add_zero_as_placeholder("3", $exhibit_list[$i][2]);
+		$exhibit_number = $exhibit_report_num."-".$item_num;
+		$exhibit_original_item = $exhibit_list[$i][12];
+		$exhibit_status_type = new exhibit_status_type();
+
+		echo '<tr>';
+		echo '<td class="bl2 bbA" nowrap="">';
+		echo $exhibit_number;
+		echo '</td>';
+		echo '<td class="bbA">Original Item #: ';
+		echo $exhibit_original_item;
+		echo '<br>';
+		echo 'Type: ';
+		echo $exhibit_type->get_value("exhibit_type_name", $exhibit_list[$i][4]);
+		echo '</td>';
+		echo '<td class="br2 bbA pdr30">';
+		echo 'Make: ';
+		echo $exhibit_list[$i][6];
+		echo '<br>';
+		echo 'Model: ';
+		echo $exhibit_list[$i][7];
+		echo '<br>';
+		echo 'Serial: ';
+		echo $exhibit_list[$i][8];
+    echo '</td>';
+    echo '</tr>';
+/*		echo '<td class="br2 bbA pdr30" align=right>';
+/		echo $exhibit_status_type->get_value("exhibit_status_type_name", $exhibit_list[$i][13]);
+/*		
+		$return_status = new return_status();
+		$return_status_id = $return_status->get_return_status();
+		if ($return_status_id == $exhibit_list[$i][13]) {
+		echo "Yes";
+		}  else {
+			
+		echo "No";
+		}
+		echo '</td>';
+*/				
+    }
+	echo '</table>';      
+  ?>
+
+
+  <BR> 
+
+
+
+  <br>
+
+
+
+  <br><br><br><br>
+  <table style="float:right; width:50%"><tr>
+    <td width="35%"><hr style="margin:0;" size=1>ACCEPTING MEMBER</td>
+    <td width="15%" nowrap><hr style="margin:0;" size=1>Date</td>
+  </tr></table>
+  <table style="float:right; width:50%"><tr>
+  <td>
+  <i><b>Please date and sign this sheet and return to <?php echo $department_name; ?></b></i>
+  </td>
+  </tr>
+  </table>
+</body> 
+</html> 

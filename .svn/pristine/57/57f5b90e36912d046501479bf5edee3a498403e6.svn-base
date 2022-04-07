@@ -1,0 +1,67 @@
+<?php
+$i=0;
+//$connection = new db();
+//$connection->db_connect($db_host, $db_username, $db_password);
+//$connection->db_select($db_name);
+if (isset($_POST["case_id"])) $case_id = $_POST["case_id"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+
+
+// get the case id for current exhibit report id
+
+$select = "select exhibit_report_case_id, exhibit_report_number from exhibit_report where exhibit_report_id = '$erid'";
+//echo $select;
+$query = mysql_query($select);
+$fetch_case_id = mysql_fetch_row($query);
+$exhibit_report_case_id = $fetch_case_id[0];
+$exhibit_report_number = $fetch_case_id[1];
+
+// get the case information from the 
+
+$select = "select case_pros_id, case_caption from case_info where case_id = '$exhibit_report_case_id'";
+//echo $select;
+$query = mysql_query($select);
+$fetch_case_info = mysql_fetch_row($query);
+echo "<h2>Amend Exhibit Report</h2>";
+echo "<h3>You have selected to amend TCU Exhibit Report # ".$exhibit_report_number;
+echo "<br />"; 
+echo "<br />"; 
+echo "It is currently associated to: ";
+echo "PROS: ".$fetch_case_info[0]." - ".$fetch_case_info[1];
+echo "</h3>";
+echo "<br>";
+echo "Please select the PROS File that you would like to associate this TCU Report with <br>";
+echo "<font color='red'>Note that this will override the PROS Number, Caption, Investigator, Investigator Unit on the Exhibit Report</font>";
+echo "<br>";
+echo "<br>";
+
+echo '<form method="post" name="amend_exhibit_report" action="./exhibit_report_move/exhibit_report_move_processor.php">';
+
+$select = "select case_id, case_pros_id, case_caption from case_info order by case_pros_id";
+$query = mysql_query($select);
+echo '<select name="new_case_info">';
+while ($result = mysql_fetch_array($query)) {
+	$result_case_id = $result["case_id"];
+	$result_case_pros_id = $result["case_pros_id"];
+	$result_case_caption = $result["case_caption"];
+	echo '<option value="'.$result_case_id.'">'.$result_case_pros_id.' - '.$result_case_caption;
+	echo '</option>';
+	
+}
+echo '</select>';
+
+echo '<br>';
+    echo '<input type="hidden" name="erid" value="'.$erid.'">'; 
+    echo '<input type="submit" name="Submit" value="Submit" class="button">'; 
+    echo '<input type="button" name="cancel" value="Cancel" class="button"onclick="location.href=\'./index.php\'">';
+
+echo '</form>';
+    
+//include('./action/print1625_form.php');
+	
+?>
+
+
+

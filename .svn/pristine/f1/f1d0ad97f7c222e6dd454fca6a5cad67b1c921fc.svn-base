@@ -1,0 +1,34 @@
+<?php
+
+
+$exhibit_report = new exhibit_report();
+$exhibit_report_list = $exhibit_report->list_exhibit_report();
+
+?>
+<style>
+  select {margin: 0.25em 0.5em 1em 0;width: 20%;border: 1px solid #999;padding: 1px 0 2px 0;background: #FFFFFF;font-family:sans-serif;}
+</style>
+
+<h2>Print Labels Form</h2>
+<?php 
+if (isset($_POST["erid"])) {
+	
+//	include('./action/printlabels_processor.php');
+	//echo '<br><br><br>';
+	//echo '<a href="?cmd=p1625">Select another Report';
+} else {
+
+?>
+<div class="dCaseInfo">
+ <br>Please select CSER Exhibit Report below and click Search to select exhibit list to print:
+  <br><br>
+  <form action="./printLabels.php" method="POST">
+<?php 
+  $exhibit_report->generate_combo_box("erid");
+?>
+<input type="submit" name="Search" class="button" value="Search">
+</form>
+</div>
+<?php 
+}
+?>

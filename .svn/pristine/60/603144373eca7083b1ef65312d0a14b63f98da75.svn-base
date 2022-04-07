@@ -1,0 +1,73 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+include('../include/common.php');
+include('../include/config.inc');
+include('../include/db.php');
+session_start();
+
+
+
+	$i=0;
+	$q = $_GET["q"];
+	if (strlen($q) != "0") {
+		
+	$q = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $q);
+	//echo $q;
+	$connection = new db();
+	$connection->db_connect($db_host, $db_username, $db_password);
+	$connection->db_select($db_name);
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 	
+	//$mylist[0][0] = null;
+	$select = "select case_id, case_pros_id, case_caption, case_lead_investigator, investigative_unit_name
+				from case_info, investigative_unit 
+				where case_pros_id like '$q%' 
+				and investigative_unit_id = case_investigative_unit_id order by case_pros_id asc";
+	//echo $select;
+	$query = mysql_query($select);
+
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+    echo '<p><h2>Case #\'s</h2>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width:110px">Case #</th>';
+		echo '<th>Caption</th>';
+		echo '</tr>';
+		while ($fetch = mysql_fetch_array($query)) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=cs&id='.$fetch["case_id"].'">'.$fetch["case_pros_id"].'</a></td>';		
+      echo '<td>'.$fetch["case_caption"].'</td>';
+//      echo '<b>Investigative Unit: </b>'.$fetch["case_lead_investigator"].'<br />';
+//      echo '<b>Investigator: </b>'.$fetch["investigative_unit_name"].'</td>';
+//		echo '</td>';
+      	echo '<tr>';
+		}
+		echo '</table>';
+		
+	} else {
+		include('../case/case_form.php');
+	}
+	}
+	//echo ($mylist[0][0]);
+	
+?>
+

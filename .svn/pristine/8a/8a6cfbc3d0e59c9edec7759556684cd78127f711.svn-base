@@ -1,0 +1,75 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class system_log {
+
+	function system_log() {
+
+	}
+
+
+	function insert_system_log($member, $action, $uri, $datetime) {
+
+		$select = "insert into system_log(system_log_member, system_log_action, system_log_datetime, system_log_url) values ('$member','$action','$datetime','$uri')";
+		//echo $select;
+		$query = mysql_query($select);
+		if (!$query) c_error('3','insert_system_log()');
+	}
+
+	function delete_system_log($id) {
+
+		$select = "update system_log set delete_flag='1' where system_log_id='$id'";
+		$query = mysql_query($select);
+		
+                if (!$query) c_error('3','delete_system_log()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update system_log set ".$tbl_col."='$value' where system_log_id='$rowid'";
+		//echo $select;
+		$query = mysql_query($select);
+
+		if (!$query) c_error('3','investigative unit set_value()');
+
+	}
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from system_log where system_log_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','investigative unit get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	function list_system_log($myid) {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from system_log where system_log_member = '$myid' order by system_log_id desc limit 50";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_system_log()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+	
+
+}
+?>

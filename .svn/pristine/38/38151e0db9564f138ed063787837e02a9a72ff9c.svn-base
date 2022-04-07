@@ -1,0 +1,38 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+$case_id = $_GET["id"];
+$erid = $_GET["erid"];
+
+include('./case/case_info_table.php');
+include('./exhibit_report/exhibit_report_info_table.php');
+include('./exhibit/exhibit_all_info_table.php');
+
+/*
+ echo '<p>';
+ echo '<form name="create_exhibit" method="post" action="index.php?cmd=ec">';
+ echo '<input type="hidden" name="erid" value="'.$erid.'">';
+ echo '<input type="hidden" name="prosnum" value="'.$case_info->get_value("case_pros_id", $case_id).'">';
+ echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+ echo '<a href="javascript: submitform()">Add Exhibit</a> ';
+ //echo '<a href="/index.php?cmd=cs&id='.$case_id.'">Back to Exhibit Report List</a>';
+ echo '</form>';
+ echo '<script type="text/javascript">';
+ echo 'function submitform()';
+ echo '{';
+ echo 'document.create_exhibit.submit()';
+ echo '}';
+ echo '</script>';
+ */
+
+?>

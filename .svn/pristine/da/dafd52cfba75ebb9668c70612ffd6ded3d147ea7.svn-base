@@ -1,0 +1,115 @@
+<?php
+$i=0;
+//$connection = new db();
+//$connection->db_connect($db_host, $db_username, $db_password);
+//$connection->db_select($db_name);
+if (isset($_POST["case_id"])) $case_id = $_POST["case_id"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+  
+  $exhibit = new exhibit();
+  $exhibit_report = new exhibit_report();
+  
+  $select = "select * from files where exhibit_report_id='$erid' and exhibit_id='0'";
+  $query = mysql_query($select);
+	echo '<h2>File Management for '.$exhibit_report->get_value("exhibit_report_number", $erid).'</h2>';
+	  
+  echo '<P>The following are the files that is associated to Exhibit Report '.$exhibit_report->get_value("exhibit_report_number", $erid);
+
+  echo '<br><br>';
+  if (mysql_num_rows($query) > 0) {
+  echo '<table width="90%">';
+  echo '<tr>';
+  echo '<th style="text-align: left; width=200px">File Name</th><th style="text-align: left; width=150px">Size</th><th style="text-align: left">Deleted</th><th style="text-align: left">Action</th>';
+  echo '</tr>';
+  while ($result = mysql_fetch_array($query)) {
+  	echo '<tr>';
+  	echo '<td>'.$result["name"].'</td>';
+  	echo '<td>'.$result["size"].'</td>';
+  	echo '<td>';
+  	if ($result["delete_flag"] == "1") { echo "Yes"; } else { echo "No"; };
+  	echo '</td>';
+  	echo '<td>';
+  	echo '<form action="./file_man/file_man_processor.php" method="post" name="delete_file_'.$result["id"].'">';
+  	echo '<input type="hidden" name="file_id" value="'.$result["id"].'">';
+  	echo '<input type="hidden" name="erid" value="'.$erid.'">';
+  	echo '</form>';
+  	
+	echo '<script type="text/javascript">';
+	echo 'function submit_delete_file_'.$result["id"].'_form()';
+	echo '{';
+	echo 'document.delete_file_'.$result["id"].'.submit()';
+	echo '}';
+	echo '</script>';
+	echo '<a href="javascript: submit_delete_file_'.$result["id"].'_form()">Delete</a>';
+	
+  	
+  	echo '</td>';
+  	echo '</tr>';
+  	
+  }
+  echo '</table>';
+ } else {
+  	echo "No Attachment(s) found";
+  }
+ 	echo '<hr>';
+
+ $number_of_rows = $exhibit->number_of_rows("exhibit_report_id", $erid);
+ if ($number_of_rows > 0) {	
+ 	
+ $mylist =  $exhibit->list_exhibit_id_by_report_id($erid);
+  for ($i=0; $i < count($mylist); $i++) {
+  $exhibit_id = $mylist[$i][0];
+ // echo $exhibit_id;
+  $exhibit_item_id = $exhibit->get_value("exhibit_item_id", $exhibit_id);
+  $item_num = add_zero_as_placeholder("3", $exhibit_item_id);
+  $exhibit_number = $exhibit_report->get_value("exhibit_report_number", $erid)."-".$item_num;
+  
+  $select1 = "select * from files where exhibit_report_id = '$erid' and exhibit_id = '$exhibit_id'";
+  $query1 = mysql_query($select1);
+
+  echo '<P>The following are the files that is associated to Exhibit '.$exhibit_number;
+  echo '<br><br>';
+  if (mysql_num_rows($query1) > 0) {
+  echo '<table width="90%">';
+  echo '<tr>';
+  echo '<th style="text-align: left; width=200px">File Name</th><th style="text-align: left; width=150px">Size</th><th style="text-align: left">Deleted</th><th style="text-align: left">Action</th>';
+    echo '</tr>';
+  while ($result1 = mysql_fetch_array($query1)) {
+  	echo '<tr>';
+  	echo '<td>'.$result1["name"].'</td>';
+  	echo '<td>'.$result1["size"].'</td>';
+  	echo '<td>';
+  	if ($result1["delete_flag"] == "1") { echo "Yes"; } else { echo "No"; };
+  	echo '</td>';
+   	echo '<td>';
+  	echo '<form action="./file_man/file_man_processor.php" method="post" name="delete_file_'.$result1["id"].'">';
+  	echo '<input type="hidden" name="file_id" value="'.$result1["id"].'">';
+  	echo '<input type="hidden" name="erid" value="'.$erid.'">';
+  	echo '</form>';
+  	
+	echo '<script type="text/javascript">';
+	echo 'function submit_delete_file_'.$result1["id"].'_form()';
+	echo '{';
+	echo 'document.delete_file_'.$result1["id"].'.submit()';
+	echo '}';
+	echo '</script>';
+	echo '<a href="javascript: submit_delete_file_'.$result1["id"].'_form()">Delete</a>';
+	
+  	
+  	echo '</td>';
+  	echo '</tr>';
+  	
+  }
+  echo '</table>';
+  } else {
+  	echo "No Attachment(s) found";
+  }
+  echo '<hr>';
+  }
+ } // end number of rows
+  
+?>
+
+
+

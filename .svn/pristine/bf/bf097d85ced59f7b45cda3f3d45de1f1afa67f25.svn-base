@@ -1,0 +1,77 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+include('../include/common.php');
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/member.php');
+	session_start();
+  //This stops SQL Injection in POST vars 
+  	$i=0;
+	$q = $_GET["q"];
+	if (strlen($q) != "0") {
+		
+	$q = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $q);
+	//echo $q;
+	$connection = new db();
+	$connection->db_connect($db_host, $db_username, $db_password);
+	$connection->db_select($db_name);
+
+	
+	
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+	
+	//$mylist[0][0] = null;
+	$select = "select case_id, exhibit_report_id, exhibit_report_number, exhibit_report_intake_date, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator from exhibit_report, case_info  where exhibit_report_number like '$q%' and exhibit_report_pros = case_pros_id order by exhibit_report_id asc";
+	//echo $select;
+	$query = mysql_query($select);
+
+	$member = new member();
+	
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+    echo '<p><h2>TCU #\'s</h2>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width:80px">TCU#</th>';
+		echo '<th  style="width:110px">PROS#</th>';
+		echo '<th>Caption</th>';
+//		echo '<th>Investigator</th>';
+		echo '<th  style="width:80px">Intake Date</th>';
+		echo '<th>Assigned Member</th>';
+		echo '</tr>';
+		while ($fetch = mysql_fetch_array($query)) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$fetch["case_id"].'&erid='.$fetch["exhibit_report_id"].'">'.$fetch["exhibit_report_number"].'</a></td>';		
+      echo '<td>'.$fetch["exhibit_report_pros"].'</td>';
+	  echo '<td>'.$fetch["exhibit_report_caption"].'</td>';
+//      echo '<td>'.$fetch["exhibit_report_investigator"].'</td>';
+      echo '<td>'.$fetch["exhibit_report_intake_date"].'</td>';
+      echo '<td>'.$member->get_value("member_login", $fetch["exhibit_report_assigned_member"]).'</td>';
+			echo '<tr>';
+		}
+		echo '</table>';
+		
+	} else {
+		echo 'NO TCU Report(s) found';
+	}
+	}
+?>
+

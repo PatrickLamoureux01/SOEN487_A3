@@ -1,0 +1,136 @@
+<?php
+//include('./include/case_info.php');
+//include('./include/investigative_unit.php');
+//include('./include/initiative.php');
+//include('./include/exhibit_report.php');
+//include('./include/exhibit_report_priority.php');
+//include('./include/member.php');
+
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+$exhibit_report = new exhibit_report();
+$investigative_unit = new investigative_unit();
+$initiative = new initiative();
+$erp = new exhibit_report_priority();
+$member = new member();
+$exhibit_report_number = $exhibit_report->get_value("exhibit_report_number", $erid);
+$exhibit_report_caption = $exhibit_report->get_value("exhibit_report_caption", $erid);
+$exhibit_report_investigative_unit = $investigative_unit->get_value("investigative_unit_name", $exhibit_report->get_value("exhibit_report_investigative_unit", $erid));
+$exhibit_report_entry_date = $exhibit_report->get_value("exhibit_report_entry_date", $erid);
+$exhibit_report_entry_person = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_assigned_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_assigned_member", $erid));
+//$exhibit_report_initiative = $initiative->get_value("initiative_name", $exhibit_report->get_value("exhibit_report_initiative", $erid));
+$exhibit_report_investigator = $exhibit_report->get_value("exhibit_report_investigator", $erid);
+$exhibit_report_investigator_email = $exhibit_report->get_value("exhibit_report_investigator_email", $erid);
+$exhibit_report_priority = $erp->get_value("exhibit_report_priority_name", $exhibit_report->get_value("exhibit_report_priority", $erid));
+$exhibit_report_task = $exhibit_report->get_value("exhibit_report_task", $erid);
+$exhibit_report_project_name = $exhibit_report->get_value("exhibit_report_project_name", $erid);
+$exhibit_report_action = $exhibit_report->get_value("exhibit_report_action", $erid);
+$exhibit_report_issues = $exhibit_report->get_value("exhibit_report_issues", $erid);
+$exhibit_report_misc_comments = $exhibit_report->get_value("exhibit_report_misc_comments", $erid);
+$exhibit_report_resolutions = $exhibit_report->get_value("exhibit_report_resolutions", $erid);
+$exhibit_report_status = $exhibit_report->get_value("exhibit_report_status", $erid);
+$exhibit_report_intake_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_intake_date = $exhibit_report->get_value("exhibit_report_intake_date", $erid);
+$exhibit_report_sw_date = $exhibit_report->get_value("exhibit_report_sw_date", $erid);
+$exhibit_report_entry_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_entry_member", $erid));
+
+echo '<br><h2>CSER Exhibit Report: '.$exhibit_report_number.'</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ ';
+if ($_GET["cmd"] != "erupload") {
+	echo '<a href="javascript: submit_exhibit_report_upload_attachment_form()">Upload Attachment(s)</a> | ';
+}
+echo '<a href="javascript: submiteditexhibitreportform()">Edit</a> &nbsp;|&nbsp; <a href="./index.php?cmd=cs&id='.$case_id.'">Report List</a> ]</span>';
+
+echo '<form name="edit_exhibit_report" id="edit_exhibit_report" method="post" action="./index.php?cmd=ere">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditexhibitreportform()';
+echo '{';
+echo 'document.edit_exhibit_report.submit()';
+echo '}';
+echo '</script>';
+
+
+echo '<form name="exhibit_report_upload_attachment" id="exhibit_report_upload_attachment" method="post" action="./index.php?cmd=erupload">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submit_exhibit_report_upload_attachment_form()';
+echo '{';
+echo 'document.exhibit_report_upload_attachment.submit()';
+echo '}';
+echo '</script>';
+
+
+echo '<table><tr>';
+echo '<td><strong>Project Name</strong></td><td>'.$exhibit_report_project_name.'</td>';
+echo '</tr><tr>';
+echo '<td><strong>Investigator</strong></td><td>'.$exhibit_report_investigator.'</td>';
+echo '</tr><tr>';
+echo '<td nowrap><strong>Investigative Team &nbsp;</strong></td><td>'.$exhibit_report_investigative_unit.'</td>';
+echo '</tr><tr>';
+//echo '<td><strong>Investigator E-mail:</strong></td><td>'.$exhibit_report_investigator_email.'</td>';
+//echo '</tr><tr>';
+echo '<td><strong>Intake Member</strong></td><td>'.$exhibit_report_intake_member.'</td>';
+echo '</tr><tr>';
+echo '<td><strong>Intake Date</strong></td><td>'.$exhibit_report_intake_date.'</td>';
+echo '</tr><tr>';
+echo '<td><strong>Search Warrant Expiry Date</strong></td><td>'.$exhibit_report_sw_date.'</td>';
+echo '</tr><tr>';
+echo '<td><strong>CSER Primary Investigator</strong></td><td>'.$exhibit_report_assigned_member.'</td>';
+echo '</tr><tr>';
+echo '<td><strong>Member(s) Assigned</strong></td><td>';
+
+			$mymemberselect = "select distinct(exhibit_assigned_to) from exhibit where exhibit_report_id = '$erid'";
+		    $mymemberquery = mysql_query($mymemberselect);
+			while ($mymember = mysql_fetch_array($mymemberquery)) {
+				if ($mymember["exhibit_assigned_to"] == '0') {
+					
+				} else {
+					echo $member->get_value("member_login", $mymember["exhibit_assigned_to"]);
+					echo '<br>';
+				}
+			}
+
+echo '</td>';
+echo '</tr><tr>';
+echo '<td><strong>Priority</strong></td><td colspan="3">'.$exhibit_report_priority.'</td>';
+echo '</tr><tr>';
+$exhibit_report_task = nl2br($exhibit_report_task);
+echo '<td><strong>Task/Instructions</strong></td><td colspan="3">'.$exhibit_report_task.'</td>';
+echo '</tr><tr>';
+$exhibit_report_action = nl2br($exhibit_report_action);
+echo '<td><strong>Action Taken / Objectives Achieved</strong></td><td colspan="3">'.$exhibit_report_action.'</td>';
+echo '</tr><tr>';
+$exhibit_report_issues = nl2br($exhibit_report_issues);
+echo '<td><strong>Issues</td><td colspan="3">'.$exhibit_report_issues.'</td>';
+echo '</tr><tr>';
+$exhibit_report_resolutions = nl2br($exhibit_report_resolutions);
+echo '<td><strong>Resolutions</strong></td><td colspan="3">'.$exhibit_report_resolutions.'</td>';
+echo '</tr><tr>';
+$exhibit_report_misc_comments = nl2br($exhibit_report_misc_comments);
+echo '<td><strong>Misc. Comments</strong></td><td colspan="3">'.$exhibit_report_misc_comments.'</td>';
+echo '</tr>';
+echo '<tr>';
+//echo '<tr>';
+//echo '<td><strong>Status:</strong></td><td>'.$exhibit_report_status.'</td>';
+//echo '</tr>';
+echo '</table>';
+
+echo '<span class="sEnterInfo"><i>Entered by: <b>'.$exhibit_report_entry_member.'</b> on '.$exhibit_report_entry_date.'.</i></span>';
+echo '</div><br>';
+
+include('./exhibit_report/exhibit_report_status_info_table.php');
+
+$files = new files();
+$files->show_exhibit_report_files($erid);
+
+
+?>

@@ -1,0 +1,71 @@
+<?php
+//include('./include/case_info.php');
+//include('./include/investigative_unit.php');
+//include('./include/initiative.php');
+//include('./include/exhibit_report.php');
+//include('./include/exhibit_report_priority.php');
+//include('./include/member.php');
+
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+$exhibit_report = new exhibit_report();
+$exhibit_report_status = new exhibit_report_status();
+
+$member = new member();
+
+if (isset($erid)) {
+	$exhibit_report_status_id = $exhibit_report_status->get_report_status_id($erid);
+	$exhibit_report_status_analysis_start_date = $exhibit_report_status->get_value("exhibit_report_status_analysis_start_date", $exhibit_report_status_id);
+	$exhibit_report_status_analysis_end_date = $exhibit_report_status->get_value("exhibit_report_status_analysis_end_date", $exhibit_report_status_id);
+	$exhibit_report_status_forward_date = $exhibit_report_status->get_value("exhibit_report_status_forward_date", $exhibit_report_status_id);
+	$exhibit_report_status_close_date = $exhibit_report_status->get_value("exhibit_report_status_close_date", $exhibit_report_status_id);
+	$exhibit_report_status_case_status = $exhibit_report_status->get_value("exhibit_report_status_case_status", $exhibit_report_status_id);
+	$exhibit_report_status_unanalyzed = $exhibit_report_status->get_value("exhibit_report_status_unanalyzed", $exhibit_report_status_id);
+
+	echo '<div><br><hr><br>';
+	echo '<label for="exhibit_report_status_analysis_start_date">Analysis Start Date:</label>';
+	echo '<input type="text" name="exhibit_report_status_analysis_start_date"  id="exhibit_report_status_analysis_start_date"  readonly value="';
+	if (isset($exhibit_report_status_analysis_start_date)) echo $exhibit_report_status_analysis_start_date;
+	echo '">';
+
+	echo '<label for="exhibit_report_status_analysis_end_date">Analysis End Date:</label>';
+	echo '<input type="text" name="exhibit_report_status_analysis_end_date"  id="exhibit_report_status_analysis_end_date"  readonly value="';
+	if (isset($exhibit_report_status_analysis_end_date)) echo $exhibit_report_status_analysis_end_date;
+	echo '">';
+
+	echo '<label for="exhibit_report_status_forward_date">Report Forward Date:</label>';
+	echo '<input type="text" name="exhibit_report_status_forward_date"  id="exhibit_report_status_forward_date"  readonly value="';
+	if (isset($exhibit_report_status_forward_date)) echo $exhibit_report_status_forward_date;
+	echo '">';
+
+	echo '<label for="exhibit_report_status_close_date">Report Close Date:</label>';
+	echo '<input type="text" name="exhibit_report_status_close_date"  id="exhibit_report_status_close_date"  readonly value="';
+	if (isset($exhibit_report_status_close_date)) echo $exhibit_report_status_close_date;
+	echo '">';
+
+	echo '<label for="exhibit_report_status_unanalyzed">Unanalyzed:</label>';
+	echo '<select name="exhibit_report_status_unanalyzed">';
+	echo '<option value="1" ';
+	if ($exhibit_report_status_unanalyzed == "1") echo 'selected';
+	echo '>Yes';
+	echo '<option value="0" ';
+	if ($exhibit_report_status_unanalyzed == "0") echo 'selected';
+	echo '>No';
+	echo '</select>';
+	
+	echo '<label for="exhibit_report_status_case_status">Report Status:</label>';
+	echo '<select name="exhibit_report_status_case_status"  id="exhibit_report_status_case_status">';
+	echo '<option ';
+	if ($exhibit_report_status_case_status == "Open") echo 'selected';
+	echo '>Open</option>';
+	echo '<option ';
+	if ($exhibit_report_status_case_status == "In Progress") echo 'selected';
+	echo '>In Progress</option>';
+	echo '<option ';
+	if ($exhibit_report_status_case_status == "Close") echo 'selected';
+	echo '>Close</option>';
+	echo '</select>';
+	echo '</div>';
+
+}
+?>

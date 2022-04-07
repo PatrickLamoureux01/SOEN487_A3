@@ -1,0 +1,49 @@
+<?php
+
+//include('./include/member.php');
+//include('./include/member_privilege');
+
+$initiative = new initiative();
+
+$mode = "New";
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+
+		$iid = $_POST['iid'];
+		$initiative_name = $initiative->get_value('initiative_name', $iid);
+		$initiative_other = $initiative->get_value('initiative_other', $iid);
+		
+	}
+	
+}
+
+?>
+
+
+  <h2><?php echo $mode; ?> Initiative</h2>
+
+
+<form method="post" action="./initiative/i_processor.php">
+<fieldset class="submitform">
+<label for="initiative_name">Initiative Name</label>
+	<input type="text" name="initiative_name" value="<?php if (isset($initiative_name)) echo $initiative_name; ?>">
+<label for="initiative_other">Description</label>
+	<input type="text" name="initiative_other" value="<?php if (isset($initiative_other)) echo $initiative_other; ?>">
+
+  <?php if ($mode == "Edit") { ?>
+    <input type="hidden" name="mode" value="edit">
+    <input type="hidden" name="iid" value="<?php echo $_POST["iid"]; ?>">
+  	<p><br><label for="Submit"></label>
+    <input type="submit" value="Update Initiative" name="Submit" class="button"/>
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='?cmd=si&iid=<?php echo $iid; ?>'" />
+  <?php } else {?>
+  	<br><br><br><label for="Submit"></label>
+	<input type="submit" value="Add Initiative" class="button">
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='?cmd=di'" />
+  <?php } ?>
+
+</fieldset>
+</form>

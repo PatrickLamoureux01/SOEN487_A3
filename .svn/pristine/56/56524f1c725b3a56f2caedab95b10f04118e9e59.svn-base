@@ -1,0 +1,69 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_report_status.php');
+include('../include/return_status.php');
+include('../include/exhibit_type.php');
+include('../include/exhibit_continuity.php');
+
+$erid = $_POST["erid"];
+$new_case_id = $_POST["new_case_info"];
+
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+$exhibit = new exhibit();
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+  	$_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+  $select = "select case_pros_id, case_caption, case_project_name, case_lead_investigator, case_lead_investigator_email, case_investigative_unit_id from case_info where case_id='$new_case_id'";
+  //echo $select;
+  $query = mysql_query($select);
+  $result = mysql_fetch_row($query);
+  
+  $newprosid = $result[0];
+  $newcasecaption = $result[1];
+  $newcaseprojectname = $result[2];
+  $newcaseleadinvestigator = $result[3];
+  $newcaseleadinvestigatoremail = $result[4];
+  $newcaseinvestigativeunitid = $result[5];
+  // case_pros_id
+  
+  $update = "update exhibit_report set exhibit_report_pros = '$newprosid', exhibit_report_caption = '$newcasecaption',
+   	exhibit_report_investigative_unit = '$newcaseinvestigativeunitid', exhibit_report_investigator = '$newcaseleadinvestigator',
+   	exhibit_report_investigator_email = '$newcaseleadinvestigatoremail', exhibit_report_project_name = '$newcaseprojectname', exhibit_report_case_id = '$new_case_id' where exhibit_report_id='$erid'";
+//echo $update;
+  $result = mysql_query($update);
+  
+  
+  echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=ers&id='.$new_case_id.'&erid='.$erid.'">';
+
+?>

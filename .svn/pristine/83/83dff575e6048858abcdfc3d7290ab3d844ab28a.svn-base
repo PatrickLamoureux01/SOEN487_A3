@@ -1,0 +1,95 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+// 
+// Description:
+
+$dbtype = "";
+
+$member = new member();
+if (isset($_GET["tk"])) {
+	$dbtype = $_GET["tk"];
+}
+switch ($dbtype) {
+
+	case "all":
+		$mylist = $member->list_member();
+		for ($i=0; $i < count($mylist); $i++) {
+			echo '<hr>';
+			$userid = $mylist[$i][0];
+			$select = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_assigned_member, exhibit_report_intake_date, exhibit_report_sw_date, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_pros = case_pros_id and exhibit_report_id in (select distinct(exhibit_report.exhibit_report_id) from exhibit_report, exhibit  where exhibit_assigned_to = '$userid' and exhibit_report.exhibit_report_id = exhibit.exhibit_report_id order by exhibit_report_status, exhibit_report_intake_date asc)";
+			$query = mysql_query($select);
+			$username = $member->get_value('member_login', $userid);
+			generate_tcu_dashboard($query, $username);
+			echo '<hr>';
+			$select2 = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date, exhibit_report_sw_date,exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_assigned_member = '$userid' and exhibit_report_pros = case_pros_id and exhibit_report_id NOT IN (select exhibit_report_id from exhibit) order by exhibit_report_status, exhibit_report_intake_date asc";
+			$query2 = mysql_query($select2);
+			generate_tcu_no_exhibit_dashboard($query2, $username);
+			echo '<p>';
+		}
+		break;
+
+	case "me":
+
+		$userid = $_SESSION["mid"];
+		$select = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date, exhibit_report_sw_date, exhibit_report_assigned_member, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_pros = case_pros_id and exhibit_report_id in (select distinct(exhibit_report.exhibit_report_id) from exhibit_report, exhibit  where exhibit_assigned_to = '$userid' and exhibit_report.exhibit_report_id = exhibit.exhibit_report_id order by exhibit_report_status, exhibit_report_intake_date asc)";
+		$query = mysql_query($select);
+		$username = $member->get_value('member_login', $_SESSION["mid"]);
+		generate_tcu_dashboard($query, $username);
+		echo '<hr>';
+		$select2 = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date,exhibit_report_sw_date, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit from exhibit_report, case_info where exhibit_report_assigned_member = '$userid' and exhibit_report_pros = case_pros_id and exhibit_report_id NOT IN (select exhibit_report_id from exhibit) order by exhibit_report_status, exhibit_report_intake_date asc";
+		$query2 = mysql_query($select2);
+		generate_tcu_no_exhibit_dashboard($query2, $username);
+		break;
+
+	case "nobody":
+
+		$select = "select case_id, exhibit_report_id,exhibit_report_task, exhibit_report_intake_date, exhibit_report_sw_date, exhibit_report_assigned_member, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info  where exhibit_report_assigned_member = '' and exhibit_report_pros = case_pros_id order by exhibit_report_status, exhibit_report_intake_date asc";
+		$query = mysql_query($select);
+		generate_tcu_dashboard($query,"");
+		echo '<hr>';
+		$select2 = "select case_id, exhibit_report_id,exhibit_report_task, exhibit_report_intake_date,exhibit_report_sw_date, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_assigned_member = '$userid' and exhibit_report_pros = case_pros_id and exhibit_report_id NOT IN (select exhibit_report_id from exhibit) order by exhibit_report_status, exhibit_report_intake_date asc";
+		$query2 = mysql_query($select2);
+		generate_tcu_no_exhibit_dashboard($query2, "");
+		
+		echo '<p>';
+		
+		break;
+
+	default:
+
+		$userid = $_SESSION["mid"];
+
+		$select = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date, exhibit_report_sw_date, exhibit_report_assigned_member, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_pros = case_pros_id and exhibit_report_id in (select distinct(exhibit_report.exhibit_report_id) from exhibit_report, exhibit  where exhibit_assigned_to = '$userid' and exhibit_report.exhibit_report_id = exhibit.exhibit_report_id order by exhibit_report_status, exhibit_report_intake_date asc)";
+		$query = mysql_query($select);
+		$username = $member->get_value('member_login', $_SESSION["mid"]);
+		generate_tcu_dashboard($query, $username);
+		echo '<hr>';
+		$select2 = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date, exhibit_report_sw_date,exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_assigned_member = '$userid' and exhibit_report_pros = case_pros_id and exhibit_report_id NOT IN (select exhibit_report_id from exhibit) order by exhibit_report_status, exhibit_report_intake_date asc";
+		$query2 = mysql_query($select2);
+		generate_tcu_no_exhibit_dashboard($query2, $username);
+		echo '<p>';
+		echo '<hr>';
+//		$select = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_number,exhibit_report_sw_date, exhibit_report_intake_date, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit from exhibit_report, case_info  where exhibit_report_assigned_member = '' and exhibit_report_pros = case_pros_id order by exhibit_report_intake_date asc";
+		$select = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date, exhibit_report_sw_date, exhibit_report_assigned_member, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_investigator, exhibit_report_investigative_unit, exhibit_report_status from exhibit_report, case_info where exhibit_report_pros = case_pros_id and exhibit_report_id in (select distinct(exhibit_report.exhibit_report_id) from exhibit_report, exhibit  where exhibit_assigned_to = '' and exhibit_report.exhibit_report_id = exhibit.exhibit_report_id order by exhibit_report_status, exhibit_report_intake_date asc) order by exhibit_report_id";
+
+		$query = mysql_query($select);
+		generate_tcu_dashboard($query,"");
+		echo '<hr>';
+		$select2 = "select case_id, exhibit_report_id, exhibit_report_task,exhibit_report_intake_date,exhibit_report_sw_date, exhibit_report_number, exhibit_report_pros, exhibit_report_caption, exhibit_report_assigned_member, exhibit_report_investigator, exhibit_report_investigative_unit from exhibit_report, case_info where exhibit_report_assigned_member = '' and exhibit_report_pros = case_pros_id and exhibit_report_id NOT IN (select exhibit_report_id from exhibit) order by exhibit_report_id asc";
+		$query2 = mysql_query($select2);
+		generate_tcu_no_exhibit_dashboard($query2, "");
+//		echo '<p>';
+		break;
+}
+
+
+// Show nobody
+
+
+?>
+

@@ -1,0 +1,48 @@
+<?php
+//include('../include/common.php');
+//include('../include/config.inc');
+//include('../include/db.php');
+//	session_start();
+$i=0;
+//	$q = $_GET["q"];
+//	if (strlen($q) != "0") {
+
+//	$q = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $q);
+//echo $q;
+/*$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+*/
+//$mylist[0][0] = null;
+$select = "select case_id, case_pros_id, case_caption, case_lead_investigator, investigative_unit_name
+				from case_info, investigative_unit 
+				where investigative_unit_id = case_investigative_unit_id order by case_pros_id asc";
+//	echo $select;
+
+$query = mysql_query($select);
+
+// insert style sheet here
+if (mysql_num_rows($query) > 0) {
+	echo '<h2>Case #\'s</h2>';
+	echo '<table width="100%" id="PROSNum">';
+	echo '<tr>';
+	echo '<th style="width:110px">Case #</th>';
+	echo '<th>Caption</th>';
+	echo '<th>Investigator</th>';
+	echo '<th>Investigative Team</th>';
+	echo '</tr>';
+	while ($fetch = mysql_fetch_array($query)) {
+		echo '<tr>';
+		echo '<td><a href="./index.php?cmd=cs&id='.$fetch["case_id"].'">'.$fetch["case_pros_id"].'</a></td>';
+		echo '<td>'.$fetch["case_caption"].'</td>';
+		echo '<td>'.$fetch["case_lead_investigator"].'</td>';
+		echo '<td>'.$fetch["investigative_unit_name"].'</td>';
+		echo '<tr>';
+	}
+	echo '</table>';
+
+}
+//}
+//echo ($mylist[0][0]);
+
+?>

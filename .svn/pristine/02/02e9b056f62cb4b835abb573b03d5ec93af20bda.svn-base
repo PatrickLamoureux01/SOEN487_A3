@@ -1,0 +1,50 @@
+<?php
+//include('./include/case_info.php');
+//include('./include/investigative_unit.php');
+//include('./include/initiative.php');
+//include('./include/exhibit_report_priority.php');
+
+$case_info = new case_info();
+$member = new member();
+$iu = new investigative_unit();
+$au = new initiative();
+$investigative_unit_name = $iu->get_value("investigative_unit_name", $case_info->get_value("case_investigative_unit_id", $case_id));
+$initiative_name = $au->get_value("initiative_name", $case_info->get_value("case_initiative_id", $case_id));
+$member_id = $case_info->get_value("case_entry_member_login", $case_id);
+$member_login = $member->get_value("member_login", $member_id);
+$entry_date = $case_info->get_value("case_entered_date", $case_id);
+
+
+echo '<h2>Case: '.$case_info->get_value("case_pros_id", $case_id).' - '.$case_info->get_value("case_caption", $case_id).'</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submiteditform()">Edit</a> ]</span>';
+
+echo '<form name="edit_case" id="edit_case" method="post" action="./index.php?cmd=ce">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditform()';
+echo '{';
+echo 'document.edit_case.submit()';
+echo '}';
+echo '</script>';
+
+
+echo '<table>';
+echo '<tr>';
+echo '<td><strong>Project Name &nbsp;</strong></td><td>'.$case_info->get_value("case_project_name", $case_id).'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td nowrap><strong>Lead Investigator &nbsp;</strong></td><td>'.$case_info->get_value("case_lead_investigator", $case_id).'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Investigative Team</strong></td><td>'.$investigative_unit_name.'</td>';
+echo '</tr>';
+echo '<td><strong>Case Memo</strong></td><td>'.$case_info->get_value("case_memo", $case_id).'</td>';
+echo '</tr>';
+echo '</table>';
+echo '<span class="sEnterInfo"><i>Entered by: <b>'.$member_login.'</b> on '.$entry_date.'.</i></span>';
+echo '</div><br>';
+
+?>

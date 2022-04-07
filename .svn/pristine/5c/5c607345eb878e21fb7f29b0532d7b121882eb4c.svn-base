@@ -1,0 +1,168 @@
+<?php
+//include('./include/case_info.php');
+//include('./include/investigative_unit.php');
+//include('./include/initiative.php');
+//include('./include/exhibit_report_priority.php');
+
+
+if ((isset($_GET["eid"])) && (isset($_GET["erid"])))
+{
+	$exhibit_id = $_GET["eid"];
+	$erid = $_GET["erid"];
+} else {
+
+	$erid = $_GET["erid"];
+}
+
+$exhibit = new exhibit();
+$member = new member();
+$exhibit_type = new exhibit_type();
+$exhibit_location = new exhibit_location();
+$exhibit_report = new exhibit_report();
+
+$alldetaillist = $exhibit->list_exhibit_id_by_report_id($erid);
+
+//echo count($mylist);
+for ($z=0; $z < count($alldetaillist); $z++) {
+	$exhibit_id = $alldetaillist[$z][0];
+
+
+$exhibit_report_id = $exhibit->get_value("exhibit_report_id", $exhibit_id);
+$exhibit_item_id = $exhibit->get_value("exhibit_item_id", $exhibit_id);
+$exhibit_date = $exhibit->get_value("exhibit_date", $exhibit_id);
+$exhibit_type_id = $exhibit->get_value("exhibit_type", $exhibit_id);
+$exhibit_make = $exhibit->get_value("exhibit_make", $exhibit_id);
+$exhibit_model = $exhibit->get_value("exhibit_model", $exhibit_id);
+$exhibit_serial = $exhibit->get_value("exhibit_serial", $exhibit_id);
+$exhibit_location_id = $exhibit->get_value("exhibit_location", $exhibit_id);
+$exhibit_condition = $exhibit->get_value("exhibit_condition", $exhibit_id);
+$exhibit_original_item = $exhibit->get_value("exhibit_original_item", $exhibit_id);
+$exhibit_status_id = $exhibit->get_value("exhibit_status", $exhibit_id);
+$exhibit_status_member = $exhibit->get_value("exhibit_status_member", $exhibit_id);
+$exhibit_status_date = $exhibit->get_value("exhibit_status_date", $exhibit_id);
+$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_report_id);
+$exhibit_released_to = $exhibit->get_value("exhibit_released_to", $exhibit_id);
+$exhibit_assigned_to = $exhibit->get_value("exhibit_assigned_to", $exhibit_id);
+$item_num = add_zero_as_placeholder("3", $exhibit_item_id);
+$exhibit_number = $exhibit_report_num."-".$item_num;
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+
+echo '<br><h2>Exhibit Item: '.$exhibit_number.'</h2>';
+
+
+$exhibit_type = new exhibit_type();
+$exhibit_location = new exhibit_location();
+$exhibit_report = new exhibit_report();
+$exhibit_status_type = new exhibit_status_type();
+
+
+
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <!-- <a href="javascript: submit_edit_exhibit_'.$exhibit_id.'_form()">Edit</a> &nbsp;|&nbsp; --><a href="./index.php?cmd=ers&id='.$case_id.'&erid='.$erid.'">Exhibit List</a> ]</span>';
+
+
+echo '<table style="width:100%">';
+//echo '<tr>';
+//echo '<td><strong>Exhibit Entry Date</strong></td><td>'.$exhibit_date.'</td>';
+//echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Original Reference</strong></td><td>'.$exhibit_original_item.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Exhibit Type</strong></td><td>'.$exhibit_type->get_value("exhibit_type_name", $exhibit_type_id).'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Make</strong></td><td>'.$exhibit_make.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Model</strong></td><td>'.$exhibit_model.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Serial</strong></td><td>'.$exhibit_serial.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Exhibit Status</strong></td><td>'.$exhibit_status_type->get_value("exhibit_status_type_name", $exhibit_status_id).'</td>';
+echo '</tr>';
+if ($return_status_id == $exhibit_status_id) {
+echo '<tr>';
+echo '<td><strong>Released to</strong></td><td>'.$exhibit_released_to.'</td>';
+echo '</tr>';
+} else {
+echo '<tr>';
+echo '<td><strong>Location</strong></td><td>'.$exhibit_location->get_value("exhibit_location_name", $exhibit_location_id).'</td>';
+echo '</tr>';
+}
+echo '<tr>';
+echo '<td><strong>Status Date</strong></td><td>'.$exhibit_status_date.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Status updated by</strong></td><td>'.$member->get_value("member_login", $exhibit_status_member).'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Exhibit Assigned to</strong></td><td>'.$member->get_value("member_login", $exhibit_assigned_to).'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Condition</strong></td><td>'.$exhibit_condition.'</td>';
+echo '</tr>';
+
+$system_log = new exhibit_continuity();
+$mylist = $system_log->list_exhibit_continuity($exhibit_id);
+$listexist = $system_log->list_exist($exhibit_id);
+?>
+<td style="vertical-align: top"><strong>Exhibit Continuity</strong></td>
+<td><?php 
+
+if ($listexist == true) {
+	echo '<p style="font-family:Arial; font-size: 10px">';
+	for($i=0; $i < count($mylist); $i++) {
+		$datetime = $mylist[$i][1];
+		$status_member = $member->get_value("member_login", $mylist[$i][4]);
+		$continuity_status = $exhibit_status_type->get_value("exhibit_status_type_name", $mylist[$i][2]);
+		$continuity_location = $exhibit_location->get_value("exhibit_location_name", $mylist[$i][5]);
+		$continuity_released_to = $mylist[$i][8];
+		$return_status = new $return_status();
+		$return_status_id = $return_status->get_return_status();
+		if ($mylist[$i][2] == $return_status_id) {
+		echo $status_member.' updated the exhibit status to '.$continuity_status.' and Exhibit is released to '.$continuity_released_to.' on '.$datetime;
+		} else {
+		echo $status_member.' updated the exhibit status to '.$continuity_status.' and Location to '.$continuity_location.' on '.$datetime;
+		}
+		echo "<br>";
+	}
+} else {
+
+	echo 'No Continuity Report Found';
+}
+
+?></td>
+<?php
+
+
+
+
+echo '</tr>';
+
+
+
+echo '</table>';
+echo '</div><br>';
+$files = new files();
+$files->show_exhibit_files($exhibit_id);
+
+echo '<form name="edit_exhibit" id="edit_exhibit" method="post" action="./index.php?cmd=ee">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<input type="hidden" name="case_id" value="'.$_GET["id"].'">';
+echo '<input type="hidden" name="exhibit_report_id" value="'.$erid.'">';
+echo '<input type="hidden" name="exhibit_id" value="'.$exhibit_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submit_edit_exhibit_'.$exhibit_id.'_form()';
+echo '{';
+echo 'document.edit_exhibit.submit()';
+echo '}';
+echo '</script>';
+}
+
+?>

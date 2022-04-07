@@ -1,0 +1,173 @@
+<?php
+//include('./include/exhibit.php');
+
+$erid = $_GET["erid"];
+$exhibit = new exhibit();
+$exhibit_list = $exhibit->list_exhibit_by_report_id($erid);
+$number_of_rows = $exhibit->number_of_rows("exhibit_report_id", $erid);
+$member = new member();
+
+
+
+//echo '<div >';
+
+//echo '<a href="javascript: submitform()">Add Exhibit</a> ';
+
+echo '<form name="create_exhibit" method="post" action="./index.php?cmd=ec">';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<input type="hidden" name="prosnum" value="'.$case_info->get_value("case_pros_id", $case_id).'">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submitform()';
+echo '{';
+echo 'document.create_exhibit.submit()';
+echo '}';
+echo '</script>';
+
+echo '<form name="return_exhibit" method="post" action="./index.php?cmd=re">';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<input type="hidden" name="prosnum" value="'.$case_info->get_value("case_pros_id", $case_id).'">';
+echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submitreturnform()';
+echo '{';
+echo 'document.return_exhibit.submit()';
+echo '}';
+echo '</script>';
+
+
+echo "<br><h2>Exhibit(s)</h2>";
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ ';
+//echo '<hr style="margin:-11px 0px 8px 0px;" size=1><span class="sAddExRep">';
+
+if ($number_of_rows > 0) {
+	echo ' <a href="javascript: submitreturnform()">Print / Return Exhibit(s)</a>';
+	echo ' | ';
+}
+echo ' <a href="javascript: submitform()">Add Exhibit</a> ';
+if ($number_of_rows > 0) {
+	echo ' | <a href="./index.php?cmd=esad&id='.$case_id.'&erid='.$erid.'">Show All Exhibit Details</a> ';
+}
+echo ']';
+echo '</span>';
+
+
+if ($number_of_rows < 1) {
+	echo '<p>No Exhibit(s) were found in the system for this Exhibit Report.</p>';
+} else {
+
+	$exhibit_type = new exhibit_type();
+	$exhibit_location = new exhibit_location();
+	$exhibit_report = new exhibit_report();
+	$to_tcb = new to_tcb();
+	$to_tcb_id = $to_tcb->get_to_tcb();
+
+	echo '<table width="100%" id="PROSNum">';
+	//echo '<tr><th>CSER Exhibit #</th><th>PE#</th><th>Type</th><th>Make</th><th>Model</th><th>Serial</th><th>Location</th><th>Condition</th><th></th></tr>';
+	echo '<tr><th>CSER Exhibit #</th><th>Description</th><th>Status</th><th>Location/Release to</th><th>Assigned To</th><th>Action</th><!--th><span class="print">Item Returned</span></th--></tr>';
+	for ($i=0; $i < count($exhibit_list); $i++) {
+
+		$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_list[$i][1]);
+		$item_num = add_zero_as_placeholder("3", $exhibit_list[$i][2]);
+		$exhibit_number = $exhibit_report_num."-".$item_num;
+		$exhibit_original_item = $exhibit_list[$i][12];
+		$exhibit_status_type = new exhibit_status_type();
+
+		echo '<tr>';
+		echo '<td nowrap>';
+		echo '<a href="./index.php?cmd=es&id='.$_GET["id"].'&erid='.$erid.'&eid='.$exhibit_list[$i][0].'">';
+		echo $exhibit_number;
+		echo '</a>';
+		echo '</td>';
+		echo '<td>Original Item #: ';
+		echo $exhibit_original_item;
+		echo '<br>';
+		echo 'Type: ';
+		echo $exhibit_type->get_value("exhibit_type_name", $exhibit_list[$i][4]);
+		echo '<br>';
+		echo 'Make: ';
+		echo $exhibit_list[$i][6];
+		echo '<br>';
+		echo 'Model: ';
+		echo $exhibit_list[$i][7];
+		echo '<br>';
+		echo 'Serial: ';
+		echo $exhibit_list[$i][8];
+		echo '<br>';
+		echo '<td>';
+		echo $exhibit_status_type->get_value("exhibit_status_type_name", $exhibit_list[$i][13]);
+		echo '</td>';
+		
+		$return_status = new return_status();
+		$return_status_id = $return_status->get_return_status();
+		if ($return_status_id == $exhibit_list[$i][13]) {
+		echo '<td>';
+		echo $exhibit_list[$i][19];
+		echo '</td>';
+			
+		} else {
+		echo '<td>';
+		echo $exhibit_location->get_value("exhibit_location_name", $exhibit_list[$i][9]);
+		echo '</td>';
+		}
+		echo '<td>';
+		echo $member->get_value("member_login", $exhibit_list[$i][20]);
+//		$exhibit_continuity = new exhibit_continuity();
+//		$been_to_tcb = $exhibit_continuity->been_to_tcb($exhibit_list[$i][0], $to_tcb_id);
+//		if ($been_to_tcb == true) {
+//			echo "Yes";
+//		} else {
+//			echo "No";
+//		}
+		echo '</td>';
+		
+		echo '<td>';
+		
+		echo '<form action="./index.php?cmd=moe" method="POST">';
+		echo '<input type="submit" name="Move" class="actionbuttons" value="Move Items">';
+		echo '<input type="hidden" name="erid" value="'.$erid.'">';
+		echo '</form>';
+		echo '<form method="post" action="./index.php?cmd=re">';
+		echo '<input type="submit" name="Return" class="actionbuttons" value="Print/Return Items">';
+		echo '<input type="hidden" name="erid" value="'.$erid.'">';
+		echo '<input type="hidden" name="prosnum" value="'.$case_info->get_value("case_pros_id", $case_id).'">';
+		echo '<input type="hidden" name="case_id" value="'.$case_id.'">';
+		echo '</form>';
+		echo '<form action="./index.php?cmd=ase" method="POST">';
+		echo '<input type="submit" name="Assign" class="actionbuttons" value="Assign Exhibits To">';
+		echo '<input type="hidden" name="erid" value="'.$erid.'">';
+		echo '</form>';
+		
+		echo '</td>';
+		//		echo '<td>';
+		//		echo $exhibit_list[$i][10];
+		//		echo '</td>';
+		/*		echo '<td nowrap>';
+		echo '[ <a href="javascript: submit_'.$exhibit_list[$i][0].'_editform()">Edit</a> ]';
+		echo '</td>';
+		echo '</tr>';
+		echo '<form name="edit_exhibit_'.$exhibit_list[$i][0].'" id="edit_exhibit_'.$exhibit_list[$i][0].'" method="post" action="index.php?cmd=ee">';
+		echo '<input type="hidden" name="mode" value="edit">';
+		echo '<input type="hidden" name="erid" value="'.$erid.'">';
+		echo '<input type="hidden" name="case_id" value="'.$_GET["id"].'">';
+		echo '<input type="hidden" name="exhibit_report_id" value="'.$erid.'">';
+		echo '<input type="hidden" name="exhibit_id" value="'.$exhibit_list[$i][0].'">';
+		echo '</form>';
+		echo '<script type="text/javascript">';
+		echo 'function submit_'.$exhibit_list[$i][0].'_editform()';
+		echo '{';
+		echo 'document.edit_exhibit_'.$exhibit_list[$i][0].'.submit()';
+		echo '}';
+		echo '</script>';
+		*/
+	}
+	echo '</table>';
+	//echo '</div>';
+
+}
+  echo '</div>';
+include('./printSignature.php');
+?>

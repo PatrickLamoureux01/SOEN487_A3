@@ -1,0 +1,143 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_location {
+
+	function exhibit_location() {
+
+	}
+
+
+	function insert_exhibit_location($value, $desc) {
+
+		$select = "select * from exhibit_location where exhibit_location_name = '$value'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into exhibit_location(exhibit_location_name, exhibit_location_other) values ('$value', '$desc')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_exhibit_location()');
+		} else {
+		//	echo 'Duplicate Existed';
+		}
+	}
+
+	function delete_exhibit_location($id) {
+
+		$select = "update exhibit_location set delete_flag='1' where exhibit_location_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit_location()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit_location set ".$tbl_col."='$value' where exhibit_location_id='$rowid'";
+	//	// echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','exhibit location set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit_location where exhibit_location_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','exhibit location get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+
+	function list_exhibit_location() {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_location";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_location()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+
+	function location_empty_or_not($location_id, $erid) {
+
+		
+		
+	}
+	
+	
+	function generate_exhibit_location($select_name) {
+		$select = "select exhibit_location_id, exhibit_location_name from exhibit_location order by exhibit_location_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		echo '<select name="'.$select_name.'" id="'.$select_name.'">';
+		echo '<option> </option>';
+		while ($result = mysql_fetch_array($query)) {
+			echo '<option value="'.$result[0].'">';
+			echo $result[1];
+			echo ' - ';
+			$select2 = "select distinct(exhibit_report_id) from exhibit where exhibit_location = '$result[0]'";
+			$query2 = mysql_query($select2);
+			while ($result2 = mysql_fetch_array($query2)) {
+				$select3 = "select exhibit_report_number from exhibit_report where exhibit_report_id = '$result2[0]'";
+				$query3 = mysql_query($select3);
+				$result3 = mysql_fetch_row($query3);
+				echo '[ '.$result3[0].' ]';
+				
+			}
+			echo '</option>';
+		}
+		echo '</select>';
+//		$mylist = fetch_results_to_list($query);
+//		generate_cmb_box($select_name, $mylist);
+	}
+
+	function generate_exhibit_location_select($select_name, $id) {
+		
+		$select = "select exhibit_location_id, exhibit_location_name from exhibit_location order by exhibit_location_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box_select()');
+		echo '<select name="'.$select_name.'" id="'.$select_name.'">';
+		echo '<option> </option>';
+		while ($result = mysql_fetch_array($query)) {
+			echo '<option value="'.$result[0].'"';
+			if ($result[0] == $id) echo 'selected';
+			echo '>';
+			echo $result[1];
+			echo ' - ';
+			$select2 = "select distinct(exhibit_report_id) from exhibit where exhibit_location = '$result[0]'";
+			$query2 = mysql_query($select2);
+			while ($result2 = mysql_fetch_array($query2)) {
+				$select3 = "select exhibit_report_number from exhibit_report where exhibit_report_id = '$result2[0]'";
+				$query3 = mysql_query($select3);
+				$result3 = mysql_fetch_row($query3);
+				echo '[ '.$result3[0].' ]';
+
+			}
+			echo '</option>';
+		}
+		echo '</select>';
+		
+//		$mylist = fetch_results_to_list($query);
+//		generate_cmb_box_select($select_name, $mylist, $id);
+	}
+
+	}
+?>

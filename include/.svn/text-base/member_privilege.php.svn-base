@@ -1,0 +1,92 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class member_privilege {
+
+
+	function member_privilege() {
+
+
+	}
+
+
+	function insert_member_privilege($value,$desc) {
+
+		$select = "select * from member_privilege where member_privilege_value='$value'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','insert_member_privilege()');
+		if (mysql_num_rows($query) == 0) {
+			$select = "insert into member_privilege(member_privilege_value, member_privilege_description) values ('$value','$desc')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_member_privilege()');
+		} else {
+			//echo 'Duplicate Existed';
+		}
+
+	}
+
+
+	function delete_member_privilege($rowid) {
+
+		$select = "update member_privilege set delete_flag='1' where member_privilege_id='$rowid'";
+		$query = exec_to_system_log($select);
+		if (!$query) c_error('3', 'delete_member_privilege()');
+
+	}
+
+
+
+    function update_member_privilege($tbl_col, $value, $rowid) {
+
+        $select = "update member_privilege set ".$tbl_col."='$value' where member_privilege_id='$rowid'";
+        //echo $select;
+        $query = exec_to_system_log($select);
+        if (!$query) c_error('3','update_member_privilege()');
+
+    }
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from member_privilege where member_privilege_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','member privilege get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+    
+	function generate_combo_box($select_name) {
+		
+		$select = "select member_privilege_id, member_privilege_description from member_privilege order by member_privilege_value";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+
+	function generate_combo_box_select($select_name, $id) {
+		
+		$select = "select member_privilege_id, member_privilege_description from member_privilege order by member_privilege_value";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box_select()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+	}
+}
+
+?>

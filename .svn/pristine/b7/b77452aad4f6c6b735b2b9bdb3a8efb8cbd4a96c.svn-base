@@ -1,0 +1,139 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit_report.php');
+include('../include/exhibit.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_report_counter.php');
+include('../include/exhibit_report_status.php');
+
+$case_id = $_POST["case_id"];
+
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+$exhibit_report = new exhibit_report();
+$exhibit_report_counter = new exhibit_report_counter();
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$exhibit_report_number[0] = $_POST["erid"];
+
+	}
+
+} else {
+
+	$exhibit_report_number = $exhibit_report->create_exhibit_report($case_id);
+
+	$next_exhibit_report_number = $exhibit_report_counter->next_exhibit_report_number();
+	$exhibit_report_counter->update_exhibit_report_number_to_current($next_exhibit_report_number);
+	$exhibit_report->set_value("exhibit_report_intake_member", $_POST["exhibit_report_intake_member"] ,$exhibit_report_number[0]);
+	$exhibit_report->set_value("exhibit_report_entry_date", date("Y-m-d H:i:s"),$exhibit_report_number[0]);
+
+}
+$exhibit_report->set_value("exhibit_report_pros", $_POST["exhibit_report_pros"], $exhibit_report_number[0]);
+//$exhibit_report->set_value("exhibit_report_date", $_POST["exhibit_report_entry_date"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_entry_member", $_SESSION["mid"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_caption", $_POST["exhibit_report_caption"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_investigative_unit", $_POST["exhibit_report_investigative_unit"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_investigator", $_POST["exhibit_report_investigator"], $exhibit_report_number[0]);
+
+if (isset($_POST["exhibit_report_investigator_email"])) {
+$exhibit_report->set_value("exhibit_report_investigator_email", $_POST["exhibit_report_investigator_email"], $exhibit_report_number[0]);
+}
+//$exhibit_report->set_value("exhibit_report_initiative", $_POST["exhibit_report_initiative"], $exhibit_report_number[0]);
+
+$assigned_to_check = $exhibit_report->get_value("exhibit_report_assigned_member", $exhibit_report_number[0]);
+//echo $assigned_to_check;
+if ($assigned_to_check == 0) {
+	$exhibit_report->set_value("exhibit_report_assigned_member", $_POST["exhibit_report_assigned_member"], $exhibit_report_number[0]);
+	$exhibit = new exhibit();
+	$exhibit_list = $exhibit->list_exhibit_id_by_report_id($exhibit_report_number[0]);
+	for ($u=0; $u < count($exhibit_list); $u++) {
+//		echo $exhibit_list[$u][0];
+		$exhibit_assigned_check = $exhibit->get_value("exhibit_assigned_to", $exhibit_list[$u][0]);
+		if ($exhibit_assigned_check == 0) {		
+		$exhibit->set_value("exhibit_assigned_to", $_POST["exhibit_report_assigned_member"], $exhibit_list[$u][0]);
+		$exhibit->set_value("exhibit_assigned_date", date("Y-m-d"), $exhibit_list[$u][0]);
+		}
+	}
+	
+} else {
+	$exhibit_report->set_value("exhibit_report_assigned_member", $_POST["exhibit_report_assigned_member"], $exhibit_report_number[0]);
+	
+	
+}
+
+
+$exhibit_report->set_value("exhibit_report_task", $_POST["exhibit_report_task"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_project_name", $_POST["exhibit_report_project_name"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_issues", $_POST["exhibit_report_issues"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_action", $_POST["exhibit_report_action"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_resolutions", $_POST["exhibit_report_resolutions"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_misc_comments", $_POST["exhibit_report_misc_comments"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_intake_member", $_POST["exhibit_report_intake_member"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_intake_date", $_POST["exhibit_report_intake_date"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_sw_date", $_POST["exhibit_report_sw_date"], $exhibit_report_number[0]);
+//$exhibit_report->set_value("exhibit_report_status", $_POST["exhibit_report_status"], $exhibit_report_number[0]);
+$exhibit_report->set_value("exhibit_report_priority", $_POST["exhibit_report_priority"], $exhibit_report_number[0]);
+
+$erid = $exhibit_report_number[0];
+
+
+$exhibit_report_status = new exhibit_report_status();
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		// check if report exist
+		$erexist = $exhibit_report_status->check_report_status_exist($erid);
+		if ($erexist == false) {
+			$exhibit_report_status->insert_exhibit_report_status($erid);
+		}
+		$exhibit_report_status_id = $exhibit_report_status->get_report_status_id($erid);
+
+		$exhibit_report_status->set_value("exhibit_report_status_analysis_start_date", $_POST["exhibit_report_status_analysis_start_date"], $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_analysis_end_date", $_POST["exhibit_report_status_analysis_end_date"], $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_forward_date", $_POST["exhibit_report_status_forward_date"], $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_close_date", $_POST["exhibit_report_status_close_date"], $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_case_status", $_POST["exhibit_report_status_case_status"], $exhibit_report_status_id);
+		$exhibit_report_status->set_value("exhibit_report_status_unanalyzed", $_POST["exhibit_report_status_unanalyzed"], $exhibit_report_status_id);
+		$exhibit_report->set_value("exhibit_report_update_member", $_SESSION["mid"], $exhibit_report_number[0]);
+		$exhibit_report->set_value("exhibit_report_update_date", date("Y-m-d H:i:s"), $exhibit_report_number[0]);
+	}
+
+} else {
+	// create new status report
+	$exhibit_report_status->insert_exhibit_report_status($erid);
+	$exhibit_report_status_id = $exhibit_report_status->get_report_status_id($erid);
+	$exhibit_report_status->set_value("exhibit_report_status_case_status", "Open", $exhibit_report_status_id);
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=ers&id='.$case_id.'&erid='.$erid.'">';
+
+?>

@@ -1,0 +1,99 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_report_priority {
+
+	function exhibit_report_priority() {
+
+	}
+
+
+	function insert_exhibit_report_priority($value) {
+
+		$select = "select * from exhibit_report_priority where exhibit_report_priority_name = '$value'";
+		$query = exec_to_system_log($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into exhibit_report_priority(exhibit_report_priority_name) values ('$value')";
+			$query = mysql_query($select);
+			if (!$query) c_error('3','insert_exhibit_report_priority()');
+		} else {
+			//echo 'Duplicate Existed';
+		}
+	}
+
+	function delete_exhibit_report_priority($id) {
+
+		$select = "update exhibit_report_priority set delete_flag='1' where exhibit_report_priority_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit_report_priority()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit_report_priority set ".$tbl_col."='$value' where exhibit_report_priority_id='$rowid'";
+		//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','assisted unit set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit_report_priority where exhibit_report_priority_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','assisted unit get_value()');
+		$result = mysql_fetch_row($query);
+		return $result[0];
+				
+	}
+
+	function list_exhibit_report_priority() {
+
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_report_priority";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_report_priority()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+
+	function generate_combo_box($select_name) {
+		
+		$select = "select exhibit_report_priority_id, exhibit_report_priority_name from exhibit_report_priority order by exhibit_report_priority_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+	
+	function generate_combo_box_select($select_name, $id) {
+		
+		$select = "select exhibit_report_priority_id, exhibit_report_priority_name from exhibit_report_priority order by exhibit_report_priority_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+	}
+
+}
+?>

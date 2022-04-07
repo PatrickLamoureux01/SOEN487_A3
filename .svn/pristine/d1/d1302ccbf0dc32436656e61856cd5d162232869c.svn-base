@@ -1,0 +1,103 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_continuity.php');
+include('../include/return_status.php');
+
+include('../include/exhibit_type.php');
+$case_id = $_POST["case_id"];
+
+$exhibit_report_id = $_POST["exhibit_report_id"];
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$exhibit = new exhibit();
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$exhibit_number[0] = $_POST["exhibit_id"];
+		$exhibit_number = $exhibit_number[0];
+	}
+} else {
+	$exhibit_number = $exhibit->create_exhibit($exhibit_report_id);
+	$exhibit_number = $exhibit_number[0];
+}
+
+$exhibit->set_value("exhibit_date", $_POST["exhibit_date"], $exhibit_number[0]);
+//if ($_POST["exhibit_other"]) {
+
+//	$exhibit_type = new exhibit_type();
+//	$newexhibitid = $exhibit_type->insert_exhibit_type($_POST["exhibit_other"]);
+//	$exhibit->set_value("exhibit_type", $newexhibitid, $exhibit_number[0]);
+//} else {
+$exhibit->set_value("exhibit_type", $_POST["exhibit_type"], $exhibit_number);
+//}
+$exhibit->set_value("exhibit_make", $_POST["exhibit_make"], $exhibit_number);
+$exhibit->set_value("exhibit_model", $_POST["exhibit_model"], $exhibit_number);
+$exhibit->set_value("exhibit_serial", $_POST["exhibit_serial"], $exhibit_number);
+$exhibit->set_value("exhibit_location", $_POST["exhibit_location"], $exhibit_number);
+$exhibit->set_value("exhibit_condition", $_POST["exhibit_condition"], $exhibit_number);
+$exhibit->set_value("exhibit_date", $_POST["exhibit_date"], $exhibit_number);
+$exhibit->set_value("exhibit_original_item", $_POST["exhibit_original_item"], $exhibit_number);
+//$exhibit->set_value("exhibit_to_tcb", $_POST["exhibit_to_tcb"], $exhibit_number);
+$exhibit->set_value("exhibit_status", $_POST["exhibit_status"], $exhibit_number);
+//$exhibit->set_value("exhibit_to_tcb_date", $_POST["exhibit_to_tcb_date"], $exhibit_number);
+//$exhibit->set_value("exhibit_return_date", $_POST["exhibit_return_date"], $exhibit_number);
+$exhibit->set_value("exhibit_status_date", $_POST["exhibit_status_date"], $exhibit_number);
+$exhibit->set_value("exhibit_status_member", $_POST["exhibit_status_member"], $exhibit_number);
+$exhibit->set_value("exhibit_assigned_to", $_POST["exhibit_assigned_to"], $exhibit_number);
+$exhibit->set_value("exhibit_assigned_date", $_POST["exhibit_assigned_date"], $exhibit_number);
+//echo $return_status_id;
+if ($_POST["exhibit_status"] != $return_status_id) {
+	$exhibit->set_value("exhibit_released_to", "", $exhibit_number);	
+} else {
+	
+	$exhibit->set_value("exhibit_released_to", $_POST["exhibit_released_to"], $exhibit_number);	
+	
+}
+//$exhibit->set_value("exhibit_return_member", $_POST["exhibit_return_member"], $exhibit_number);
+
+$exhibit_continuity = new exhibit_continuity();
+$existornot = $exhibit_continuity->check_last_status($exhibit_number, $_POST["exhibit_status"]);
+$location_change = $exhibit_continuity->check_last_location($exhibit_number, $_POST["exhibit_location"]);
+if (($existornot == false) || ($location_change == false)) {
+	$exhibit_continuity->insert_exhibit_continuity($_POST["exhibit_status_date"], $_POST["exhibit_status"], $exhibit_number, $_POST["exhibit_status_member"], $_POST["exhibit_location"], date("Y-m-d H:m:s"), $_SESSION["mid"], "0", $_POST["exhibit_released_to"]);
+}
+
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=ers&id='.$case_id.'&erid='.$exhibit_report_id.'">';
+
+?>

@@ -1,0 +1,60 @@
+<?php
+
+
+$exhibit_report = new exhibit_report();
+$exhibit_report_list = $exhibit_report->list_exhibit_report();
+
+?>
+<style>
+  select {margin: 0.25em 0.5em 1em 0;width: 20%;border: 1px solid #999;padding: 1px 0 2px 0;background: #FFFFFF;font-family:sans-serif;}
+</style>
+
+<h2>Delete Empty Case Form</h2>
+<?php 
+if (isset($_POST["erid"])) {
+	
+	include('./action/print1625_processor.php');
+	//echo '<br><br><br>';
+	//echo '<a href="?cmd=p1625">Select another Report';
+} else {
+
+?>
+<div class="dCaseInfo">
+ <br>The following Cases does not have any CSER Exhibit Report Associate to it.  Please select the one that you'd like to delete:
+  <br><br>
+  <form action="./delete_empty_case/delete_empty_case_processor.php" method="POST">
+	<?php 
+		$select = "select case_id, case_pros_id, case_caption from case_info where case_id not in (select exhibit_report_case_id from exhibit_report)";
+		$query = mysql_query($select);
+		$rowcount = mysql_num_rows($query);
+		
+		if ($rowcount > 0) {
+		echo '<select name="delete_case_info">';
+		while ($result = mysql_fetch_array($query)) {
+			$result_case_id = $result["case_id"];
+			$result_case_pros_id = $result["case_pros_id"];
+			$result_case_caption = $result["case_caption"];
+		echo '<option value="'.$result_case_id.'">'.$result_case_pros_id.' - '.$result_case_caption;
+		echo '</option>';
+		}
+		echo '</select>';
+
+		?>
+		<br>
+<input type="submit" name="Delete" class="button" value="Delete">
+</form>
+		<?php 
+		} else {
+			
+			echo "No Result(s) found";
+			
+		}
+		
+	
+	
+	?>
+
+</div>
+<?php 
+}
+?>

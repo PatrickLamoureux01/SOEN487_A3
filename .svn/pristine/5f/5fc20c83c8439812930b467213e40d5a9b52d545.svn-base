@@ -1,0 +1,273 @@
+<?php
+
+if (isset($_POST["start_date"])) $start_date = $_POST["start_date"];
+if (isset($_POST["end_date"])) $end_date = $_POST["end_date"];
+
+?>
+
+
+<?php 
+		$login_member_info = new member();
+		$login_member_id = $login_member_info->get_member_id($_SESSION["User"]);
+		$login_member_firstname = $login_member_info->get_value("member_first_name", $login_member_id);
+		$login_member_lastname = $login_member_info->get_value("member_last_name", $login_member_id);
+if (isset($start_date) && isset($end_date)) {
+
+	$select = 'SELECT exhibit_report_id 
+				FROM exhibit_report_status
+				WHERE ((exhibit_report_status_analysis_start_date >= "'.$start_date.'" 
+				AND    exhibit_report_status_analysis_start_date <= "'.$end_date.'") 
+				OR   (exhibit_report_status_analysis_end_date >= "'.$start_date.'" 
+				AND    exhibit_report_status_analysis_end_date <= "'.$end_date.'")
+				OR   (  exhibit_report_status_analysis_end_date = "0000-00-00"
+				AND  exhibit_report_status_analysis_start_date <= "'.$end_date.'"))
+				AND exhibit_report_status_unanalyzed <> "1"
+				and exhibit_report_id in
+					(select distinct exhibit_report_id
+					from exhibit_report
+					where exhibit_report_assigned_member <> "0")';
+	//echo $select;
+	$query = mysql_query($select);
+	echo '<form action="./index.php?cmd=reports&type=8" method="post">';
+	echo '<input type="hidden" name="start_date" value="'.$start_date.'">';
+	echo '<input type="hidden" name="end_date" value="'.$end_date.'">';
+	echo '<table style="width: 750px; border: 1px solid black">';
+	echo '<tr>';
+	echo '<td align="middle" colspan="2"style="width: 750px; border: 1px solid black" >';
+	echo '<h2 align="middle">Bi-weekly Reporting Update</h2>';
+	echo '<h2>'.$department_name.'</h2>';
+	echo '<br>';
+	echo '<h2>Dates Covered from '.$start_date.' to '.$end_date.'</h2>';
+	echo '<br>';
+	echo '</td>';
+	echo '</tr>';
+	echo '<tr style="border: 1px solid black">';
+	echo '<td style="border: 1px solid black">General Summary:';
+	echo '</td>';
+	echo '<td align="left" style="width: 500px; border: 1px solid black; vertical-align: top">';
+	if (!$_POST["savetoprint"]) {
+	echo '<textarea rows="10" cols="500" name="general_summary"></textarea>';
+	} else {
+		$generalsummary = $_POST["general_summary"];
+		echo nl2br(str_replace('\\r\\n', "\r\n", $generalsummary));		
+		echo '<br>';
+		echo '<br>';
+		echo '<br>';
+	}
+	echo '</td>';
+	echo '</tr>';
+	echo '<tr style="border: 1px solid black">';
+	echo '<td style="border: 1px solid black">Training:';
+	echo '</td>';
+	echo '<td align="left" style="width: 500px; border: 1px solid black; vertical-align: top">';
+	if (!$_POST["savetoprint"]) {
+	echo '<textarea rows="10" cols="500" name="training"></textarea>';
+	} else {
+		$training = $_POST["training"];
+		echo nl2br(str_replace('\\r\\n', "\r\n", $training));		
+		echo '<br>';
+		echo '<br>';
+		echo '<br>';
+	}
+	echo '</td>';
+	echo '</tr>';
+	echo '<tr style="border: 1px solid black">';
+	echo '<td style="border: 1px solid black">Unit Specific Initiatives:';
+	echo '</td>';
+	echo '<td align="left" style="width: 500px; border: 1px solid black; vertical-align: top">';
+	if (!$_POST["savetoprint"]) {
+	echo '<textarea rows="10" cols="500" name="initiatives"></textarea>';
+	} else {
+		$initiatives = $_POST["initiatives"];
+		echo nl2br(str_replace('\\r\\n', "\r\n", $initiatives));		
+		echo '<br>';
+		echo '<br>';
+		echo '<br>';
+		}
+	echo '</td>';
+	echo '</tr>';
+	echo '<tr style="border: 1px solid black">';
+	echo '<td align="middle" colspan="2">';
+	echo '<br>';
+	if (!$_POST["savetoprint"]) {
+	echo '<input type="submit" name="savetoprint" value="Print">';
+	} else {
+		echo '<script language="javascript">';
+		echo 'window.print()';
+		echo '</script>';
+		
+	}
+	echo '<br>';
+	echo '<table style="width: 750px; border: 1px solid black">';
+	while ($fetch = mysql_fetch_array($query)) {
+
+	
+		
+		
+		$select1 = 'select exhibit_report_caption, exhibit_report_pros, exhibit_report_investigative_unit,
+						exhibit_report_project_name, exhibit_report_action, exhibit_report_issues, exhibit_report_resolutions,
+						exhibit_report_misc_comments from exhibit_report where exhibit_report_id ="'.$fetch[0].'"';
+//		echo $select1;
+		$query1 = mysql_query($select1);
+		$row = mysql_fetch_row($query1);
+		$filetype = $row[0];
+		
+		$iu_name = new investigative_unit();
+		$exhibit_report = new exhibit_report();
+		$prosnum = $exhibit_report->get_value("exhibit_report_pros", $fetch[0]);
+		$unitsupported = $iu_name->get_value("investigative_unit_name",$row[2]);
+		$filenumber = $row[1];
+		$projectname = $row[3];
+		$actiontaken = $row[4];
+		$issues = $row[5];
+		$resolutions = $row[6];
+		$misc_comments = $row[7];
+		$exhibit_report_number = $exhibit_report->get_value("exhibit_report_number", $fetch[0]);
+		$case_info = new case_info();
+		$case_id = $case_info->get_id_by_pros_num($prosnum);
+		$member_info = new member();
+		$member_id = $exhibit_report->get_value("exhibit_report_assigned_member", $fetch[0]);
+		$member_name = $member_info->get_value("member_login", $member_id);
+
+		
+	echo '<tr class="no-print" style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'CSER Exhibit Report #:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo '<a href="./index.php?cmd=ers&id='.$case_id.'&erid='.$fetch[0].'" target="_blank">'.$exhibit_report_number.'</a>';
+		echo '</td>';
+	echo '</tr>';	
+		
+	echo '<tr class="no-print" style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Who is the Primary:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo $member_name;
+		echo '</td>';
+	echo '</tr>';	
+	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'File Type:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo $filetype;
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Team Supported:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo $unitsupported;
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'File Number:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo $filenumber;
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Project Name:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo $projectname;
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Action Taken Objectives Achieved:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo nl2br($actiontaken);
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Issues:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo nl2br($issues);
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+			echo 'Resolutions:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+				echo nl2br($resolutions);
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr style="border: 1px solid black">';
+		echo '<td style="border: 1px solid black">';
+		echo 'Misc. Comments:';
+		echo '</td>';
+		echo '<td style="border: 1px solid black">';
+		echo nl2br($misc_comments);
+		echo '</td>';
+	echo '</tr>';	
+	echo '<tr>';
+		echo '<td>';
+		echo '&nbsp;';
+		echo '</td>';
+		echo '<td>';
+		echo '&nbsp';
+		echo '</td>';
+	echo '</tr>';			
+	} 
+
+   echo '</table>';
+   echo '</td>';
+	echo '</tr>';
+	echo '</table>';
+	echo '<br><br><br>';
+	
+	echo 'Prepared by: '.$login_member_firstname.' '.$login_member_lastname;
+	echo '<br><br>';
+	echo 'Date: '.date('Y-m-d');
+	echo '<br><br>';
+	echo '<a class="no-print" href="./index.php?cmd=reports&type=8">Start a new Search</a>';
+    echo '&nbsp;';
+	echo '</form>';
+} else {
+
+?>
+<h2>Active Files being worked on by Date Range</h2>
+<i>* Please note that this report will only provide results according to live data.  i.e. Files <b>currently</b> being worked on,
+and files start or end within the date range.  Therefore results will only be as accurate as while the report is being generated.</i>
+<br>
+<br>
+
+<form action="./index.php?cmd=reports&type=8" method="post">
+<table style="width:650px">
+<tr>
+<td style="text-align: right">Start Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px" type="text" name="start_date"  id="start_date" class="w20 flLeft" readonly value="
+	<?php if (isset($start_date)) echo $start_date; ?>
+	">
+</td>
+<td style="text-align: right">End Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px"  type="text" name="end_date"  id="end_date" class="w20 flLeft" readonly value="
+	<?php if (isset($end_date)) echo $end_date; ?>
+	">
+</td>
+
+<td>
+	<input type="submit" name="submit" id="submit" class="button">
+</td>
+</tr>
+</table>
+
+</form>
+<br><br><br><br>
+<?php }?>

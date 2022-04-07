@@ -1,0 +1,87 @@
+<?php 
+
+$member = new member();
+$member_list = $member->list_member();
+$number_of_rows = $member->number_of_rows();
+$member = new member();
+
+
+
+echo '<form name="create_member" method="post" action="./index.php?cmd=ma"></form>';
+echo '<script type="text/javascript">';
+echo 'function submitform(){';
+echo 'document.create_member.submit()';
+echo '}';
+echo '</script>'; 
+
+echo "<h2>Member(s)</h2>";
+echo '<div class="dCaseInfo">';
+echo '<span class="sAddExRep">[ <a href="javascript: submitform()">Add Member</a> ]</span>';
+
+//echo '<div >';
+/*
+echo '<form name="create_member" method="post" action="index.php?cmd=ma">';
+//echo '<a href="javascript: submitform()">Add Exhibit</a> ';
+echo '<hr style="margin:-11px 0px 8px 0px;" size=1><span class="sAddExRep">[ <a href="javascript: submitform()">Add Member</a> ]</span>';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submitform()';
+echo '{';
+echo 'document.create_member.submit()';
+echo '}';
+echo '</script>'; 
+ */
+
+
+
+if ($number_of_rows < 1) {
+	echo '<p>No Member(s) were found in the system.</p>';
+} else {
+	
+
+	echo '<table width="100%" id="PROSNum">';
+    echo '<tr><th>Member Name</th><th>Fist Name</th><th>Last Name</th><!--th>E-mail</th--><th>Privilege</th><th>Last Login</th></tr>';
+	for ($i=0; $i < count($member_list); $i++) {
+	$member_privilege = new member_privilege();
+	$member_id = $member_list[$i][0];
+	$member_login = $member_list[$i][1];
+	$member_first_name = $member_list[$i][5];
+	$member_last_name = $member_list[$i][6];
+	$member_email = $member_list[$i][7];
+	$member_last_login = $member_list[$i][4];
+	$member_privilege_description = $member_privilege->get_value("member_privilege_description", $member_list[$i][8]);
+	
+		
+		echo '<tr>';
+		echo '<td nowrap>';
+		echo '<a href="./index.php?cmd=ms&mid='.$member_id.'">';
+		echo $member_login;
+		echo '</a>';
+    	echo '</td>';
+ 		echo '<td>';
+		echo $member_first_name;
+		echo '</td>';
+		echo '<td>';
+		echo $member_last_name;
+		echo '</td>';
+//		echo '<td>';
+//		echo $member_email;
+//		echo '</td>';
+		echo '<td>';
+		echo $member_privilege_description;
+		echo '</td>';
+		echo '<td>';
+		echo $member_last_login;
+		echo '</td>';
+
+	}
+  echo '</table>';
+  
+}
+
+
+
+echo '</div>';
+
+include('./printSignature.php');
+?>

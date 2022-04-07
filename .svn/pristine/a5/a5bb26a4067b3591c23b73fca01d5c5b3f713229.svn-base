@@ -1,0 +1,394 @@
+<?php
+//$connection = new db();
+//$connection->db_connect($db_host, $db_username, $db_password);
+//$connection->db_select($db_name);
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+if (!$_POST["search_type"]) {
+echo '<form method="post" action="./index.php?cmd=search&stype='.$_GET["stype"].'">';
+
+if (isset($_GET["stype"])) {
+	switch($_GET["stype"]) {
+
+		case "1":
+			echo '<h2>Search by CASE #</h2>';
+			echo '<br>';
+			echo 'Please enter the CASE number and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="hidden" name="search_type" value="bypros">';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "2":
+			echo '<h2>Search by CSER #</h2>';
+			echo '<br>';
+			echo 'Please enter the CSER number and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="hidden" name="search_type" value="bytcu">';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "3":
+			echo '<h2>Search by Exhibit Model</h2>';
+			echo '<br>';
+			echo 'Please enter the Exhibit Model and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="hidden" name="search_type" value="bymodel">';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "4":
+			echo '<h2>Search by Exhibit S/N</h2>';
+			echo '<br>';
+			echo 'Please enter the Exhibit S/N number and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="hidden" name="search_type" value="bysn">';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "5":
+			echo '<h2>Search by CAPTION</h2>';
+			echo '<br>';
+			echo 'Please enter the CAPTION and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="hidden" name="search_type" value="bycaption">';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "6":
+			echo '<h2>Search by Investigator Name</h2>';
+			echo '<br>';
+			echo 'Please enter the Investigator Name and click Search';
+			echo '<br>';
+			echo '<br>';
+			echo '<input type="hidden" name="search_type" value="byinvestigator">';
+			echo '<input type="text" name="search_field" style="width: 150px"> ';
+			echo '<input type="submit" name="submit" value="Search" style="width: 150px; background-color: #CCCCCC">';
+			echo '<br>';
+			echo '<br>';
+			break;
+			
+	}
+}
+
+echo '</form>';
+} else {
+  
+  $search_field = $_POST["search_field"];
+  
+  $exhibit_report = new exhibit_report();
+  $exhibit = new exhibit();
+  $case_info = new case_info();
+  $exhibit_type = new exhibit_type();
+  $exhibit_status_type = new exhibit_status_type();
+  $exhibit_location = new exhibit_location();
+  $member = new member();
+  
+if (isset($_POST["search_type"])) {
+	switch($_POST["search_type"]) {
+
+		case "bysn":
+			echo '<h2>The following are the search result(s) based on your search "'.$search_field.'":</h2>';
+			$select = 'select * from exhibit where exhibit_serial like "%'.$search_field.'%"';
+			$query = mysql_query($select);
+
+			while ($fetch = mysql_fetch_array($query)) {
+
+				$exhibit_id = $fetch["exhibit_id"];
+				$exhibit_report_id = $exhibit->get_value("exhibit_report_id", $exhibit_id);
+				$exhibit_item_id = $exhibit->get_value("exhibit_item_id", $exhibit_id);
+				$exhibit_date = $exhibit->get_value("exhibit_date", $exhibit_id);
+				$exhibit_date = strtotime($exhibit_date);
+				$exhibit_date = strftime("%Y-%m-%d", $exhibit_date);
+				$exhibit_type_id = $exhibit->get_value("exhibit_type", $exhibit_id);
+				$exhibit_make = $exhibit->get_value("exhibit_make", $exhibit_id);
+				$exhibit_model = $exhibit->get_value("exhibit_model", $exhibit_id);
+				$exhibit_serial = $exhibit->get_value("exhibit_serial", $exhibit_id);
+				$exhibit_location_id = $exhibit->get_value("exhibit_location", $exhibit_id);
+				$exhibit_condition = $exhibit->get_value("exhibit_condition", $exhibit_id);
+				$exhibit_original_item = $exhibit->get_value("exhibit_original_item", $exhibit_id);
+				$exhibit_status_id = $exhibit->get_value("exhibit_status", $exhibit_id);
+				$exhibit_status_member = $exhibit->get_value("exhibit_status_member", $exhibit_id);
+				$exhibit_status_date = $exhibit->get_value("exhibit_status_date", $exhibit_id);
+				$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_report_id);
+				$exhibit_report_pros = $exhibit_report->get_value("exhibit_report_pros", $exhibit_report_id);
+				$exhibit_released_to = $exhibit->get_value("exhibit_released_to", $exhibit_id);
+				$exhibit_assigned_to = $exhibit->get_value("exhibit_assigned_to", $exhibit_id);
+				$item_num = add_zero_as_placeholder("3", $exhibit_item_id);
+				$exhibit_number = $exhibit_report_num."-".$item_num;
+				$return_status = new return_status();
+				$return_status_id = $return_status->get_return_status();
+
+				echo '<div class="dCaseInfo">';
+				echo '<span class="sEditLink"> ';
+				echo '';
+				echo '</span>';
+	
+	
+				echo '<table width="100%" id="PROSNum">';
+				//echo '<tr><th>CSER Exhibit #</th><th>PE#</th><th>Type</th><th>Make</th><th>Model</th><th>Serial</th><th>Location</th><th>Condition</th><th></th></tr>';
+				echo '<tr><th width="150">CSER Exhibit #</th><th width="350">Description</th><th width="100">Status</th><th width="300">Location/Release to</th><th width="100">Assigned To</th></tr>';
+				
+				echo '<tr>';
+				echo '<td nowrap>';
+				$caseid = $case_info->get_id_by_pros_num($exhibit_report_pros);
+				
+				echo '<a href="./index.php?cmd=es&id='.$caseid.'&erid='.$exhibit_report_id.'&eid='.$exhibit_id.'">';
+				echo $exhibit_number;
+				echo '</a>';
+				echo '</td>';
+				echo '<td>Original Item #: ';
+				echo $exhibit_original_item;
+				echo '<br>';
+				echo 'Type: ';
+				echo $exhibit_type->get_value("exhibit_type_name", $exhibit_type_id);
+				echo '<br>';
+				echo 'Make: ';
+				echo $exhibit_make;
+				echo '<br>';
+				echo 'Model: ';
+				echo $exhibit_model;
+				echo '<br>';
+				echo 'Serial: ';
+				echo $exhibit_serial;
+				echo '<br>';
+				echo '<td>';
+				echo $exhibit_status_type->get_value("exhibit_status_type_name", $exhibit_status_id);
+				echo '</td>';
+				
+				$return_status = new return_status();
+				$return_status_id = $return_status->get_return_status();
+				if ($return_status_id == $exhibit_status_id) {
+					echo '<td>';
+					echo $exhibit_released_to;
+					echo '</td>';
+						
+					} else {
+					echo '<td>';
+					echo $exhibit_location->get_value("exhibit_location_name", $exhibit_location_id);
+					echo '</td>';
+				}
+				echo '<td>';
+				echo $member->get_value("member_login", $exhibit_assigned_to);
+				echo '</td>';
+				
+			echo '</table>';
+			echo '</div>';
+			}			 // end while
+			
+			echo '<br>';
+			echo '<br>';
+			echo '<a href="./index.php?cmd=search&stype='.$_GET["stype"].'">Start another Search</a>';
+			echo '<br>';
+			echo '<br>';
+			break;
+		case "bypros":
+			
+			break;
+		case "bytcu":
+			
+			break;
+			
+		case "bycaption":
+			echo '<h2>The following are the search result(s) based on your search "'.$search_field.'":</h2>';
+			$select = 'select case_id, case_pros_id, case_caption, case_lead_investigator, investigative_unit_name
+							from case_info, investigative_unit 
+							where investigative_unit_id = case_investigative_unit_id and case_caption like "%'.$search_field.'%" order by case_pros_id asc';
+			//	echo $select;
+			
+			$query = mysql_query($select);
+			
+			// insert style sheet here
+			if (mysql_num_rows($query) > 0) {
+				echo '<h2>Case #\'s</h2>';
+				echo '<table width="100%" id="PROSNum">';
+				echo '<tr>';
+				echo '<th style="width:110px">Case #</th>';
+				echo '<th>Caption</th>';
+				echo '<th>Investigator</th>';
+				echo '<th>Investigative Team</th>';
+				echo '</tr>';
+				while ($fetch = mysql_fetch_array($query)) {
+					echo '<tr>';
+					echo '<td><a href="./index.php?cmd=cs&id='.$fetch["case_id"].'">'.$fetch["case_pros_id"].'</a></td>';
+					echo '<td>'.$fetch["case_caption"].'</td>';
+					echo '<td>'.$fetch["case_lead_investigator"].'</td>';
+					echo '<td>'.$fetch["investigative_unit_name"].'</td>';
+					echo '<tr>';
+				}
+				echo '</table>';
+			
+			}
+			echo '<br>';
+			echo '<br>';
+			echo '<a href="./index.php?cmd=search&stype='.$_GET["stype"].'">Start another Search</a>';
+			echo '<br>';
+			echo '<br>';
+			
+			break;
+		
+		case "bymodel":
+			echo '<h2>The following are the search result(s) based on your search "'.$search_field.'":</h2>';
+			$select = 'select * from exhibit where exhibit_model like "%'.$search_field.'%"';
+			$query = mysql_query($select);
+
+			while ($fetch = mysql_fetch_array($query)) {
+
+				$exhibit_id = $fetch["exhibit_id"];
+				$exhibit_report_id = $exhibit->get_value("exhibit_report_id", $exhibit_id);
+				$exhibit_item_id = $exhibit->get_value("exhibit_item_id", $exhibit_id);
+				$exhibit_date = $exhibit->get_value("exhibit_date", $exhibit_id);
+				$exhibit_date = strtotime($exhibit_date);
+				$exhibit_date = strftime("%Y-%m-%d", $exhibit_date);
+				$exhibit_type_id = $exhibit->get_value("exhibit_type", $exhibit_id);
+				$exhibit_make = $exhibit->get_value("exhibit_make", $exhibit_id);
+				$exhibit_model = $exhibit->get_value("exhibit_model", $exhibit_id);
+				$exhibit_serial = $exhibit->get_value("exhibit_serial", $exhibit_id);
+				$exhibit_location_id = $exhibit->get_value("exhibit_location", $exhibit_id);
+				$exhibit_condition = $exhibit->get_value("exhibit_condition", $exhibit_id);
+				$exhibit_original_item = $exhibit->get_value("exhibit_original_item", $exhibit_id);
+				$exhibit_status_id = $exhibit->get_value("exhibit_status", $exhibit_id);
+				$exhibit_status_member = $exhibit->get_value("exhibit_status_member", $exhibit_id);
+				$exhibit_status_date = $exhibit->get_value("exhibit_status_date", $exhibit_id);
+				$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_report_id);
+				$exhibit_report_pros = $exhibit_report->get_value("exhibit_report_pros", $exhibit_report_id);
+				$exhibit_released_to = $exhibit->get_value("exhibit_released_to", $exhibit_id);
+				$exhibit_assigned_to = $exhibit->get_value("exhibit_assigned_to", $exhibit_id);
+				$item_num = add_zero_as_placeholder("3", $exhibit_item_id);
+				$exhibit_number = $exhibit_report_num."-".$item_num;
+				$return_status = new return_status();
+				$return_status_id = $return_status->get_return_status();
+
+				echo '<div class="dCaseInfo">';
+				echo '<span class="sEditLink"> ';
+				echo '';
+				echo '</span>';
+	
+	
+				echo '<table width="100%" id="PROSNum">';
+				//echo '<tr><th>CSER Exhibit #</th><th>PE#</th><th>Type</th><th>Make</th><th>Model</th><th>Serial</th><th>Location</th><th>Condition</th><th></th></tr>';
+				echo '<tr><th width="150">CSER Exhibit #</th><th width="250">Description</th><th width="100">Status</th><th width="100">Location/Release to</th><th width="50">Assigned To</th></tr>';
+				
+				echo '<tr>';
+				echo '<td nowrap>';
+				$caseid = $case_info->get_id_by_pros_num($exhibit_report_pros);
+				
+				echo '<a href="./index.php?cmd=es&id='.$caseid.'&erid='.$exhibit_report_id.'&eid='.$exhibit_id.'">';
+				echo $exhibit_number;
+				echo '</a>';
+				echo '</td>';
+				echo '<td>Original Item #: ';
+				echo $exhibit_original_item;
+				echo '<br>';
+				echo 'Type: ';
+				echo $exhibit_type->get_value("exhibit_type_name", $exhibit_type_id);
+				echo '<br>';
+				echo 'Make: ';
+				echo $exhibit_make;
+				echo '<br>';
+				echo 'Model: ';
+				echo $exhibit_model;
+				echo '<br>';
+				echo 'Serial: ';
+				echo $exhibit_serial;
+				echo '<br>';
+				echo '<td>';
+				echo $exhibit_status_type->get_value("exhibit_status_type_name", $exhibit_status_id);
+				echo '</td>';
+				
+				$return_status = new return_status();
+				$return_status_id = $return_status->get_return_status();
+				if ($return_status_id == $exhibit_status_id) {
+					echo '<td>';
+					echo $exhibit_released_to;
+					echo '</td>';
+						
+					} else {
+					echo '<td>';
+					echo $exhibit_location->get_value("exhibit_location_name", $exhibit_location_id);
+					echo '</td>';
+				}
+				echo '<td>';
+				echo $member->get_value("member_login", $exhibit_assigned_to);
+				echo '</td>';
+				
+			echo '</table>';
+			echo '</div>';
+			}			 // end while
+			echo '<br>';
+			echo '<br>';
+			echo '<a href="./index.php?cmd=search&stype='.$_GET["stype"].'">Start another Search</a>';
+			echo '<br>';
+			echo '<br>';
+			break;
+			
+		case "byinvestigator":
+			echo '<h2>The following are the search result(s) based on your search "'.$search_field.'":</h2>';
+			$select = 'select case_id, case_pros_id, case_caption, case_lead_investigator, investigative_unit_name
+							from case_info, investigative_unit 
+							where investigative_unit_id = case_investigative_unit_id and case_lead_investigator like "%'.$search_field.'%" order by case_pros_id asc';
+			//	echo $select;
+			
+			$query = mysql_query($select);
+			
+			// insert style sheet here
+			if (mysql_num_rows($query) > 0) {
+				echo '<h2>Case #\'s</h2>';
+				echo '<table width="100%" id="PROSNum">';
+				echo '<tr>';
+				echo '<th style="width:110px">Case #</th>';
+				echo '<th>Caption</th>';
+				echo '<th>Investigator</th>';
+				echo '<th>Investigative Team</th>';
+				echo '</tr>';
+				while ($fetch = mysql_fetch_array($query)) {
+					echo '<tr>';
+					echo '<td><a href="./index.php?cmd=cs&id='.$fetch["case_id"].'">'.$fetch["case_pros_id"].'</a></td>';
+					echo '<td>'.$fetch["case_caption"].'</td>';
+					echo '<td>'.$fetch["case_lead_investigator"].'</td>';
+					echo '<td>'.$fetch["investigative_unit_name"].'</td>';
+					echo '<tr>';
+				}
+				echo '</table>';
+			
+			}
+			echo '<br>';
+			echo '<br>';
+			echo '<a href="./index.php?cmd=search&stype='.$_GET["stype"].'">Start another Search</a>';
+			echo '<br>';
+			echo '<br>';
+			
+			break;
+		
+	
+	}
+}
+}
+?>
+
+
+

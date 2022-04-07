@@ -1,0 +1,181 @@
+<?php
+if (isset($_POST["case_id"])) {
+	$case_id = $_POST["case_id"];
+}
+if (isset($_POST["erid"])) {
+	$erid = $_POST["erid"];
+}
+if (isset($_GET["id"])) {
+	$case_id = $_GET["id"];
+}
+if (isset($_GET["erid"])) {
+	$erid = $_GET["erid"];
+}
+if (isset($_GET["eid"])) {
+	$_POST["exhibit_id"] = $_GET["eid"];
+}
+if(isset($_GET["ul"])) $_POST["mode"] = "edit";
+include('./case/case_info_table.php');
+include('./exhibit_report/exhibit_report_info_table.php');
+
+$exhibit_type = new exhibit_type();
+$exhibit_location = new exhibit_location();
+$exhibit_status_type = new exhibit_status_type();
+$member = new member();
+$mode = "New";
+
+if (isset($_POST["mode"])) {
+
+	if ($_POST["mode"] == "edit") {
+
+		$mode = "Edit";
+		$exhibit = new exhibit();
+		$exhibit_type_id = $exhibit->get_value("exhibit_type", $_POST["exhibit_id"]);
+		$exhibit_make = $exhibit->get_value("exhibit_make", $_POST["exhibit_id"]);
+		$exhibit_model = $exhibit->get_value("exhibit_model", $_POST["exhibit_id"]);
+		$exhibit_serial = $exhibit->get_value("exhibit_serial", $_POST["exhibit_id"]);
+		$exhibit_location_id = $exhibit->get_value("exhibit_location", $_POST["exhibit_id"]);
+		$exhibit_condition = $exhibit->get_value("exhibit_condition", $_POST["exhibit_id"]);
+		$exhibit_original_item = $exhibit->get_value("exhibit_original_item", $_POST["exhibit_id"]);
+		$exhibit_status_id = $exhibit->get_value("exhibit_status", $_POST["exhibit_id"]);
+		$exhibit_status_date = $exhibit->get_value("exhibit_status_date", $_POST["exhibit_id"]);
+		$exhibit_released_to = $exhibit->get_value("exhibit_released_to", $_POST["exhibit_id"]);
+		//		$exhibit_to_tcb = $exhibit->get_value("exhibit_to_tcb", $_POST["exhibit_id"]);
+		//		$exhibit_to_tcb_date = $exhibit->get_value("exhibit_to_tcb_date", $_POST["exhibit_id"]);
+		//		$exhibit_return_date = $exhibit->get_value("exhibit_return_date", $_POST["exhibit_id"]);
+		$exhibit_status_member = $exhibit->get_value("exhibit_status_member", $_POST["exhibit_id"]);
+		$exhibit_assigned_date = $exhibit->get_value("exhibit_assigned_date", $_POST["exhibit_id"]);
+		$exhibit_assigned_to = $exhibit->get_value("exhibit_assigned_to", $_POST["exhibit_id"]);
+	}
+}
+
+?>
+
+<br>
+<h2><?php echo $mode; ?> Exhibit</h2>
+<hr	style="margin: -11px 0px 8px 0px;">
+
+
+    <script src="./_style/js/formValidation.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+       //Use below if form has a name 
+      $('form[name="Form_exhibit_report"]').submit(function() {
+
+      //$('form').submit(function() {
+        var reason = "";
+            reason += validateEmpty($("#exhibit_type"));
+            reason += validateEmpty($("#exhibit_make"));
+            reason += validateEmpty($("#exhibit_model"));
+            reason += validateEmpty($("#exhibit_serial"));
+		<?php 
+            if ($mode != "Edit") {
+            echo 'reason += validateEmpty($("#exhibit_location"));';
+            }
+         ?>
+        if (reason != "") {
+          alert("Some fields need correction:\n" + reason);
+          return false;
+        }
+        return true;
+      });
+    });
+    </script>  
+
+<form method="post" action="./exhibit/exhibit_processor.php"
+	name="Form_exhibit_report">
+
+
+<fieldset class="submitform">
+
+	<input type="hidden" name="case_id"	id="case_id" value="<?php echo $case_id; ?>">
+	<input type="hidden" name="exhibit_report_id" id="exhibit_report_id" value="<?php echo $erid; ?>">
+	<input type="hidden" name="exhibit_date" id="exhibit_date" value="<?php echo date("Y-m-d")?>">
+	<label for="exhibit_type">Exhibit Type:</label><?php
+if ($mode == "Edit") {
+	$exhibit_type->generate_combo_box_select("exhibit_type", $exhibit_type_id);
+} else {
+	$exhibit_type->generate_combo_box("exhibit_type");
+}
+?> <!--    <label for="exhibit_other">Exhibit Type - If Other (Optional)</label>
+	<input type="text" name="exhibit_other" id="exhibit_other" value="">
+--> <label for="exhibit_original_item">Original Reference:</label> 
+	<input type="text" name="exhibit_original_item" id="exhibit_original_item" class="txtUpper" value="<?php if (isset($exhibit_original_item)) echo $exhibit_original_item; ?>">
+	<label for="exhibit_make">Make:</label>
+	<input type="text" name="exhibit_make" id="exhibit_make" value="<?php if (isset($exhibit_make)) echo $exhibit_make; ?>">
+	<label for="exhibit_model">Model:</label>
+	<input type="text" name="exhibit_model" id="exhibit_model" value="<?php if (isset($exhibit_model)) echo $exhibit_model;?>"> 
+	<label for="exhibit_serial">Serial Number:</label>
+	<input type="text" name="exhibit_serial" id="exhibit_serial" value="<?php if (isset($exhibit_serial)) echo $exhibit_serial;?>">
+	<label for="exhibit_status">Status:</label> <?php
+		if ($mode == "Edit") {
+		$exhibit_status_type->generate_combo_box_select("exhibit_status", $exhibit_status_id);
+	} else {
+		$exhibit_status_type->generate_combo_box_select("exhibit_status", "2");
+	}
+	?>
+	<br>
+<!--  	<label for="exhibit_status_date">Status Date:</label> --> <?php
+	echo '<input type="hidden" name="exhibit_status_date" value="';
+	echo date("Y-m-d H:i"); 
+	echo '">';
+	?> 	
+	
+	<label for="exhibit_location">Location:</label> <?php
+	if ($mode == "Edit") {
+		$exhibit_location->generate_exhibit_location_select("exhibit_location", $exhibit_location_id);
+	} else {
+		$exhibit_location->generate_exhibit_location("exhibit_location");
+	}
+	?> 
+	<label for="exhibit_released_to">Exhibit Released to:</label>
+	<input type="text"
+	name="exhibit_released_to" id="exhibit_released_to"
+	value="<?php if (isset($exhibit_released_to)) echo $exhibit_released_to;?>">	
+	<label for="exhibit_status_member">Status updated by:</label> <?php
+	if ($mode == "Edit") {
+		$member->generate_combo_box_select("exhibit_status_member", $_SESSION["mid"]);
+	} else {
+		$member->generate_combo_box_select("exhibit_status_member", $_SESSION["mid"]);
+	}
+	?> <label for="exhibit_condition">Comments:</label> <textarea
+	name="exhibit_condition" id="exhibit_condition" COLS=50 ROWS=4><?php if (isset($exhibit_condition)) echo $exhibit_condition; ?></TEXTAREA>
+	<label for="assigned_to">Assigned To:</label>
+	<?php 
+	if ($mode == "Edit") {
+		$member->generate_combo_box_select("exhibit_assigned_to", $exhibit_assigned_to);
+	} else {
+		$member->generate_combo_box_select("exhibit_assigned_to", "0");
+	}
+	?>
+
+
+	<label for="assigned_date">Assigned Date:</label>
+	<?php
+	echo '<input type="text" name="exhibit_assigned_date" id="exhibit_assigned_date" readonly value="';
+	if (isset($exhibit_assigned_date)) { echo $exhibit_assigned_date; } 
+		echo '">';
+	?> 	
+<p><br>
+	<?php if ($mode == "Edit") {?> <input type="hidden" name="mode"
+	value="edit"> <input type="hidden" name="exhibit_id"
+	value="<?php echo $_POST["exhibit_id"]; ?>">
+
+
+<br><br><br>
+<label for="Submit"></label> <input type="submit" id="submit"
+	value="Update Exhibit" name="Submit" class="button" /> <input
+	type=button value="Cancel"
+	onClick="location.href='./index.php?cmd=ers&id=<?php echo $case_id; ?>&erid=<?php echo $erid; ?>'"
+	class="button"> <?php } else { ?>
+
+
+<br><br><br>
+<label for="Submit"></label> <input type="submit" id="submit"
+	value="Create Exhibit" name="Submit" class="button" /> <input
+	type=button value="Cancel"
+	onClick="location.href='./index.php?cmd=ers&id=<?php echo $case_id; ?>&erid=<?php echo $erid; ?>'"
+	class="button"> <?php }?>
+
+</fieldset>
+</form>

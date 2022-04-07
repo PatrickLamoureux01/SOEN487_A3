@@ -1,0 +1,83 @@
+<?php
+//include('./include/case_info.php');
+//include('./include/investigative_unit.php');
+//include('./include/initiative.php');
+//include('./include/exhibit_report.php');
+//include('./include/exhibit_report_priority.php');
+//include('./include/member.php');
+
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+$exhibit_report = new exhibit_report();
+$exhibit_report_status = new exhibit_report_status();
+
+$member = new member();
+
+$exhibit_report_status_id = $exhibit_report_status->get_report_status_id($erid);
+$exhibit_report_status_analysis_start_date = $exhibit_report_status->get_value("exhibit_report_status_analysis_start_date", $exhibit_report_status_id);
+$exhibit_report_status_analysis_end_date = $exhibit_report_status->get_value("exhibit_report_status_analysis_end_date", $exhibit_report_status_id);
+$exhibit_report_status_forward_date = $exhibit_report_status->get_value("exhibit_report_status_forward_date", $exhibit_report_status_id);
+$exhibit_report_status_close_date = $exhibit_report_status->get_value("exhibit_report_status_close_date", $exhibit_report_status_id);
+$exhibit_report_status_case_status = $exhibit_report_status->get_value("exhibit_report_status_case_status", $exhibit_report_status_id);
+$exhibit_report_status_unanalyzed = $exhibit_report_status->get_value("exhibit_report_status_unanalyzed", $exhibit_report_status_id);
+$exhibit_report_update_person = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_update_member", $erid));
+$exhibit_report_update_date = $exhibit_report->get_value("exhibit_report_update_date", $erid);
+
+
+echo '<form action="./exhibit_report/exhibit_report_status_processor.php" method="post">';
+echo '<div class="dCaseInfo mrg-5">';
+echo '<table><tr>';
+echo '<td><strong>Analysis Start Date</strong></td>';
+echo '<td>';
+if (isset($exhibit_report_status_analysis_start_date)) echo $exhibit_report_status_analysis_start_date;
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td nowrap><strong>Analysis End Date</strong></td>';
+echo '<td>';
+if (isset($exhibit_report_status_analysis_end_date)) echo $exhibit_report_status_analysis_end_date;
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Report Forward Date</strong></td>';
+echo '<td>';
+if (isset($exhibit_report_status_forward_date)) echo $exhibit_report_status_forward_date;
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Report Close Date</strong></td>';
+echo '<td>';
+if (isset($exhibit_report_status_close_date)) echo $exhibit_report_status_close_date;
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Unanalyzed?</strong></td>';
+echo '<td>';
+if ($exhibit_report_status_unanalyzed == "0") { echo "No"; } else { echo "Yes"; };
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Report Status</strong></td>';
+echo '<td colspan="3">';
+if (isset($exhibit_report_status_case_status)) echo $exhibit_report_status_case_status;
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<input type="hidden" name="erid" value="'.$erid.'">';
+echo '<td><b>ACTION: </b></td>';
+echo '<td>';
+echo '<input type="hidden" name="analysis_referer" value="'.$_SERVER["REQUEST_URI"].'">';
+echo '<input type="submit" name="analysis_date_update" value="Start" class="button">';
+echo '<input type="submit" name="analysis_date_update" value="End" class="button">';
+echo '<input type="submit" name="analysis_date_update" value="Forward Report" class="button">';
+echo '<input type="submit" name="analysis_date_update" value="Close Report" class="button">';
+echo '<input type="submit" name="analysis_date_update" value="Unanalyzed" class="button">';
+echo '</td></tr>';
+echo '</table>';
+
+echo '<span class="sEnterInfo"><i>Last Updated by: <b>'.$exhibit_report_update_person.'</b> on '.$exhibit_report_update_date.'.</i></span>';
+
+echo '</div>';
+echo '</form>';
+
+?>

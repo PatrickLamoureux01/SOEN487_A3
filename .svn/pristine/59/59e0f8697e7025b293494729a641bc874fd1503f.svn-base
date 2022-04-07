@@ -1,0 +1,37 @@
+	<?php 
+	if (isset($_POST["erid"])) $erid = $_POST["erid"]; 
+	if (isset($_POST["case_id"])) $case_id = $_POST["case_id"];
+	if (isset($_GET["erid"])) $erid = $_GET["erid"];
+	if (isset($_GET["id"])) $case_id = $_GET["id"];
+	if (isset($_GET["eid"])) $exhibit_id = $_GET["eid"];
+	if (isset($_POST["exhibit_id"])) $exhibit_id = $_POST["exhibit_id"];
+	
+	
+	include('./case/case_info_table.php');
+include('./exhibit_report/exhibit_report_info_table.php');
+include('./exhibit/exhibit_info_table.php');
+	
+	$files = new files();
+//	$files->show_exhibit_files($_POST["exhibit_id"]);
+	?>
+
+<form action="./exhibit/exhibit_upload.php" method="post"
+	enctype="multipart/form-data"><?php
+	?>
+
+<fieldset><input type="hidden" name="exhibit_id"
+	value="<?php echo $exhibit_id; ?>"> <input type="hidden"
+	name="case_id" value="<?php echo $case_id; ?>"> <input type="hidden"
+	name="erid" value="<?php echo $erid; ?>"> <input type="hidden"
+	name="mode" value="edit"> <input type="hidden" name="MAX_FILE_SIZE"
+	value="500000000000"> <label for="myfile">File:</label> <input
+	name="userfile" id="userfile" type="file" size="50" style="width:400px" /> <label
+	for="filetype">File Type:</label> <select name="file_category">
+	<option>Images</option>
+</select>
+<p><label for="submitButton"></label> <input type="submit" name="upload"
+	value="Add" class="button" />
+<input type="button" name="done" value="Done" onclick="location.href='./index.php?cmd=es&id=<?php echo $case_id;?>&erid=<?php echo $erid;?>&eid=<?php echo $exhibit_id;?>'" class="button">
+
+</fieldset>
+</form>

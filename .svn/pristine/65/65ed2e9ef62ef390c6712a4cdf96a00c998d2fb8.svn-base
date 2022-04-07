@@ -1,0 +1,17 @@
+<?php
+	session_start();
+	session_unset();
+  session_destroy();
+//header("location: ".$_SERVER["REQUEST_URI"]);
+  header("location: ./index.php");
+  exit();
+  /*
+	if ($_SERVER["SERVER_PORT"] != "80") {
+		echo '<meta http-equiv="refresh" content="2;url=http://'.$_SERVER["SERVER_NAME"].':'.$_SERVER["SERVER_PORT"].'">';
+	} else {
+		echo '<meta http-equiv="refresh" content="2;url=http://'.$_SERVER["SERVER_NAME"].'">';
+	}
+  echo '<div align="middle">You have been logged out of the system.  You will be redirected to login page in 3 seconds.</div>';
+   */
+?>
+

@@ -1,0 +1,19 @@
+<?php 
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+// include('./header.php');
+?>
+<form action="" method="post" class="formSearchCase"> 
+  <label for="tSearchCase" accesskey="h" id="lblFindCase">CASE:</label> <input type="text" name="tSearchCase" id="txtFindCase" accesskey="3" style="width: 100px"> 
+</form> 
+<span id="txtForm"></span>
+<span id="txtHint"></span>

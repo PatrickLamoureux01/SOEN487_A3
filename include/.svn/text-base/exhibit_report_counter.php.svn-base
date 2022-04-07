@@ -1,0 +1,56 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_report_counter {
+
+
+	function exhibit_report_counter() {
+
+		// Check if current year counter exist
+		$current_year = date('Y');
+		$select = "select * from exhibit_report_counter where exhibit_report_counter_year = '$current_year'";
+		$query = mysql_query($select);
+                if (!$query) echo 'Error 003: Database Query error on exhibit_report_counter()';
+		if (mysql_num_rows($query) == 0) {		
+				$select = "insert into exhibit_report_counter(exhibit_report_counter_year) values ('$current_year')";
+				$query = mysql_query($select);
+		}
+	}
+
+
+	function next_exhibit_report_number() {
+
+		$current_year = date('Y');
+		$select = "select exhibit_report_counter_value from exhibit_report_counter where exhibit_report_counter_year = '$current_year'";
+		$query = mysql_query($select);
+                if (!$query) echo 'Error 003: Database Query error on next_exhibit_report_number()';
+		$result = mysql_fetch_row($query);
+		
+		$current_report_value = $result[0]+1;
+
+		return $current_report_value;
+	}
+
+	function update_exhibit_report_number_to_current($newvalue) {
+
+		$current_year = date('Y');
+		$select = "update exhibit_report_counter set exhibit_report_counter_value = '$newvalue' where exhibit_report_counter_year = '$current_year'";
+		$query = mysql_query($select);
+                if (!$query) echo 'Error 003: Database Query error on update_exhibit_report_number_to_current()';
+
+	}
+
+}
+
+?>

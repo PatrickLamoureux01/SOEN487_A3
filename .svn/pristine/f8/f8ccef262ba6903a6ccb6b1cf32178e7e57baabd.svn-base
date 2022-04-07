@@ -1,0 +1,64 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_report_status.php');
+include('../include/return_status.php');
+include('../include/exhibit_type.php');
+include('../include/exhibit_continuity.php');
+$case_id = $_POST["case_id"];
+$erid = $_POST["erid"];
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+$exhibit = new exhibit();
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+$exhibit_count = $_POST["exhibit_count"];
+
+for ($i = 0; $i < $exhibit_count; $i++) {
+	$exhibit_id = $_POST["exhibit_id_$i"];
+//	$exhibit_move_date = $_POST["exhibit_move_date"];
+//	$exhibit_move_member = $_POST["exhibit_move_member"];
+//	$exhibit_move_location = $_POST["exhibit_move_location"];
+	$exhibit_assign_to_member = $_POST["exhibit_assign_to_member"];
+	$exhibit_assign_to = false; 
+	if (isset($_POST["exhibit_to_assign_$i"])) $exhibit_assign_to =  true;
+	
+	$exhibit_status = $exhibit->get_value("exhibit_status", $exhibit_id);
+	
+	if ($exhibit_assign_to == true) {
+		$exhibit->set_value("exhibit_assigned_to", $exhibit_assign_to_member, $exhibit_id);
+	}
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=ers&id='.$case_id.'&erid='.$erid.'">';
+
+?>

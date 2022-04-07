@@ -1,0 +1,60 @@
+<?php
+
+	if (isset($_POST["erid"])) $erid=$_POST["erid"];
+	if (isset($_GET["erid"])) $erid=$_GET["erid"];
+	
+	$case_info = new case_info();
+	$exhibit_report = new exhibit_report();
+	$prosnum = $exhibit_report->get_value("exhibit_report_pros", $erid);
+	$case_id = $case_info->get_id_by_pros_num($prosnum);
+	$return_status = new return_status();
+	$return_status_id = $return_status->get_return_status();
+	$exhibit_report_number = $exhibit_report->get_value("exhibit_report_number", $erid);
+	$exhibit = new exhibit();
+	$number_of_exhibit = $exhibit->number_of_rows("exhibit_report_id", $erid);
+
+
+echo '<div class="dCaseInfo">';
+echo '<span class="sAddExRep">[<a href="./index.php?cmd=p1625">Select another Report</a> ]</span>';
+
+
+	if ($number_of_exhibit > 0) {
+	
+	
+	echo '<br>The following Movement Report can be printed for TCU Report: <b>'.$exhibit_report_number.'</b>';
+	echo '<br><br>';
+
+  $select = "select distinct(exhibit_return_date) from exhibit where exhibit_report_id = '$erid' and exhibit_status = '$return_status_id' group by exhibit_return_date";
+	$query = mysql_query($select);
+
+  $selectfwd = "select distinct(exhibit_status_date) from exhibit where exhibit_report_id = '$erid' and exhibit_status = '5' group by exhibit_status_date";
+	$queryfwd = mysql_query($selectfwd);
+	
+	//	echo $select;
+  echo '<p>';
+  echo ' Movement Report: ';
+	echo '<a href="./printMaster.php?erid='.$erid.'" target="_blank">Complete Exhibit List</a>';
+	echo '<p>';
+	while ($fetch = mysql_fetch_array($query)) {
+		
+		echo ' Movement Report: Returned Exhibit(s) - <a href="./printRelease.php?erid='.$erid.'&id='.$case_id.'&date='.$fetch[0].'" target="_blank"> '.$fetch[0].'</a>';
+		echo '<br>';
+	}
+	while ($fetchfwd = mysql_fetch_array($queryfwd)) {
+	
+		echo ' Movement Report: Forwarded Exhibit(s) - <a href="./printForward.php?erid='.$erid.'&id='.$case_id.'&status=5" target="_blank">Forwarded</a>';
+		echo '<br>';
+	}
+		
+	 echo '<p>';
+		echo 'Exhibit Label(s): ';
+ 	echo '<a href="./printLabels.php?erid='.$erid.'" target="_blank">TCU Exhibit Label(s)</a>';
+	
+	} else {
+		
+		echo "<br>No Exhibits Found in this system";
+	}
+	
+	echo '</div>';
+
+ 	?>

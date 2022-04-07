@@ -1,0 +1,534 @@
+<?php
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+include('system_log.php');
+
+// This function takes error number and generate appropriate error message
+function c_error($number, $loc) {
+
+	switch($number) {
+		
+		case 1:		echo "Error ".$number.": Database Connection error on ".$loc;
+					break;
+		case 3:		echo "Error ".$number.": Database Query error on ".$loc;
+					break;
+		
+	}
+
+}
+
+function fetch_results_to_list($query) {
+
+	$i = 0;
+	$mylist[0][0] = 0; 
+	while ($fetch = mysql_fetch_array($query)) {           
+		for ($k=0; $k < mysql_num_fields($query); $k++) {
+			$mylist[$i][$k] = $fetch[$k];
+			
+//			echo $mylist[$i][$k];
+//			echo '<br>';
+        }
+        $i++;
+	}
+		return $mylist;
+
+}
+
+function print_table($mylist) {
+
+	echo '<table>';
+	for ($i=0; $i < count($mylist); $i++) {
+	echo '<tr>'; 
+		for ($j=0; $j < count($mylist[$i]); $j++) {
+			echo '<td>';
+			echo $mylist[$i][$j];
+			echo '</td>';
+		}
+		echo '</tr>';
+	}
+	echo '</table>';
+	
+}
+
+function add_zero_as_placeholder($length, $value) {
+	
+	$newstring = null;
+	$current_value_len = strlen($value);
+	for ($i=0; $i < $length - $current_value_len; $i++) {		
+		$newstring = '0'.$newstring;
+	}
+	return $newstring.$value;
+}
+
+function get_exhibit_count_in_erid($erid) {
+	$exhibit_type = new exhibit_type();
+	$select = "SELECT count(*), exhibit_type FROM `exhibit` WHERE  exhibit_report_id ='$erid'";
+	$query_rows = mysql_num_rows($select);
+	
+	return $query_rows;
+}
+
+function get_exhibit_count($erid) {
+
+	$exhibit_type = new exhibit_type();
+
+	$select = "SELECT count(*), exhibit_type FROM `exhibit` WHERE  exhibit_report_id ='$erid' group by exhibit_type";
+	$query = mysql_query($select);
+	while ($fetch = mysql_fetch_array($query)) {
+		$exhibit_count = $fetch[0];
+		$exhibit_name = $exhibit_type->get_value("exhibit_type_name", $fetch[1]);
+		$myarray = $exhibit_count.' - '.$exhibit_name.' | '.$myarray;
+	}
+	return rtrim($myarray, " | ");
+}
+
+// this function does check exhibit return status.  and return true or false depending on status type
+function check_exhibit_return($erid) {
+	
+	$exhibit_type = new exhibit_type();
+
+	$select = "SELECT count(*), exhibit_status FROM `exhibit` WHERE  exhibit_report_id ='$erid' and exhibit_status != '1' group by exhibit_report_id";
+	$query = mysql_query($select);
+	$numofrows = mysql_num_rows($query);
+
+	if ($numofrows > 0) { return false; } else { return true; }
+		
+}
+
+function generate_cmb_box($tbl_col, $valuelist) {
+
+	echo '<select name="'.$tbl_col.'" id="'.$tbl_col.'">';
+		echo '<option> </option>';
+	for ($i=0; $i<count($valuelist); $i++) {
+		echo '<option value="'.$valuelist[$i][0].'">'.$valuelist[$i][1].'</option>';	
+	}
+	echo '</select>';
+}
+
+function generate_cmb_box_select($tbl_col, $valuelist, $select_id) {
+
+	echo '<select name="'.$tbl_col.'" id="'.$tbl_col.'">';
+	echo '<option> </option>';
+	for ($i=0; $i<count($valuelist); $i++) {
+		if ($valuelist[$i][0] == $select_id){
+			echo '<option value="'.$valuelist[$i][0].'" selected>'.$valuelist[$i][1].'</option>';	
+		} else {
+			echo '<option value="'.$valuelist[$i][0].'">'.$valuelist[$i][1].'</option>';	
+		}
+	}
+	echo '</select>';
+}
+
+function generate_txt_box($tbl_col, $value) {
+	
+	echo '<input type="text" name="'.$tbl_col.'" value="'.$value.'">';
+	
+}
+
+function exec_to_system_log($select) {
+	
+	$system_log = new system_log();
+	$mid = $_SESSION["mid"];
+	$datetime = mysql_real_escape_string(date("Y-m-d H:i:s"));
+	$memberaction = mysql_real_escape_string($select);
+	$action_url = mysql_real_escape_string($_SERVER["REQUEST_URI"]);
+	$system_log->insert_system_log($mid, $memberaction, $action_url, $datetime);
+		
+	return mysql_query($select);
+}
+
+function to_system_log($action) {
+
+	$system_log = new system_log();
+	$mid = $_SESSION["mid"];
+	$datetime = mysql_real_escape_string(date("Y-m-d H:i:s"));
+	$memberaction = mysql_real_escape_string($action);
+	$action_url = mysql_real_escape_string($_SERVER["REQUEST_URI"]);
+	$system_log->insert_system_log($mid, $memberaction, $action_url, $datetime);
+	
+	
+}
+
+function welcome_box() {
+  	echo 'You are Logged in as:  <font color="blue">'.$_SESSION["User"].'</font> &nbsp;' ;
+}
+
+function colordate($expiry_date) {
+	
+	$today = date("Y-m-d");
+	$seconds_diff = strtotime($expiry_date) - strtotime($today);
+	//echo $seconds_diff;
+	return $seconds_diff/3600/24;
+}
+
+function generate_tcu_dashboard($query, $username) {
+	$member = new member();
+	$investigative_unit = new investigative_unit();
+	$exhibit_report_status = new exhibit_report_status();
+	if ($username == "") { 
+	echo '<h2>Unassigned TCU Report(s)</h2>';
+	echo '<i>The following list are Report(s) with physical exhibit(s).</i>';
+	echo '<p>';
+	} else {
+	echo '<h2>TCU Report(s) assigned to '.$username.'</h2>';
+	echo '<i>The following list are Report(s) with physical exhibit(s).</i>';
+	echo '<p>';
+	}
+	
+	
+	if (mysql_num_rows($query) > 0) {
+	
+	// Start the shovelling
+		while ($fetch=mysql_fetch_array($query)) {
+			$case_status = $exhibit_report_status->get_open_close_status($fetch["exhibit_report_id"]);
+			if ($case_status == "In Progress") {
+				$inprogressfiles[] = $fetch;
+			}
+			if ($case_status == "Close") {
+				$closefiles[] = $fetch;
+			}
+			if ($case_status == "Open") {
+				$openfiles[] = $fetch;
+			}
+		}
+		echo '<div id="accordion-example" data-collapse="accordion">';
+		
+// Dump In Progress Files		
+		if (count($inprogressfiles) > 0) {
+		echo '<h3 class="open">In Progress Files ('.count($inprogressfiles).')</h3>';
+		echo '<div>';
+		echo '<p>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">Search Warrant Expiry Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($inprogressfiles); $j++) {
+			echo '<tr>';
+			
+			$datediff = colordate($inprogressfiles[$j]["exhibit_report_sw_date"]);
+			echo '<td><a href="./index.php?cmd=ers&id='.$inprogressfiles[$j]["case_id"].'&erid='.$inprogressfiles[$j]["exhibit_report_id"].'">'.$inprogressfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_pros"].'</td>';
+
+      		$exhibit_type_count = get_exhibit_count($inprogressfiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $inprogressfiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$inprogressfiles[$j]["exhibit_report_caption"]."</span></td>";
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $inprogressfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			
+      		$tcu_primary = $member->get_value('member_login', $inprogressfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#66CCFF">In Progress</td>';
+      		
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Closed Files
+		if (count($closefiles) > 0) {
+		echo '<h3>Completed Files ('.count($closefiles).')</h3>';
+		echo '<div>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">Search Warrant Expiry Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($closefiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$closefiles[$j]["case_id"].'&erid='.$closefiles[$j]["exhibit_report_id"].'">'.$closefiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$closefiles[$j]["exhibit_report_pros"].'</td>';
+      		$exhibit_type_count = get_exhibit_count($closefiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $closefiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$closefiles[$j]["exhibit_report_caption"]."</span></td>";
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $closefiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$closefiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($closefiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($closefiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($closefiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($closefiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+      		      		$tcu_primary = $member->get_value('member_login', $closefiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#FF9999">Close</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Open Files		
+		if (count($openfiles) > 0) {
+		echo '<h3 class="open">Open Files ('.count($openfiles).')</h3>';
+		echo '<div>';
+		echo '<p>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">Search Warrant Expiry Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($openfiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$openfiles[$j]["case_id"].'&erid='.$openfiles[$j]["exhibit_report_id"].'">'.$openfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$openfiles[$j]["exhibit_report_pros"].'</td>';
+      		
+      		$exhibit_type_count = get_exhibit_count($openfiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $openfiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$openfiles[$j]["exhibit_report_caption"]."</span></td>";
+      		
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $openfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$openfiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($openfiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($openfiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($openfiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($openfiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+
+      		$tcu_primary = $member->get_value('member_login', $openfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#99FF99">Open</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+		echo '</div>'; // end accordion
+	} else {
+		echo '<p>';
+		if ($username) {
+		echo 'NO TCU Report(s) assigned to '.$username;
+		} else {
+			echo 'NO Unassigned TCU Report(s)';
+		}
+	}
+echo '<p>';
+	
+}
+
+function generate_tcu_no_exhibit_dashboard($query, $username) {
+	$member = new member();
+	$investigative_unit = new investigative_unit();
+	$exhibit_report_status = new exhibit_report_status();
+	if ($username == "") { 
+	echo '<font color="#000"><i>The following list are Report(s) with no exhibit(s) involved such as IP Trace, Website Capture, etc.</i></font>';
+	echo '<p>';
+	} else {
+	echo '<font color="#000"><i>The following list are Report(s) with no exhibit(s) involved such as IP Trace, Website Capture, etc.</i></font>';
+	echo '<p>';
+	}
+	
+	if (mysql_num_rows($query) > 0) {
+	
+	// Start the shovelling
+		while ($fetch=mysql_fetch_array($query)) {
+			$case_status = $exhibit_report_status->get_open_close_status($fetch["exhibit_report_id"]);
+			if ($case_status == "In Progress") {
+				$inprogressfiles[] = $fetch;
+			}
+			if ($case_status == "Close") {
+				$closefiles[] = $fetch;
+			}
+			if ($case_status == "Open") {
+				$openfiles[] = $fetch;
+			}
+		}		
+
+		echo '<div id="accordion-example" data-collapse="accordion">';
+		
+	// Dump In Progress Files		
+		if (count($inprogressfiles) > 0) {
+		echo '<h3 class="open">In Progress Files ('.count($inprogressfiles).')</h3>';
+		echo '<div>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">Search Warrant Expiry Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($inprogressfiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$inprogressfiles[$j]["case_id"].'&erid='.$inprogressfiles[$j]["exhibit_report_id"].'">'.$inprogressfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_pros"].'</td>';
+
+      		$exhibit_type_count = get_exhibit_count($inprogressfiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $inprogressfiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$inprogressfiles[$j]["exhibit_report_caption"]."</span></td>";
+
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $inprogressfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$inprogressfiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($inprogressfiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$inprogressfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+      		$tcu_primary = $member->get_value('member_login', $inprogressfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#66CCFF">In Progress</td>';
+      		
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Closed Files
+		if (count($closefiles) > 0) {
+		echo '<h3>Completed Files ('.count($closefiles).')</h3>';
+		echo '<div>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($closefiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$closefiles[$j]["case_id"].'&erid='.$closefiles[$j]["exhibit_report_id"].'">'.$closefiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$closefiles[$j]["exhibit_report_pros"].'</td>';
+
+      		$exhibit_type_count = get_exhibit_count($closefiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $closefiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$closefiles[$j]["exhibit_report_caption"]."</span></td>";
+
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $closefiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$closefiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($closefiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($closefiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($closefiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($closefiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$closefiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+      		      		$tcu_primary = $member->get_value('member_login', $closefiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#FF9999">Close</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+// Dump Open Files		
+		if (count($openfiles) > 0) {
+		echo '<h3 class="open">Open Files ('.count($openfiles).')</h3>';
+		echo '<div>';
+		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 75px">TCU#</th>';
+		echo '<th style="width: 100px">PROS#</th>';
+		echo '<th >Caption</th>';
+		echo '<th style="width: 300px">Investigative Unit</th>';
+		echo '<th style="width: 100px">Intake Date</th>';
+		echo '<th style="width: 100px">Search Warrant Expiry Date</th>';
+		echo '<th style="width: 100px">TCU Primary Investigator';
+		echo '<th style="width: 80px">Case Status</th>';
+		echo '</tr>';
+		for ($j=0; $j < count($openfiles); $j++) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$openfiles[$j]["case_id"].'&erid='.$openfiles[$j]["exhibit_report_id"].'">'.$openfiles[$j]["exhibit_report_number"].'</a></td>';		
+      		echo '<td>'.$openfiles[$j]["exhibit_report_pros"].'</td>';
+      		
+      		$exhibit_type_count = get_exhibit_count($openfiles[$j]["exhibit_report_id"]);
+      		$spaninfo = $openfiles[$j]["exhibit_report_task"]." \r\n(".$exhibit_type_count.")";
+      		echo "<td><span title=\"".$spaninfo."\">".$openfiles[$j]["exhibit_report_caption"]."</span></td>";
+      		
+      		$iu_name = $investigative_unit->get_value("investigative_unit_name", $openfiles[$j]["exhibit_report_investigative_unit"]);
+			echo '<td>'.$iu_name.'</td>';
+      		echo '<td>'.$openfiles[$j]["exhibit_report_intake_date"].'</td>';
+			if (colordate($openfiles[$j]["exhibit_report_sw_date"]) >= 28) {
+	      		echo '<td style="background-color:#99FF99">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if ((colordate($openfiles[$j]["exhibit_report_sw_date"]) > 14) && (colordate($openfiles[$j]["exhibit_report_sw_date"]) < 28)) {
+	      		echo '<td style="background-color:#FFFF66">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+			if (colordate($openfiles[$j]["exhibit_report_sw_date"]) <= 14) {
+	      		echo '<td style="background-color:#FF9999">'.$openfiles[$j]["exhibit_report_sw_date"].'</td>';
+			}	
+
+      		      		$tcu_primary = $member->get_value('member_login', $openfiles[$j]["exhibit_report_assigned_member"]);
+			echo '<td>'.$tcu_primary.'</td>';
+			echo '<td style="background-color:#99FF99">Open</td>';
+      		echo '</tr>';
+		}
+		echo '</table>';
+		echo '</div>';
+		}
+		echo '</div>';		
+	} else {
+		if ($username) {
+			echo '<p>';
+		echo 'NO TCU Report(s) assigned to '.$username;
+		} else {
+			echo '<p>';
+			echo 'NO Unassigned TCU Report(s)';
+		}
+	}
+//	echo '<p>';
+//	echo '<hr>';
+
+	
+}
+
+?>

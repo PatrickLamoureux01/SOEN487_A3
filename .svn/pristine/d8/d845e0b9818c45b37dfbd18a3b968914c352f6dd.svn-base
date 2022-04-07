@@ -1,0 +1,75 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/member_privilege.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$member = new member();
+$member_privilege = new member_privilege();
+$member_login = $_POST["member_login"];
+$member_first_name = $_POST["member_first_name"];
+$member_last_name = $_POST["member_last_name"];
+$member_email = $_POST["member_email"];
+$member_password = $_POST["member_password"];
+$member_privilege_id = $_POST["member_privilege"];
+$member_password_repeat = $_POST["member_password_repeat"];
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+
+	if ($member_password == $member_password_repeat) {
+		
+		$password = sha1($member_password);
+		$mid = $_POST["mid"];
+//		$member->set_value("member_login", $_POST["member_login"], $mid);
+		$member->set_value("member_first_name", $_POST["member_first_name"], $mid);
+		$member->set_value("member_last_name", $_POST["member_last_name"], $mid);
+		$member->set_value("member_email", $_POST["member_email"], $mid);
+
+		if (isset($_POST["member_privilege"])) $member->set_value("member_privilege", $_POST["member_privilege"], $mid);
+		if (($_POST["member_password"] != "") && ($_POST["member_password_repeat"] != "")) $member->set_value("member_password", $password, $mid);
+	} else {
+		echo "password mismatch";
+		$mid = $member->get_member_id($member_login);
+	}		
+	}
+} else {
+
+	if ($member_password == $member_password_repeat) {
+		$member->insert_member($member_login, $member_password, $member_first_name, $member_last_name, $member_email, $member_privilege_id);
+		$mid = $member->get_member_id($member_login);
+	} else {
+		echo "password mismatch";
+	}
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=ms&mid='.$mid.'">';
+
+?>

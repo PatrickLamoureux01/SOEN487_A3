@@ -1,0 +1,104 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_report_status {
+
+	function exhibit_report_status() {
+
+	}
+
+
+	function insert_exhibit_report_status($reportid) {
+
+		$select = "select * from exhibit_report_status where exhibit_report_id = '$reportid'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into exhibit_report_status(exhibit_report_id) values ('$reportid')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_exhibit_report_status()');
+		} else {
+//			echo 'Duplicate Existed';
+		}
+	}
+
+	function delete_exhibit_report_status($id) {
+
+		$select = "update exhibit_report_status set delete_flag='1' where exhibit_report_status_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit_report_status()'); 
+
+	}
+	
+	function check_report_status_exist($reportid) {
+		$select = "select exhibit_report_status_id from exhibit_report_status where exhibit_report_id = '$reportid'";
+		$query = mysql_query($select);
+		$num_of_rows = mysql_num_rows($query);
+		if ($num_of_rows > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	function get_open_close_status($erid) {
+		$select = "select exhibit_report_status_case_status from exhibit_report_status where exhibit_report_id = '$erid'";
+		$query = mysql_query($select);
+		$result = mysql_fetch_row($query);
+		return $result[0];
+		
+	}
+
+	function get_report_status_id($reportid) {
+		$select = "select exhibit_report_status_id from exhibit_report_status where exhibit_report_id = '$reportid'";
+		$query = mysql_query($select);
+		$result = mysql_fetch_row($query);
+		return $result[0];		
+	}
+	
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit_report_status set ".$tbl_col."='$value' where exhibit_report_status_id='$rowid'";
+		//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','exhibit report status set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit_report_status where exhibit_report_status_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','exhibit report status get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	function list_exhibit_report_status() {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_report_status";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_report_status()');
+
+		$mylist = fetch_results_to_list($query);
+	
+		return $mylist;
+	}
+}
+?>

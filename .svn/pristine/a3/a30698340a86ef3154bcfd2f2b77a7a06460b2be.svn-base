@@ -1,0 +1,46 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+include('../include/exhibit.php');
+include('../include/investigative_unit.php');
+include('../include/initiative.php');
+include('../include/exhibit_report_status.php');
+include('../include/return_status.php');
+include('../include/exhibit_type.php');
+include('../include/exhibit_continuity.php');
+include('../include/files.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+$erid=$_POST["erid"];
+$files = new files();
+$files->delete_files($_POST["file_id"]);
+echo '<meta http-equiv="refresh" content="10;url=../index.php?cmd=afileman&erid='.$erid.'">';
+
+?>

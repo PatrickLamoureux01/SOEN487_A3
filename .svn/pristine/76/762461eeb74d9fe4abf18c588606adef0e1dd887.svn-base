@@ -1,0 +1,61 @@
+<?php
+
+if (isset($_GET["type"])) {
+	
+	switch($_GET["type"]) {
+		
+		// TCU Reports by Date Range
+		case "1":		
+			if ($_SESSION["ac"] == 1) {
+			include('./report/case_by_date.php');
+			}
+			break;
+		case "2":
+			if ($_SESSION["ac"] == 1) {	
+			include('./report/exhibits_by_type.php');
+			}
+			break;
+		case "9":
+			include('./report/case_by_date_by_member.php');
+			break;	
+		case "5":
+			include('./report/exhibit_location_status.php');
+			break;	
+		case "6":
+			include('./report/exhibits_by_member.php');
+			break;
+		case "7":
+			include('./report/exhibits_reports_by_investigative_unit.php');
+			break;
+		case "8":
+			include('./report/active_exhibits_reports_in_dates.php');
+			break;
+	}
+
+	echo '<a  class="no-print" href="?cmd=reports">Back to Report Menu</a>';
+} else {
+?>
+<h2>Report Menu</h2>
+<br><br>
+<ul style="text-indent: 20px;">
+<?php if ($_SESSION["ac"] == 1) { ?>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=1">Number of CSER Exhibit Reports by Date Range</a></li>
+<?php }?>
+<?php if ($_SESSION["ac"] == 1) { ?>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=2">Number of Exhibits by type</a></li>
+<?php }?>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=9">Number of CSER Exhibit Reports by Date Range by Member</a></li>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=5">Exhibit Room Status</a></li>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=6">Number of Exhibits by member</a></li>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=7">Number of Exhibit Report by Investigative Unit</a></li>
+<li style=" padding: 4px"><a href="./index.php?cmd=reports&type=8">Active Files Report</a></li>
+
+
+
+</ul>
+
+<?php
+
+}
+
+?>

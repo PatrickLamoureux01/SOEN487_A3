@@ -1,0 +1,159 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_report {
+
+	function exhibit_report() {
+
+	}
+
+
+	function create_exhibit_report($case_id) {
+
+		$current_year = date('Y');
+		$erc = new exhibit_report_counter();
+		$next_report_num = $erc->next_exhibit_report_number();
+		$fmt_next_report_num = add_zero_as_placeholder(3, $next_report_num);
+		$exhibit_report_number = $current_year.'-'.$fmt_next_report_num;
+		
+		$select = "select * from exhibit_report where exhibit_report_number = '$exhibit_report_number'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into exhibit_report(exhibit_report_number, exhibit_report_case_id) values ('$exhibit_report_number','$case_id')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_exhibit_report()');
+			$select = "select exhibit_report_id, exhibit_report_number from exhibit_report where exhibit_report_number = '$exhibit_report_number'";
+			$query = mysql_query($select);
+			if (!$query) c_error('3', 'create_exhibit_report()');
+			$result = mysql_fetch_row($query);
+			return $result;
+		} else {
+			//echo 'Duplicate Existed';
+			$select = "select exhibit_report_id, exhibit_report_number from exhibit_report where exhibit_report_number = '$exhibit_report_number'";
+			$query = mysql_query($select);
+			if (!$query) c_error('3', 'create_exhibit_report()');
+			$result = mysql_fetch_row($query);
+			return $result;
+		}
+	}
+
+	function delete_exhibit_report($id) {
+
+		$select = "update exhibit_report set delete_flag='1' where exhibit_report_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit_report()'); 
+
+	}
+
+	
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit_report set ".$tbl_col."='$value' where exhibit_report_id='$rowid'";
+//		echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','exhibit report set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit_report where exhibit_report_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','exhibit report get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+		
+	}	
+	
+	function get_report_id_by_num($report_num) {
+		
+		$select = "select exhibit_report_id from exhibit_report where exhibit_report_number = '$report_num'";
+		$query = mysql_query($select);
+		
+		$result = mysql_fetch_row($query);
+		
+		return $result[0];
+		
+	}
+
+	function list_exhibit_report() {
+
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_report";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_report()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+	
+	function list_last5_exhibit_report() {
+		
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_report";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_report()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+		
+		
+	}
+	
+	function list_exhibit_report_by_case_id($case_id) {
+
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_report where exhibit_report_case_id='$case_id'";
+	//	echo $select;
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_report()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+			
+	}
+	
+	function number_of_rows($tbcol, $value) {
+		
+		$select = "select * from exhibit_report where $tbcol = '$value'";
+		$query = mysql_query($select);
+		return mysql_num_rows($query);
+		
+	}
+	
+	function generate_combo_box($select_name) {
+		
+		$select = "select exhibit_report_id, exhibit_report_number from exhibit_report order by exhibit_report_number";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+	
+}
+?>

@@ -1,0 +1,35 @@
+<?php
+
+
+if (isset($_GET["iid"])) $iid = $_GET["iid"];
+if (isset($_POST["iid"])) $iid = $_POST["iid"];
+$initiative = new initiative();
+$initiative_name = $initiative->get_value('initiative_name', $iid);
+$initiative_other = $initiative->get_value('initiative_other', $iid);
+
+echo '<h2>Initiative</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submiteditiform()">Edit</a> &nbsp;|&nbsp; <a href="/index.php?cmd=di&id='.$iid.'">Initiative List</a> ]</span>';
+
+echo '<form name="edit_i" id="edit_i" method="post" action="index.php?cmd=ei">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="iid" value="'.$iid.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditiform()';
+echo '{';
+echo 'document.edit_i.submit()';
+echo '}';
+echo '</script>'; 
+
+
+echo '<table><tr>';
+echo '<td><strong>Initiative</strong></td><td>'.$initiative_name.'</td>';
+echo '</tr><tr>';
+echo '<td nowrap><strong>Initiative Description</strong></td><td>'.$initiative_other.'</td>';
+echo '</tr>';
+echo '</table>';
+
+echo '</div><br>';
+
+?>

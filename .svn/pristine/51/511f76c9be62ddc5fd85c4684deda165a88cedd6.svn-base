@@ -1,0 +1,56 @@
+<?php 
+/*	$connection = new db();
+	$connection->db_connect($db_host, $db_username, $db_password);
+	$connection->db_select($db_name);
+*/	
+	$select = "select * from initiative order by initiative_name asc";
+
+	$query = mysql_query($select);
+
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+
+  echo '<form name="create_i" method="post" action="index.php?cmd=ai"></form>';
+  echo '<script type="text/javascript">';
+  echo 'function submitform(){document.create_i.submit()}';
+  echo '</script>';     
+
+
+    echo '<h2>Initiative</h2>';
+    echo '<div class="dCaseInfo">';
+    echo '<span class="sAddExRep">[ <a href="javascript: submitform()">Add Initiative</a> ]</span>';
+
+
+
+
+    /*
+    echo '<form name="create_i" method="post" action="index.php?cmd=ai">';
+//echo '<a href="javascript: submitform()">Add Exhibit Report</a> ';
+echo '<hr style="margin:-11px 0px 8px 0px;"><span class="sAddExRep">[ <a href="javascript: submitform()">Add Initiative</a> ]</span>';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submitform()';
+echo '{';
+echo 'document.create_i.submit()';
+echo '}';
+echo '</script>';     
+     */
+    echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th>Initiative</th>';
+		echo '<th>Description</th>';
+		echo '</tr>';
+		while ($fetch = mysql_fetch_array($query)) {
+			echo '<tr>';
+			echo '<td><a href="/index.php?cmd=si&iid='.$fetch["initiative_id"].'">'.$fetch["initiative_name"].'</a></td>';		
+      echo '<td>'.$fetch["initiative_other"].'</td>';
+			echo '<tr>';
+		}
+    echo '</table>';
+    echo '</div>';
+		
+	}
+	//}
+	//echo ($mylist[0][0]);
+	
+?>

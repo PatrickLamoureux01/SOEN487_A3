@@ -1,0 +1,14 @@
+from 1.30 to 1.42
+// ALTER TABLE `exhibit_report` ADD `exhibit_report_sw_date` DATE NOT NULL
+from 1.4x to 1.5x
+ALTER TABLE `exhibit_report_status` ADD `exhibit_report_status_unanalyzed` INT( 1 ) NOT NULL;
+ALTER TABLE `exhibit_report_status` ADD `exhibit_report_status_close_date` DATE NOT NULL AFTER `exhibit_report_status_forward_date`;
+update exhibit_report_status set exhibit_report_status_close_date = exhibit_report_status_forward_date;
+ALTER TABLE `exhibit_report` ADD `exhibit_report_project_name` TEXT NOT NULL AFTER `delete_flag`;
+ALTER TABLE `exhibit_report` ADD `exhibit_report_action` TEXT NOT NULL AFTER `exhibit_report_project_name` ,
+ADD `exhibit_report_issues` TEXT NOT NULL AFTER `exhibit_report_action` ,
+ADD `exhibit_report_resolutions` TEXT NOT NULL AFTER `exhibit_report_issues` ,
+ADD `exhibit_report_misc_comments` TEXT NOT NULL AFTER `exhibit_report_resolutions`;
+ALTER TABLE `case_info` ADD `case_project_name` TEXT NOT NULL AFTER `case_caption` 
+INSERT INTO `exhibit_status_type` (`exhibit_status_type_id`, `exhibit_status_type_name`, `exhibit_status_type_other`, `delete_flag`) VALUES ('7', 'Completed', '', '0');
+INSERT INTO `exhibit_status_type` (`exhibit_status_type_id`, `exhibit_status_type_name`, `exhibit_status_type_other`, `delete_flag`) VALUES ('8', 'Pending', '', '0');

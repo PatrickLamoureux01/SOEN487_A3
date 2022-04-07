@@ -1,0 +1,67 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/case_info.php');
+include('../include/common.php');
+include('../include/member.php');
+session_start();
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$duplicate = false;
+$case_info = new case_info();
+$member_info = new member();
+$member_login_id = $_SESSION["mid"];
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$case_id = $_POST["case_id"];
+		if (($case_info->check_duplicate_pros_id($_POST["case_pros_id"], $_POST["case_id"])) == true) {
+			$duplicate = true;
+			echo "PROS Number exist in system.  You cannot update with this PROS number";
+		}
+	}
+}
+if ($duplicate == false) {
+	$case_info->insert_case_info($_POST["case_pros_id"]);
+	$case_id = $case_info->get_id($_POST["case_pros_id"]);
+
+	$case_info->set_value("case_caption", $_POST["case_caption"], $case_id);
+	$case_info->set_value("case_project_name", $_POST["case_project_name"], $case_id);
+	$case_info->set_value("case_lead_investigator", $_POST["case_lead_investigator"], $case_id);
+	$case_info->set_value("case_lead_investigator_email", $_POST["case_lead_investigator_email"], $case_id);
+//	$case_info->set_value("case_initiative_id", $_POST["initiative_id"], $case_id);
+	$case_info->set_value("case_investigative_unit_id", $_POST["investigative_unit_id"], $case_id);
+	$case_info->set_value("case_entered_date", $_POST["case_entered_date"], $case_id);
+	$case_info->set_value("case_entry_member_login", $_POST["member_id"], $case_id);
+	$case_info->set_value("case_memo", $_POST["case_memo"], $case_id);
+
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=cs&id='.$case_id.'">';
+
+?>

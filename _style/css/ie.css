@@ -1,0 +1,70 @@
+* {
+	margin: 0;
+}
+html, body {
+  height: 97%;
+  margin-top:10px;
+  margin-bottom:10px;
+  font-size: 16px;
+}
+
+#content-container1 {
+	
+	float: left;
+	width: 92%;
+		
+	} 
+#content-container2 {
+	float: left;
+	width: 92%;
+	}
+	
+#content {
+	float: right;
+	width: 100%;
+	border: 0px solid gray;
+	font-weight: normal;
+	left: 245px;
+	display: inline;
+	}
+	
+#header {
+	height: 87px;
+	background: url(../../_style/img/mast_RCMPGRC.gif) no-repeat;
+	border-bottom: 1px solid #777;
+}
+
+input, textarea {margin: 0.25em 0 0.5em 0;width: 80%;border: 1px solid #999;padding: 1px 0 2px 0;background: #FFFFFF;font-family:sans-serif;}
+select {margin: 0.25em 0 0.5em 0;width: 63%;border: 1px solid #999;padding: 1px 0 2px 0;background: #FFFFFF;font-family:sans-serif;}
+
+
+.dCaseInfo table {margin-top:2px}
+
+#PROSNum {border-collapse: collapse;}
+/*#PROSNum td {cursor: pointer;}*/
+
+
+a.date-picker {
+	width: 18px;
+	height: 18px;
+	border: solid 1px;
+	color: #fff;
+	padding: 0;
+	margin: 0;
+	float: left;
+	overflow: hidden;
+	cursor: pointer;
+	background: url(../../_style/img/ico_calendar.png) no-repeat; 
+}
+a.date-picker2Day {
+	width: 18px;
+	height: 18px;
+	border: solid 1px;
+	color: #fff;
+	padding: 0;
+	margin: 0;
+	float: left;
+	overflow: hidden;
+	cursor: pointer;
+	background: url(../../_style/img/ico_today.png) no-repeat; 
+}

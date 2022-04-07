@@ -1,0 +1,81 @@
+<?php
+
+if (isset($_POST["start_date"])) $start_date = $_POST["start_date"];
+if (isset($_POST["end_date"])) $end_date = $_POST["end_date"];
+
+?>
+
+<h2>Number of CSER Exhibit Reports by Investigative Team by Date Range</h2>
+
+<?php 
+
+if (isset($start_date) && isset($end_date)) {
+
+    echo '<h2># of CSER Exhibit Reports by Investigative Team from '.$start_date.' to '.$end_date.'</h2>';
+	$select = 'select * from investigative_unit';
+	$query = mysql_query($select);
+	echo '<br>';
+	echo '<br>';
+	echo '<table style="width:650px"  id="PROSNum">';
+	echo '<tr>';
+	echo '<th style="width:200px">Investigative Team</th><th style="text-align: center">Number of CSER Exhibit Reports</th>';
+	while ($fetch = mysql_fetch_array($query)) {
+		
+		$select_exhibit_report = "select exhibit_report_id from exhibit_report where exhibit_report_investigative_unit = '$fetch[0]' and exhibit_report_intake_date >= '$start_date' and exhibit_report_intake_date <= '$end_date'";
+
+//		echo $select_exhibit;
+		$query_exhibit_report = mysql_query($select_exhibit_report);
+		$result = mysql_fetch_row($query_exhibit_report);
+		$count = mysql_num_rows($query_exhibit_report);
+		
+		if ($count > 0) {
+
+		echo '<tr><td>'.$fetch["investigative_unit_name"].'</td>';
+		
+		if ($count > 0) {
+		echo '<td style="text-align: center">'.$count.'</td></tr>';
+		} else {
+			
+		echo '<td style="text-align: center">None</td></tr>';
+		}
+		}
+		
+	} 
+
+   echo '</table>';
+	
+	echo '<br><br><br>';
+	echo '<a href="./index.php?cmd=reports&type=2">Start a new Search</a>';
+    echo '&nbsp;';
+	
+} else {
+
+?>
+
+<form action="./index.php?cmd=reports&type=7" method="post">
+<table style="width:650px">
+<tr>
+<td style="text-align: right">Start Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px" type="text" name="start_date"  id="start_date" class="w20 flLeft" readonly value="
+	<?php if (isset($start_date)) echo $start_date; ?>
+	">
+</td>
+<td style="text-align: right">End Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px"  type="text" name="end_date"  id="end_date" class="w20 flLeft" readonly value="
+	<?php if (isset($end_date)) echo $end_date; ?>
+	">
+</td>
+
+<td>
+	<input type="submit" name="submit" id="submit" class="button">
+</td>
+</tr>
+</table>
+
+</form>
+<br><br><br><br>
+<?php }?>

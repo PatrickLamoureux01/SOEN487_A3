@@ -1,0 +1,14 @@
+      <div class="print">
+        <br><br><h2>Reports</h2>
+        <hr style="margin:-11px 0px 8px 0px;" size=1>
+        <table width="100%" id="PROSNum">
+          <tr><th>Report Type</th><th style="text-align:right;">Item Delivered</th></tr>
+          <tr><td nowrap>Printed Summary Report</td><td nowrap align=right>[ ]</td></tr>
+          <tr><td nowrap>Electronic Report on CD/DVD Rom or external media</td><td align=right nowrap>N/A [ ] &nbsp;&nbsp;&nbsp; [ ]</td></tr>
+        </table><br><br><br><br>
+        <table width="50%" id="PROSNum" style="float:right;"><tr>
+          <td width="35%"><hr style="margin:0;">SIGNATURE</td>
+          <td width="15%" nowrap><hr style="margin:0;">Date</td>
+        </tr>
+        </table>
+		</div>

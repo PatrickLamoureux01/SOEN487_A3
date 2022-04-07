@@ -1,0 +1,44 @@
+<?php
+session_start();
+if (isset($_SESSION["User"])) {
+
+	if(isset($_GET['id']))
+	{
+		// if id is set then get the file with the id from database
+
+
+		include('../include/config.inc');
+		include('../include/db.php');
+		include('../include/common.php');
+		include('../include/files.php');
+
+		$connection = new db();
+		$connection->db_connect($db_host, $db_username, $db_password);
+		$connection->db_select($db_name);
+
+		$id    = $_GET['id'];
+		$query = "SELECT name, type, size, content " .
+         "FROM files WHERE id = '$id'";
+
+		$result = mysql_query($query) or die('Error, query failed');
+		list($name, $type, $size, $content) =                                  mysql_fetch_array($result);
+
+		header("Content-length: $size");
+		header("Content-type: $type");
+		header("Content-Disposition: attachment; filename=$name");
+		echo $content;
+
+		exit;
+	}
+	?>
+<html>
+<body onload="javascript:window.close()">
+</body>
+</html>
+	<?php
+
+} else {
+	echo "You are not authorized to download this file!";
+}
+
+?>

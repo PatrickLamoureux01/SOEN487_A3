@@ -1,0 +1,153 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class member {
+
+
+	function member() {
+
+
+	}
+
+	function get_member_id($member_login) {
+		
+		$select = "select member_id from member where member_login = '$member_login'";
+		$query = mysql_query($select);
+		$member_id = mysql_fetch_row($query);
+		if (!$query) c_error('3','get_member_id()');
+		return $member_id[0];		
+	}
+
+	function insert_member($login, $password, $first, $last, $email, $mprivilege) {
+
+		$select = "select * from member where member_login='$login'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','insert_member()');
+		if (mysql_num_rows($query) == 0) {
+			$password = sha1($password);
+			$select = "insert into member(member_login, member_password, member_first_name, member_last_name, member_email, member_privilege) values ('$login','$password','$first','$last','$email','$mprivilege')";
+			//echo $select;
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_member()');
+		} else {
+			//echo 'Duplicate Existed';
+		}
+
+	}
+
+	function validate_member($login, $password) {
+
+		$sha1pw = sha1($password);
+		$select = "select * from member where member_login = '$login' and member_password = '$sha1pw'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3', 'validate_member()');
+		if (mysql_num_rows($query) == 1) {
+			return 1;
+		} else {
+			return 0;
+		}
+
+	}
+
+
+	function delete_member($rowid) {
+
+		$select = "update member set delete_flag='1' where member_id='$rowid'";
+		$query = exec_to_system_log($select);
+		if (!$query) c_error('3', 'delete_member()');
+
+	}
+
+
+
+    function set_value($tbl_col, $value, $rowid) {
+
+        $select = "update member set ".$tbl_col."='$value' where member_id='$rowid'";
+    //    echo $select;
+        $query = exec_to_system_log($select);
+
+        if (!$query) c_error('3','member set_value()');
+
+    }
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from member where member_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','member get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+    function list_member() {
+    	
+    	$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from member";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_status_type()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+    	
+    }
+
+	function member_privilege($member_login) {
+
+		$select = "SELECT member_privilege_value, member_privilege_description from member, member_privilege where member_login='$member_login' and member_privilege = member_privilege_value;";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','member_privilege()');
+		
+		$mylist = fetch_results_to_list($query);		
+		
+		return $mylist;
+	}
+	
+	function generate_combo_box($select_name) {
+		
+		$select = "select member_id, member_login from member order by member_login";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+	
+	function generate_combo_box_select($select_name, $id) {
+
+		$select = "select member_id, member_login from member order by member_login";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+				
+		
+	} 
+	
+	function number_of_rows() {
+
+		$select = "select * from member";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','number_of_rows()');
+		
+		return mysql_num_rows($query);
+	
+	}
+}
+
+?>

@@ -1,0 +1,55 @@
+<?php
+
+
+
+$member_id = $_GET["mid"];
+
+$member = new member();
+$member_privilege = new member_privilege();
+$member_login = $member->get_value('member_login', $member_id);
+$member_first_name = $member->get_value('member_first_name', $member_id);
+$member_last_name = $member->get_value('member_last_name', $member_id);
+$member_email = $member->get_value('member_email', $member_id);
+$member_privilege_id = $member->get_value('member_privilege', $member_id);
+$member_last_login = $member->get_value('member_login_date', $member_id);
+
+echo '<h2>Info for '.$member_login.'</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submit_edit_member_form()">Edit Member</a>  &nbsp;|&nbsp; <a href="./index.php?cmd=ml">Member List</a> ]</span>';
+
+
+echo '<table>';
+echo '<tr>';
+echo '<td nowrap><strong>Member Login</strong></td><td>'.$member_login.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>First Name</strong></td><td>'.$member_first_name.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Last Name</strong></td><td>'.$member_last_name.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>E-mail</strong></td><td>'.$member_email.'</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><strong>Privilege</strong></td><td>'.$member_privilege->get_value('member_privilege_description', $member_privilege_id).'</td>';
+echo '</tr>';
+
+echo '<tr>';
+echo '<td><strong>Last Login</strong></td><td>'.$member_last_login.'</td>';
+echo '</tr>';
+echo '</table>';
+echo '</div><br>';
+
+echo '<form name="edit_member" id="edit_member" method="post" action="./index.php?cmd=me">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="mid" value="'.$member_id.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submit_edit_member_form()';
+echo '{';
+echo 'document.edit_member.submit()';
+echo '}';
+echo '</script>'; 
+
+?>

@@ -1,0 +1,37 @@
+<?php
+
+
+if (isset($_GET["elid"])) $elid = $_GET["elid"];
+if (isset($_POST["elid"])) $elid = $_POST["elid"];
+$exhibit_location = new exhibit_location();
+$exhibit_location_name = $exhibit_location->get_value('exhibit_location_name', $elid);
+$exhibit_location_other = $exhibit_location->get_value('exhibit_location_other', $elid);
+
+echo '<h2>Exhibit Location</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submiteditelform()">Edit</a> &nbsp;|&nbsp; <a href="./index.php?cmd=del&id='.$elid.'">Exhibit Location List</a> ]</span>';
+
+
+
+echo '<form name="edit_el" id="edit_el" method="post" action="./index.php?cmd=eel">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="elid" value="'.$elid.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditelform()';
+echo '{';
+echo 'document.edit_el.submit()';
+echo '}';
+echo '</script>'; 
+
+
+echo '<table><tr>';
+echo '<td><strong>Exhibit Location</strong></td><td>'.$exhibit_location_name.'</td>';
+echo '</tr><tr>';
+echo '<td nowrap><strong>Exhibit Location Description</strong></td><td>'.$exhibit_location_other.'</td>';
+echo '</tr>';
+echo '</table>';
+
+echo '</div><br>';
+
+?>

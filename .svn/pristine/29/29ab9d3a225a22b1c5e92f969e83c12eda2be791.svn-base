@@ -1,0 +1,100 @@
+<?php
+
+if (isset($_POST["start_date"])) $start_date = $_POST["start_date"];
+if (isset($_POST["end_date"])) $end_date = $_POST["end_date"];
+
+?>
+
+<h2>Number of CSER Exhibit Reports by Date Range by Member</h2>
+
+<?php 
+
+if (isset($start_date) && isset($end_date)) {
+
+  	echo '<h2>CSER #\'s from '.$start_date.' to '.$end_date.'</h2>';
+	
+	$select_member = 'select member_id, member_login from member';
+	$query_member = mysql_query($select_member);
+	while ($fetch_member = mysql_fetch_array($query_member)) {
+		$this_member_id = $fetch_member[0];
+		$this_member_login = $fetch_member[1];
+	echo '<hr>';
+	echo '<h2>Statistics for '.$this_member_login.'</h2>';
+
+	$select = "select * from exhibit_report where exhibit_report_assigned_member = $this_member_id and exhibit_report_id in (select exhibit_report_id from exhibit_report_status where exhibit_report_status_analysis_start_date >= '$start_date' and exhibit_report_status_analysis_start_date <='$end_date')";
+	//echo $select;
+	$query = mysql_query($select);
+
+	$member = new member();
+	$iu = new investigative_unit();
+	
+	// insert style sheet here
+  if (mysql_num_rows($query) > 0) {
+  	$count = mysql_num_rows($query);
+	echo 'There are '.$count.' of Exhibit Report found';
+	echo '<br><br>';
+	  	
+  		echo '<table width="100%" id="PROSNum">';
+		echo '<tr>';
+		echo '<th style="width: 65px">CSER #</th>';
+		echo '<th style="width: 110px">CASE #</th>';
+		echo '<th>Caption</th>';
+		echo '<th>Investigative Unit</th>';
+		echo '<th style="width: 80px">Intake Date</th>';
+		echo '<th>Assigned Member</th>';
+		echo '</tr>';
+		while ($fetch = mysql_fetch_array($query)) {
+			echo '<tr>';
+			echo '<td><a href="./index.php?cmd=ers&id='.$fetch["case_id"].'&erid='.$fetch["exhibit_report_id"].'">'.$fetch["exhibit_report_number"].'</a></td>';		
+      echo '<td>'.$fetch["exhibit_report_pros"].'</td>';
+	  echo '<td>'.$fetch["exhibit_report_caption"].'</td>';
+
+$investigative_unit_name = $iu->get_value("investigative_unit_name", $fetch["exhibit_report_investigative_unit"]);
+
+	  echo '<td>'.$investigative_unit_name.'</td>';
+
+
+
+      echo '<td>'.$fetch["exhibit_report_intake_date"].'</td>';
+      echo '<td>'.$member->get_value("member_login", $fetch["exhibit_report_assigned_member"]).'</td>';
+			echo '<tr>';
+		}
+		echo '</table>';
+		
+	} else {
+		echo 'NO CSER Exhibit Report(s) found';
+	}
+
+	} // End BIG WHILE
+	echo '<br><br><br>';
+	echo '<a href="./index.php?cmd=reports&type=1">Start a new Search</a>';
+} else {
+
+?>
+<div>
+<p>Select your date range and click Submit Query</p>
+<form action="./index.php?cmd=reports&type=9" method="post">
+<table style="width:650px"><tr>
+<td style="text-align: right">Start Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px" type="text" name="start_date"  id="start_date" class="w20 flLeft" readonly value="<?php if (isset($start_date)) echo $start_date; ?>">
+</td>
+<td style="text-align: right">End Date</td>
+
+<td style="vertical-align: top">
+	<input style="width:100px; height:20px"  type="text" name="end_date"  id="end_date" class="w20 flLeft" readonly value="<?php if (isset($end_date)) echo $end_date; ?>">
+</td>
+
+<td>
+	<input type="submit" name="submit" id="submit" class="button" value="Submit">
+</td>
+</tr>
+</table>
+
+</form>
+</div>
+<br><br><br><br><br>
+<?php }?>
+
+

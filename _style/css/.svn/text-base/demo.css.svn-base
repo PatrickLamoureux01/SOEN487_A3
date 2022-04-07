@@ -1,0 +1,32 @@
+h3 {
+  margin: 0;
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  background-color: #eee;
+
+}
+
+h3 a {
+  background: url("sprite.png") 15px 13px no-repeat;
+  display: block;
+  padding: 10px;
+  padding-left: 32px;
+  margin: 0;
+  color: #d00;
+  text-decoration: none;
+  font-weight: normal;
+
+}
+h3:hover { background: #ddd; }
+h3.open  { background: #eee; }
+h3.open a { background-position: 13px -25px;}
+h3 + div { padding: 10px; }
+
+
+/* Pre hide sections with JavaScript on
+--- */
+h3+div {
+  display: none;
+}

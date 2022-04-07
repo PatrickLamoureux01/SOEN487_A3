@@ -1,0 +1,45 @@
+
+<h2>Exhibit Location Status</h2>
+
+<?php 
+
+$select = "select exhibit_location.exhibit_location_id, exhibit_location_name from exhibit_location order by exhibit_location_name";
+$query = mysql_query($select);
+	echo '<br>';
+	echo '<br>';
+	echo '<table style="width:650px" id="PROSNum">';
+	echo '<tr>';
+	echo '<th style="width:200px">Exhibit Room Location</th><th>TCU Exhibit Report #</th>';
+
+	while ($result = mysql_fetch_array($query)) {
+	
+		echo '<tr><td style="text-align: center; width:125px">';
+		echo $result[1];
+		echo '</td>';
+	
+	$select1 = "select distinct(exhibit_report_id) from exhibit where exhibit_location = '$result[0]'";
+	$query1 = mysql_query($select1);
+	$result1 = mysql_num_rows($query1);
+	echo '<td style="width: 450px">';
+	
+	if ($result1 > 0) {
+		while ($result2 = mysql_fetch_array($query1)){
+			$select3 = "select exhibit_report_number from exhibit_report where exhibit_report_id = '$result2[0]'";
+			$query3 = mysql_query($select3);
+			$result3 = mysql_fetch_row($query3);
+			echo '[ '.$result3[0].' ] ';		
+			//			echo $result2[0].'<br>';
+		}
+	} else {
+		echo '';
+	}
+	echo '</td>';	
+	
+	echo '</tr>';
+}
+echo '</table>';
+
+echo '<br><br><br><br>';
+
+
+?>

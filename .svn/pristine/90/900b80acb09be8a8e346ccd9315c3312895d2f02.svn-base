@@ -1,0 +1,99 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class initiative {
+
+	function initiative() {
+
+	}
+
+
+	function insert_initiative($value, $desc) {
+
+		$select = "select * from initiative where initiative_name = '$value'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into initiative(initiative_name, initiative_other) values ('$value', '$desc')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_initiative()');
+		} else {
+		//	echo 'Duplicate Existed';
+		}
+	}
+
+	function delete_initiative($id) {
+
+		$select = "update initiative set delete_flag='1' where initiative_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_initiative()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update initiative set ".$tbl_col."='$value' where initiative_id='$rowid'";
+		//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','assisted unit set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from initiative where initiative_id = '$id'";
+	//echo $select;
+		$query = mysql_query($select);
+		if (!$query) c_error('3','assisted unit get_value()');
+		$result = mysql_fetch_row($query);
+		return $result[0];
+				
+	}
+
+	function list_initiative() {
+
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from initiative";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_initiative()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+
+	function generate_combo_box($select_name) {
+		
+		$select = "select initiative_id, initiative_name from initiative order by initiative_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+
+	function generate_combo_box_select($select_name, $id) {
+		
+		$select = "select initiative_id, initiative_name from initiative order by initiative_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box_select()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+	}
+}
+?>

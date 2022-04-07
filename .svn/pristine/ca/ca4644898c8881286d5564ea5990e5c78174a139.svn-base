@@ -1,0 +1,176 @@
+html {
+	overflow-y: scroll;
+	padding-top:1%;
+	padding-bottom:1%;
+} 
+
+body {text-align: center;height: 100%; font-family:arial; font-size: 16px}
+
+.wrapper {
+	position: relative;
+	width: 98%;
+	font-size: 0.9em;
+	margin: 0  auto 100px;
+	text-align: left;
+}
+
+
+/* beginning of framing */
+#container 
+{ 
+	margin: 0 0;
+	align: center;
+	width: 98%;
+	}
+
+#header {
+	background: #ccc;
+	
+	}
+
+#navigation {
+	
+	}
+	
+#section-navigation {
+	
+	float: left;
+	width: 215px;
+	padding: 15px 0;
+	margin: 0 10px;
+	/*display: inline;*/
+	position: absolute;
+	
+	}
+	
+#content-container1 {
+	
+	float: left;
+	width: 100%;
+		
+	} 
+#content-container2 {
+	float: left;
+	width: 100%;
+	}
+
+#content {
+	float: right;
+	width: 80%;
+	border: 0px solid gray;
+	font-weight: normal;
+	left: 225px;
+	display: inline;
+	position: absolute;
+	}
+	
+#header {
+	height: 45px;
+	background: url(../../_style/img/mast_RCMPGRC.gif) no-repeat;
+	border-bottom: 1px solid #777;
+}
+
+#header-tagLine {
+  float:left;
+  text-align:bottom;
+  margin:80px 5px 0px 0px;
+  font-size:12px;
+  font-weight:bold; 
+  clear:both;
+  
+}
+
+#header-headerMenu {
+  text-align:bottom;
+  margin:10px 5px 0px 0px;
+  font-size:12px;
+  font-weight:bold;
+  clear:both;
+  padding-bottom: 5px;
+  padding-left: 10px;
+}
+
+
+/* this ends the framing */
+
+h1 {text-indent: -500em;}
+h2 {position: float; padding: 0 0 0.6em;color: #d00;font: 1.3em arial,sans-serif;text-shadow: #ddd 1px 1px 2px;}
+p {padding: 0 0 1em;color: #666;font: .95em/1.4em arial,sans-serif;}
+a {color: #00f;}
+a:hover, a:focus {color: #0bf;}
+a:focus {background: #f00;color:fff;}
+strong {font: 0.9em arial,sans-serif;font-weight: bold;}
+	
+th {
+  border-style:solid;
+  border-color:#7776
+  border-width:0px 0px 1px 0px;
+  padding:2px;
+}
+td {
+  padding:3px;
+  vertical-align:text-top;
+}
+
+.print {display:none;}
+/* Form Fields */
+  
+  fieldset  {padding: 0 0.5em 1em 0.5em;margin: 0 0 1em 0;border: 0px solid #999;  width: 98%;}
+  legend    {padding: 0 0.5em 1em 0;font-weight:bold}
+  label     {display: block;float: left;clear: left;text-align: right;width: 20%;padding: 5px 0 2px 0;margin: 0 5px 0 0;border: 0px solid #000;white-space:nowrap;font:80%/1.5 arial,sans-serif;border}
+
+ 
+
+
+
+  input.button  {width: auto;background: #FFFFFF;border: 1px solid #999;padding: 2px 4px 2px 4px;}
+  input, select, textarea {margin: 0.25em 0 0.5em 0;width: 70%;border: 1px solid #999;padding: 1px 0 2px 0;background: #FFFFFF;font-family:sans-serif;}
+  input:focus, select:focus, textarea:focus   {border: 2px solid #4899BE;padding: 1px 0 0px 0;}
+  input.button:focus  {width: auto;background: #FFFFFF;border: 2px solid #4899BE;padding: 2px 4px 2px 4px;}
+  input.chkrdo, input.chkrdo:focus {border:0px; width: auto;margin:4px 0px 2px 0px;}
+  input.err, select.err {border:solid 1px #990000;background-color:#f8dbdd;}
+
+  table #PROSNum {border-collapse: collapse;}
+  #PROSNum tr {background-color: #eee;border-top: 1px solid #fff;}
+  #PROSNum tr:hover {background-color: #ccc;}
+  #PROSNum th {background-color: #fff;text-align:left;  font: 1em arial,sans-serif;font-weight: bold;}
+  #PROSNum th, #PROSNum td {padding: 3px 5px;}
+
+
+
+.sEditLink {float:right;margin:-15px 0px 0px 0px;font:80%/1.5 arial,sans-serif;background-color:white;}
+.sAddExRep {float:right;margin:-15px 0px 0px 0px;font:80%/1.5 arial,sans-serif;background-color:white;}
+
+.sEnterInfo {margin:0px 0px 0px 0px;padding:0px 0px 0px 3px;font:75%/1.0 arial,sans-serif;float:right;}
+.dCaseInfo {border-top:1px solid #9a9a9a;border-bottom:1px solid #9a9a9a;margin:0px 0px 0px 0px;padding:5px 0px 10px 0px; background-color:f3f3f3;}
+
+#lblFindCase {font-weight:bold;font-size:100%;margin:-4px 0px 0px 0px;text-align:right;border:solid 0px;width: 24%;}
+#txtFindCase {width:73%;margin:0px 0px 0px 3px;}
+
+.mrg-5 {margin:-15px 0px 0px 0px}
+.mrg-1 {margin:-1px 0px 0px 0px}
+
+.w20 {width:20%;}
+.flLeft {float:left;}
+.fclrBoth {clear: both;}
+.txtUpper {text-transform:uppercase;}
+
+
+.formSearchCase {border: solid 0px #000; margin: 1em 0 0 0;clear:both;}	
+
+
+#tbReturn table {border-collapse: collapse;padding:0px; margin:0px;}
+#tbReturn tr {padding:0px; margin:0px;}
+#tbReturn td {border:solid 0px;padding:0px 0px 4px 0px;margin:0px;vertical-align:top;}
+#tbReturn label   {border:solid 0px;width:auto;margin:0px;padding:0px;text-align: left;}
+#tbReturn select   {margin:0px;padding:0px;vertical-align:top;}
+div #tbReturn input.text   {margin:0px;padding:0px;vertical-align:top;}
+
+#tbReturn select:focus   {border: 1px solid #4899BE;margin:0px;padding:0px;}
+
+
+
+
+
+
+

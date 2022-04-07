@@ -1,0 +1,63 @@
+<?php
+/*   // Edit upload location here
+ $destination_path = getcwd().DIRECTORY_SEPARATOR;
+
+ $result = 0;
+  
+ $target_path = $destination_path . basename( $_FILES['myfile']['name']);
+
+ if(@move_uploaded_file($_FILES['myfile']['tmp_name'], $target_path)) {
+ $result = 1;
+ }
+ */
+session_start();
+//This stops SQL Injection in POST vars
+
+$erid = $_POST["erid"];
+$case_id = $_POST["case_id"];
+
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/files.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+foreach ($_POST as $key => $value) {
+	$_POST[$key] = mysql_real_escape_string($value);
+}
+
+//This stops SQL Injection in GET vars
+foreach ($_GET as $key => $value) {
+	$_GET[$key] = mysql_real_escape_string($value);
+}
+if(isset($_POST['upload']) && $_FILES['userfile']['size'] > 0)
+{
+	$fileName = $_FILES['userfile']['name'];
+	$tmpName  = $_FILES['userfile']['tmp_name'];
+	$fileSize = $_FILES['userfile']['size'];
+	$fileType = $_FILES['userfile']['type'];
+
+	$fp      = fopen($tmpName, 'r');
+	$content = fread($fp, filesize($tmpName));
+	$content = addslashes($content);
+	fclose($fp);
+
+	if(!get_magic_quotes_gpc())
+	{
+		$fileName = addslashes($fileName);
+	}
+
+	$files = new files();
+	$ul= $files->insert_files($fileName, $fileSize, $fileType, $content);
+	$rowid = $ul[0];
+	$files->set_value('file_category', $_POST["file_category"], $rowid);
+	$files->set_value('exhibit_report_id', $erid, $rowid);
+}
+
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=erupload&id='.$case_id.'&erid='.$erid.'&ul='.$ul[1].'">';
+
+
+?>

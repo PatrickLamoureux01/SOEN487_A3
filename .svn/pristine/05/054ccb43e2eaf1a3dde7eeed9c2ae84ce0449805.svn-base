@@ -1,0 +1,76 @@
+<?php
+
+//include('./include/member.php');
+//include('./include/member_privilege');
+
+$member = new member();
+$member_privilege = new member_privilege();
+
+$mode = "New";
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+	$member1_id = $member->get_value("member_id", $_POST["mid"]);
+	$member1_login = $member->get_value('member_login', $_POST["mid"]);
+	$member1_first_name = $member->get_value('member_first_name', $_POST["mid"]);
+	$member1_last_name = $member->get_value('member_last_name', $_POST["mid"]);
+	$member1_email = $member->get_value('member_email', $_POST["mid"]);
+	$member1_privilege_id = $member->get_value('member_privilege', $_POST["mid"]);
+	}
+	
+}
+
+?>
+
+
+  <h2><?php echo $mode; ?> Member Information</h2>
+
+
+<form method="post" action="./member/member_processor.php">
+<fieldset class="submitform">
+<label for="member_login">Login Name</label>
+<?php if ($mode == "Edit") {?>
+	<input type="text" name="member_login" value="<?php if (isset($member1_login)) echo $member1_login; ?>" disabled>
+	<input type="hidden" name="member_login" value="<?php if (isset($member1_login)) echo $member1_login; ?>">
+<?php } else {?>
+	<input type="text" name="member_login" value="<?php if (isset($member1_login)) echo $member1_login; ?>">
+<?php }?>
+<label for="member_first_name">First Name</label>
+	<input type="text" name="member_first_name" value="<?php if (isset($member1_first_name)) echo $member1_first_name; ?>">
+<label for="member_last_name">Last Name</label>
+	<input type="text" name="member_last_name" value="<?php if (isset($member1_last_name)) echo $member1_last_name; ?>">
+<label for="member_email">Member E-mail</label>
+	<input type="text" name="member_email" value="<?php if (isset($member1_email)) echo $member1_email; ?>">
+<label for="member_password">Password</label>
+	<input type="password" name="member_password">
+<label for="member_password">Retype Password</label>
+	<input type="password" name="member_password_repeat">
+<?php if ($_SESSION["ac"] == 1 ) { ?>
+<label for="member_privilege">Privilege</label>
+	<?php
+
+	if (isset($member1_privilege_id)) {
+		$member_privilege->generate_combo_box_select('member_privilege', $member1_privilege_id);
+	
+	} else {
+		$member_privilege->generate_combo_box('member_privilege');
+	}
+}
+?>
+
+  <?php if ($mode == "Edit") { ?>
+    <input type="hidden" name="mode" value="edit">
+    <input type="hidden" name="mid" value="<?php echo $_POST["mid"]; ?>">
+  	<p><br><label for="Submit"></label>
+    <input type="submit" value="Update Member" name="Submit" class="button"/>
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=ms&mid=<?php echo $_POST['mid']; ?>'" />
+  <?php } else {?>
+  	<br><br><br><label for="Submit"></label>
+	<input type="submit" value="Add Member" class="button">
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=ml'" />
+  <?php } ?>
+
+</fieldset>
+</form>

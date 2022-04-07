@@ -1,0 +1,48 @@
+.actionbuttons, .headerMenu, .tagline, .leftnav, .sEditLink, .sAddExRep, .footer, #lblFindCase, #txtFindCase {
+display: none;
+}
+#section-navigation, #header-headerMenu {
+	display: none;
+	}
+.print {display:show;}
+th {text-align:left;}
+td {
+  padding:3px;
+  vertical-align:text-top
+}
+form {
+	margin: 0 0 0 0;
+}
+h2 {
+	margin: 0px 0 10px 0px;
+}
+.sEnterInfo {
+  display:none;
+	margin: 0px 0px 0px 8px;
+}
+
+
+.no-print {
+	display: none !important;
+	}
+	
+body {
+	font-size: 9pt;
+	font-family:'Arial';
+}
+
+table {
+	font-size: 9pt;
+	font-family:'Arial';
+	page-break-inside: auto;
+}
+
+tr {
+	page-break-inside:avoid; page-break-after:auto;
+}
+td {
+	page-break-inside:avoid; page-break-after:auto;
+}
+
+thead {display: table-header-group; }
+tfoot {display: table-footer-group; }

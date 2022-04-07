@@ -1,0 +1,47 @@
+<?php
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class return_status {
+
+	function return_status() {
+
+	}
+
+
+	function set_return_status($status_id) {
+
+		$select = "select * from return_status where return_status_id='1'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) > 0 ){
+			$select = "update return_status set return_status_type='$status_id' where return_status_id='1'";
+			$query = exec_to_system_log($select);			
+		} else {
+			$select = "insert into return_status (return_status_type) values ('$status_id')";
+			$query = exec_to_system_log($select);
+		}
+		
+		if (!$query) c_error('3','insert_return_status()');
+	}
+
+	function get_return_status() {
+		
+		$select = "select return_status_type from return_status where return_status_id='1'";
+		$query = mysql_query($select);
+		$fetch = mysql_fetch_row($query);
+		
+		return $fetch[0];
+		
+	}
+}
+?>

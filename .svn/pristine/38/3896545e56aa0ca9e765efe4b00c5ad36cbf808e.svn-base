@@ -1,0 +1,48 @@
+<?php
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class to_tcb {
+
+	function to_tcb() {
+
+	}
+
+
+	function set_to_tcb($status_id) {
+
+		$select = "select * from to_tcb where to_tcb_id='1'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) > 0 ){
+			$select = "update to_tcb set to_tcb_type='$status_id' where to_tcb_id='1'";
+			$query = exec_to_system_log($select);			
+		} else {
+			$select = "insert into to_tcb (to_tcb_type) values ('$status_id')";
+			$query = exec_to_system_log($select);
+		}
+		
+		if (!$query) c_error('3','insert_to_tcb()');
+	}
+
+	function get_to_tcb() {
+		
+		$select = "select to_tcb_type from to_tcb where to_tcb_id='1'";
+		$query = mysql_query($select);
+		$fetch = mysql_fetch_row($query);
+//		echo $select;
+		
+		return $fetch[0];
+		
+	}
+}
+?>

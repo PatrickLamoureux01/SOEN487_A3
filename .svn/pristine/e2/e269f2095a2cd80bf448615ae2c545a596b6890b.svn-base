@@ -1,0 +1,18 @@
+<?php
+$system_log = new system_log();
+$myid = $_SESSION["mid"];
+$mylist = $system_log->list_system_log($myid);
+
+?>
+<h2>My Activities</h2>
+<?php
+echo '<font style="font-size: 7pt">';
+for($i=0; $i < count($mylist); $i++) {
+	echo $mylist[$i][3].' - '.$mylist[$i][2];
+	echo "<br>";
+}
+echo '</font>';
+
+?>
+
+

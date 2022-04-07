@@ -1,0 +1,35 @@
+<?php
+
+
+if (isset($_GET["etid"])) $etid = $_GET["etid"];
+if (isset($_POST["etid"])) $etid = $_POST["etid"];
+$exhibit_type = new exhibit_type();
+$exhibit_type_name = $exhibit_type->get_value('exhibit_type_name', $etid);
+$exhibit_type_other = $exhibit_type->get_value('exhibit_type_other', $etid);
+
+echo '<h2>Exhibit Type</h2>';
+echo '<div class="dCaseInfo">';
+echo '<span class="sEditLink">[ <a href="javascript: submiteditetform()">Edit</a> &nbsp;|&nbsp; <a href="/index.php?cmd=det&id='.$etid.'">Exhibit Type List</a> ]</span>';
+
+echo '<form name="edit_el" id="edit_el" method="post" action="index.php?cmd=eet">';
+echo '<input type="hidden" name="mode" value="edit">';
+echo '<input type="hidden" name="etid" value="'.$etid.'">';
+echo '</form>';
+echo '<script type="text/javascript">';
+echo 'function submiteditetform()';
+echo '{';
+echo 'document.edit_el.submit()';
+echo '}';
+echo '</script>'; 
+
+
+echo '<table><tr>';
+echo '<td><strong>Exhibit Type</strong></td><td>'.$exhibit_type_name.'</td>';
+echo '</tr><tr>';
+echo '<td nowrap><strong>Exhibit Type Description</strong></td><td>'.$exhibit_type_other.'</td>';
+echo '</tr>';
+echo '</table>';
+
+echo '</div><br>';
+
+?>

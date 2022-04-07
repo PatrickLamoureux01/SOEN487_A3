@@ -1,0 +1,50 @@
+<?php
+
+//include('./include/member.php');
+//include('./include/member_privilege');
+
+$investigative_unit = new investigative_unit();
+
+$mode = "New";
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+
+		$iuid = $_POST['iuid'];
+		$investigative_unit_name = $investigative_unit->get_value('investigative_unit_name', $iuid);
+		$investigative_unit_other = $investigative_unit->get_value('investigative_unit_other', $iuid);
+		
+	}
+	
+}
+
+?>
+
+
+  <h2><?php echo $mode; ?> Investigative Team</h2>
+
+
+<form method="post" action="./investigative_unit/iu_processor.php">
+<fieldset class="submitform">
+<label for="investigative_unit_name">Investigative Team Name</label>
+	<input type="text" name="investigative_unit_name" value="<?php if (isset($investigative_unit_name)) echo $investigative_unit_name; ?>">
+<label for="investigative_unit_other">Member(s) in Team</label>
+	<input type="text" name="investigative_unit_other" value="<?php if (isset($investigative_unit_other)) echo $investigative_unit_other; ?>">
+
+  <?php if ($mode == "Edit") { ?>
+    <input type="hidden" name="mode" value="edit">
+    <input type="hidden" name="iuid" value="<?php echo $_POST["iuid"]; ?>">
+  	<p><br><label for="Submit"></label>
+    <input type="submit" value="Update Investigative Team" name="Submit" class="button"/>
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=siu&iuid=<?php echo $iuid; ?>'" />
+  <?php } else {?>
+  	<br><br>
+  	<br><label for="Submit"></label>
+	<input type="submit" value="Add Investigative Unit" class="button">
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=diu'" />
+  <?php } ?>
+
+</fieldset>
+</form>

@@ -1,0 +1,67 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+include('./header.php');
+include('./include/config.inc');
+include('./include/common.php');
+include('./include/db.php');
+include('./include/assisted_unit.php');
+include('./include/exhibit_report_counter.php');
+include('./include/investigative_unit.php');
+include('./include/member.php');
+include('./include/exhibit_report.php');
+
+	$mylist[0][0] = 0;
+	$connection = new db();
+	$connection->db_connect($db_host, $db_username, $db_password);
+	$connection->db_select($db_name);
+
+	$iu = new investigative_unit();
+	$iu->insert_investigative_unit("Red Deer MCU");
+	$mylist = $iu->list_investigative_unit();
+	print_table($mylist);
+	$au = new assisted_unit();
+	$au->list_assisted_unit();
+	$au->generate_combo_box();
+//    $au->insert_assisted_unit("ABC");	
+//	$au->update_assisted_unit("assisted_unit_other", "", "1");
+//	$au->update_assisted_unit("assisted_unit_name", "MCU", "1");
+//	$au->insert_assisted_unit("CIP");
+//	$au->insert_assisted_unit("PSAT");
+//	$au->insert_assisted_unit("ICE");
+	$mylist = $au->list_assisted_unit();
+	print_table($mylist);
+//$au->update_assisted_unit('assisted_unit_name','DON','1');
+//$au->delete_assisted_unit("3");
+//
+	$erc = new exhibit_report_counter();
+//	echo 'current report number ='.$erc->next_exhibit_report_number();
+	echo '<br>';
+	$current_number = $erc->next_exhibit_report_number();
+//	$erc->update_exhibit_report_number_to_current($current_number);
+    echo 'next report number = '.$erc->next_exhibit_report_number();
+	echo '<br>';
+    $m = new member();
+//	$m->insert_member('larryj','12qwaszx#','Larry','Jackson','larryj@abtechcrime.com','0');
+	$mylist = $m->list_member();
+	print_table($mylist);
+	
+	$crn = new exhibit_report();
+//	$crn->create_exhibit_report();
+	$mylist = $crn->list_exhibit_report();
+	print_table($mylist);
+	$crn->set_value("exhibit_report_caption", "Don kick ass now", 10);
+	$mynum = $crn->get_value("exhibit_report_caption",10);
+	echo $mynum;
+	$crn->delete_exhibit_report("10");
+?>

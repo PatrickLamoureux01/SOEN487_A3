@@ -1,0 +1,441 @@
+<?php 
+  include('./header.php');
+  if (isset($_SESSION["grantstatus"])) {
+    // If Session is granted, Insert all the contents / wrapper here
+  	if ($_SESSION["grantstatus"] == "grant") { 
+      // check consistency between id && erid
+	    if (isset($_GET["id"]) && isset($_GET["erid"])) {}
+      // Start HTML Coding Here
+      
+	$member = new member();
+	$memberid = $member->get_member_id($_SESSION["User"]);
+	$_SESSION["mid"] = $memberid;
+	$mylist = $member->member_privilege($_SESSION["User"]);
+	if (isset($mylist[0][0])) {
+		$_SESSION["ac"] = $mylist[0][0];
+	}
+	if (isset($mylist[0][1])) {
+		$_SESSION["acl"] = $mylist[0][1];
+	}
+	
+	// Turn off undefined index error
+	error_reporting (E_ALL ^ E_NOTICE);
+?>
+
+<!--  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">--> 
+	<html> 
+	<head> 
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+  	<title>CSER Management System</title> 
+    <link rel="stylesheet" type="text/css" media="screen" href="./_style/css/exhibit.css" /> 
+    <link rel="stylesheet" type="text/css" media="print" href="./_style/css/print.css" />
+    <script src="./_style/js/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="./_style/js/jquery-ui-1.9.2.custom.js" type="text/javascript"></script> 
+    <script src="./_style/js/jquery.treeview.js" type="text/javascript"></script>
+    <link rel="stylesheet" media="screen" type="text/css" href="./_style/css/treeview.css" />
+    <link rel="stylesheet" media="screen" type="text/css" href="./_style/css/demo.css" />
+    <link rel="stylesheet" media="screen" type="text/css" href="./_style/css/jquery-ui-1.9.2.custom.css" />
+	<script src="./_style/js/json2.js"></script>
+	<script src="./_style/js/jquery-migrate-1.2.1.js"></script>
+	<script src="./_style/js/jquery.collapse.js"></script>
+    <script src="./_style/js/jquery.collapse_storage.js"></script>
+    <script src="./_style/js/jquery.collapse_cookie_storage.js"></script>
+	<!--[if IE]>
+    <link rel="stylesheet" media="screen" type="text/css" href="./_style/css/ie.css" />
+	<!-- [endif]-->
+	</head> 
+  	<body> 
+	<div class="wrapper"> 
+	<div id="container"> 
+				<div id="header">
+				
+				</div>
+        		<div id="header-headerMenu">
+        		<?php echo $department_name; ?> | Database Name: <?php echo $db_name;?> | Code Version: <?php echo $eems_code_version;?>
+				</div> <!--  End Header Div --> 
+			
+			<div id="content-container1">
+			<div id="content-container2">
+        	<div id="section-navigation">
+		        <?php 
+          			welcome_box(); 
+        		?>
+		        <p>
+        		<?php
+		          include('./search/case_search.php');
+		          ?>
+				<p>
+		          <?php 
+		          include('./menu.php');
+	            ?>
+			</div> <!--  end section-navigation -->
+
+
+        	<div id="content">
+        	<span id="txtTMP"></span>
+			<p>
+
+	        <?php
+	        if (isset($_GET["cmd"])) {
+	          switch($_GET["cmd"]) {
+	            // new case
+	            case "nc":
+	              include('./search/case_search.php');
+	              break;
+	            // case edit
+	            case "ce":
+	              include('./case/case_form.php');
+	              break;
+	            // exhibit edit
+	            case "ee":
+	              include('./exhibit/exhibit_form.php');
+	              break;          
+	            // Exhibit Select
+	            case "es":
+	              include('./exhibit/exhibit_select.php');
+	              break;
+	            // Exhibit Select All Details
+	            case "esad":
+	              include('./exhibit/exhibit_all_details.php');
+	          	  break;
+	            // exhibit report edit
+	            case "ere":
+	              include('./exhibit_report/exhibit_report_form.php');
+	              break;
+	            // exhibit report create
+	            case "ers":
+	              include('./exhibit_report/exhibit_report_select.php');
+	              break;
+	            // case select
+	            case "cs":
+	              include('./case/case_select.php');
+	              break;
+	            // exhibit create	
+	            case "ec":
+	              include('./exhibit/exhibit_form.php');
+	              break;	
+	            // create exhibit report
+	            case "cer":
+	              include('./exhibit_report/exhibit_report_form.php');
+	              break;
+	            case "eupload":
+	            	include('./exhibit/exhibit_add_attachment.php');
+	            	break;
+	            // exhibit report upload attachment
+	            case "erupload":
+	              include('./exhibit_report/exhibit_report_add_attachment.php');
+	              break;
+	            // case list
+	            case "cl":
+	            	include('./case/case_mlist.php');
+	            	break;
+	            // exhibit report list
+	            case "tl":
+	            	include('./exhibit_report/exhibit_report_mlist.php');
+	            	break;  
+	              // Load help page 
+	            case "Help":
+	              include "./help/help.php";
+	              break;
+				// Edit member
+	              case "me":
+	            	include('./member/member_form.php');
+	            	break;
+	        
+	            // Add Member
+	            case "ma":
+	            	include('./member/member_form.php');
+	            	break;
+	            // select Member
+	            case "ms":
+	            	include('./member/member_select.php');
+	            	break;
+	            // List Member	
+	            case "ml":
+	            	if ($_SESSION["ac"] == 1) { 
+	            	include('./member/member_list.php');
+	            	} else {
+	            		echo 'You have no Permission!';
+	            	}
+	            	break;	
+	            case "fileman":
+	            	if ($_SESSION["ac"] == 1) { 
+	            	include('./action/file_man_form.php');
+	            	} else {
+	            		echo 'You have no Permission!';
+	            	}
+	            	break;	
+	            	
+	            case "afileman":
+	            	if ($_SESSION["ac"] == 1) { 
+	            	include('./file_man/file_man.php');
+	            	} else {
+	            		echo 'You have no Permission!';
+	            	}
+	            	break;	
+	            	
+	            // display investigative unit      
+	            case "diu":
+	            	include ('./investigative_unit/iu_mlist.php');
+	            	break;
+	            // add investigative unit	
+	            case "aiu":
+	            	include('./investigative_unit/iu_form.php');
+	            	break;
+	            // edit investigative unit
+	            case "eiu":
+	            	include('./investigative_unit/iu_form.php');
+	            	break;	
+	            // select investigative unit
+	            case "siu":
+	            	include('./investigative_unit/iu_select.php');
+	            	break;
+	            // display exhibitlocation	
+	            case "del":
+	            	include ('./location/location_mlist.php');
+	            	break;
+	            // add initiative	
+	            case "ael":
+	            	include('./location/location_form.php');
+	            	break;
+	            // edit initiative
+	            case "eel":
+	            	include('./location/location_form.php');
+	            	break;	
+	            // select initiative
+	            case "sel":
+	            	include('./location/location_select.php');
+	            	break;
+	            	
+	            // display exhibitlocation	
+	            case "det":
+	            	include ('./exhibit_type/exhibit_type_mlist.php');
+	            	break;
+	            // add initiative	
+	            case "aet":
+	            	include('./exhibit_type/exhibit_type_form.php');
+	            	break;
+	            // edit initiative
+	            case "eet":
+	            	include('./exhibit_type/exhibit_type_form.php');
+	            	break;	
+	            // select initiative
+	            case "set":
+	            	include('./exhibit_type/exhibit_type_select.php');
+	            	break;
+	            // Exhibit Serial Number Search
+	            case "esns":
+	            	include('./search/exhibit_sn_search.php');
+	            	break;	
+	
+	            // Dashboard Main	
+	            case "dbm":
+	            	include('./dashboard/main.php');
+	            	break;	
+	            	
+	            // My Activity
+	            case "myact":
+	            	include('./dashboard/myact.php');
+	          		break;
+	          	// Return Exhibit
+	            case "re":
+	            	include('./exhibit_return/exhibit_return.php');
+	            	break;
+	            // Move exhibits form
+	            case "amoe":
+	            	include('./action/exhibit_move_form.php');
+	            	break;
+	            // Process Move Exhibits
+	            case "moe":
+	            	include('./exhibit_move/exhibit_move.php');
+	            	break;
+	            // Amend Exhibit Report
+	            case "aer":
+	            	include('./action/exhibit_report_move_form.php');
+	            	break;
+	            // process exhibit report amend
+	            case "amender":
+	            	include('./exhibit_report_move/exhibit_report_move.php');
+	            	break;
+	            case "dec":	            	
+	            	include('./action/delete_empty_case.php');
+	            	break;
+	            // Process Move Exhibits
+	            case "search":
+	            	include('./search/search.php');
+	            	break;
+	            	// Assign exhibits
+	            case "ase":
+	            	include('./exhibit_assign/exhibit_assign.php');
+	            	break;
+	            // Return Exhibits
+	            case "rete":
+	            	include('./action/return_exhibit_form.php');
+	            	break;
+	            // Report Menu
+	            case "reports":
+	            	include('./report/report_menu.php');
+	            	break;
+	            // Printing Forms
+	            case "p1625":
+	            	include('./action/print1625_form.php');
+	            	break;
+				// Printing Labels            
+	            case "plabels":
+	            	include('./action/printlabels_form.php');
+	            	break;
+	            // left blank PROS search is on side.	
+	            default:
+	              include('./dashboard/main.php');
+	            break;
+	            }
+	          } else {
+	          include('./dashboard/main.php');
+	          }
+        	?>
+       		</div> <!-- end Content Div -->
+       
+       <div class="push"></div> 
+    </div> <!-- end content container 1 -->
+	</div> <!--  end content container 2 -->    
+    </div> <!-- end container -->
+    </div> <!--  end wrapper -->
+<?php 
+// End HTML Coding Here
+	} 
+  } else {
+    // Redirect User to Login Page
+     include('./login.php');	
+  }  //
+?>
+
+<?php if (isset($_SESSION["User"])) { ?>
+
+    <script type="text/javascript">
+    // test view divs
+    // document.getElementById("txtForm").innerHTML=window.location;
+    // document.getElementById("txtHint").innerHTML=(document.referrer == 'http://localhost/');
+
+    $(document).ready(function() {
+      // puts the focus into search if at root of site or on root page. 
+      // * change to address of site.   
+      if (window.location == 'http://localhost/' | window.location == 'http://localhost/index.php') $("#txtFindCase").focus(); 
+      // Tree view for Menu
+      
+      $("#navigation").treeview({
+    		persist: "location",
+    		collapsed:true,
+    		unique:true
+      });
+    
+
+      // Set the Calendar popup for new and edit exhibit report. 
+      // Date is there to move prev month in calendar or else it removes prev option
+//      $.datePicker.setDateFormat('ymd','-'); // unicode
+//      $('#exhibit_report_status_analysis_start_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_report_status_analysis_end_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_report_status_forward_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_to_tcb_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_report_intake_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_status_date').datePicker({startDate:'2006-01-01'});
+//      $('#exhibit_assigned_date').datePicker({startDate:'2006-01-01'});
+//      $('#start_date').datePicker({startDate:'2006-01-01'});
+//      $('#end_date').datePicker({startDate:'2006-01-01'});
+ 
+		
+		$( "#exhibit_report_status_analysis_start_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		
+		$( "#exhibit_report_status_analysis_end_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_report_status_forward_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_report_status_close_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_to_tcb_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_report_intake_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_report_sw_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_status_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+
+		$( "#exhibit_assigned_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#start_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#end_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+
+		$( "#exhibit_status_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+		$( "#exhibit_assigned_date" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+			inline: true
+		});
+
+
+      // takes table tr id and attaches a mouse click or tab focus and then takes href from cell and applies to row. 
+/*	  $('#PROSNum tr').live('click keypress', function() {
+        var href = $(this).find("a").attr("href");
+        //$(this).css('cursor','pointer');
+        if(href) window.location = href;
+      });
+*/
+      // On keypress the false will cancel keyup, allows keyup code if true
+      // allows only numbers to be typed in search. Auto puts in dash at 5th spot
+      // p and t inside search box will change report search type and reload page with results.
+      // Onkey up is a simple ajax call to load content area with search results. 
+      $('#txtFindCase').bind('keypress', function(e) {
+        if (e.which==97) document.getElementById("lblFindCase").innerHTML ='CASE:';
+        if (e.which==101) document.getElementById("lblFindCase").innerHTML ='CSER:';
+        if (!(e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) && (document.getElementById("lblFindCase").innerHTML=='CASE:' || document.getElementById("lblFindCase").innerHTML=='CSER:')){
+          var sTxt = $(this).val();
+          if (sTxt.indexOf('-') < 0) $(this).val(sTxt.replace(/(.{4})/,"$1-"));
+          return true;
+        }
+        return false;
+      })
+      $('#txtFindCase').bind('keyup', function(e) {
+        if (document.getElementById("lblFindCase").innerHTML=='CASE:' && $(this).val().length>0)  $('#content').load('./search/ajax_search_pros.php?q='+$(this).val());
+        if (document.getElementById("lblFindCase").innerHTML=='CSER:' && $(this).val().length>0)   $('#content').load('./search/ajax_search_tcu.php?q='+$(this).val());
+        return false;
+      })
+
+    });
+
+
+    </script>   
+ <?php } ?>
+<br>
+<br>
+<br>
+  </body> 
+</html>
+
+

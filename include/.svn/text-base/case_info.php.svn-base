@@ -1,0 +1,106 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class case_info {
+
+	function case_info() {
+
+	}
+	
+	function insert_case_info($value) {
+
+		$select = "select * from case_info where case_pros_id = '$value'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) == 0) { 
+			$select = "insert into case_info(case_pros_id) values ('$value')";
+			$query = exec_to_system_log($select);
+			if (!$query) c_error('3','insert_case_info()');
+		} else {
+			//echo 'Duplicate Existed';
+		}
+	}
+	
+	function get_id_by_pros_num($prosnum) {
+		
+		$select = "select case_id from case_info where case_pros_id = '$prosnum'";
+		$query = mysql_query($select);
+		$fetch = mysql_fetch_row($query);
+		
+		return $fetch[0];
+		
+	}
+	
+	function check_duplicate_pros_id($prosid, $caseid) {
+		$select = "select case_id from case_info where case_pros_id = '$prosid' and case_id != '$caseid'";
+		$query = mysql_query($select);
+		if (mysql_num_rows($query) > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function delete_case_info($id) {
+
+		$select = "update case_info set delete_flag='1' where case_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_case_info()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update case_info set ".$tbl_col."='$value' where case_id='$rowid'";
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','case info set_value()');
+
+	}
+	
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from case_info where case_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','case info get_value()');
+		$result = mysql_fetch_row($query);
+		return $result[0];
+				
+	}
+
+	function list_case_info() {
+
+		$i = 0;
+		$k = 0;
+		$mylist[0][0]=0;
+		$select = "select * from case_info";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_case_info()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+	
+	function get_id($prosnum) {
+		
+		$select = "select case_id from case_info where case_pros_id='$prosnum'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','get_id()');
+		$result = mysql_fetch_row($query);
+		return $result[0];
+	}
+
+}
+?>

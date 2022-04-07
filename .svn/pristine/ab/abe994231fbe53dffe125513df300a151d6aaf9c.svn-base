@@ -1,0 +1,135 @@
+<?php
+$i=0;
+//$connection = new db();
+//$connection->db_connect($db_host, $db_username, $db_password);
+//$connection->db_select($db_name);
+if (isset($_POST["case_id"])) $case_id = $_POST["case_id"];
+if (isset($_POST["erid"])) $erid = $_POST["erid"];
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+
+$select = "select exhibit_id, exhibit_report_id, exhibit_location, exhibit_item_id, exhibit_status, exhibit_status_date, exhibit_released_to, exhibit_status_member, exhibit_type, exhibit_make, exhibit_model, exhibit_serial from exhibit where exhibit_report_id = '$erid' and exhibit_status != '$return_status_id'";
+$query = mysql_query($select);
+
+$exhibit_report = new exhibit_report();
+if (!isset($case_id)) $case_id = $exhibit_report->get_value("exhibit_report_case_id", $erid);
+$exhibit_status_type = new exhibit_status_type();
+$exhibit = new exhibit();
+$member = new member();
+$i=0;
+if (mysql_num_rows($query) > 0) {
+	echo '<h2>Move Exhibit(s) for '.$exhibit_report->get_value("exhibit_report_number", $erid).'</h2>';
+	echo '<div class="dCaseInfo">';
+
+	echo '<br>Please check off the items you would like to move:';
+	echo '<p>';
+
+	echo '<form method="post" action="./exhibit_move/exhibit_move_processor.php" name="Form_exhibit_move">';
+    echo '<table width="100%" id="PROSNum">';
+    echo '<tr><th>&nbsp;&nbsp;</th><th>Exhibit Item</th><th>Description</th><th>Serial</th><th>Current Location</th>';
+	echo '</tr>';
+	while ($fetch = mysql_fetch_array($query)) {
+		$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $fetch["exhibit_report_id"]);
+		$item_num = add_zero_as_placeholder("3", $fetch["exhibit_item_id"]);
+		$exhibit_number = $exhibit_report_num."-".$item_num;
+		$return_member = $member->get_value("member_login", $fetch["exhibit_status_member"]);
+		$exhibit_return_date = $fetch["exhibit_status_date"];
+		$exhibit_status_id = $fetch["exhibit_status"];
+		$exhibit_released_to = $fetch["exhibit_released_to"];
+		$exhibit_location = new exhibit_location();
+		$exhibit_location_name = $exhibit_location->get_value("exhibit_location_name", $fetch["exhibit_location"]); 
+		echo '<tr>';
+		echo '<td>';
+		echo '<input type="checkbox" style="appearance: none; background:#eeeeee; border: none;" name="exhibit_to_move_'.$i.'" value="Move"';
+		echo '>';
+		$eid = $fetch["exhibit_id"];
+		echo '<input type="hidden" name="exhibit_id_'.$i.'" value="'.$eid.'">';
+		echo '</td>';
+		echo '<td>'.$exhibit_number.'</td>';
+		echo '<td>'.$fetch["exhibit_make"].' - ';
+		echo $fetch["exhibit_model"] .'</td>';
+		echo '<td>'.$fetch["exhibit_serial"].'</td>';
+		echo '<td>'.$exhibit_location_name.'</td>';
+		echo '</tr>';
+		$i++;
+		
+	}
+  echo '</table>';
+  
+  
+  echo '<hr size=1 style="margin-top:10px;margin-bottom:10px;">';
+
+  echo '<table width="90%" id="tbReturn"><tbody><tr>';
+  echo '  <td width="15%"><label for="exhibit_move_member">Move By:</label></td>';
+  echo '<td>';
+  $member->generate_combo_box_select("exhibit_move_member", $_SESSION["mid"]);
+  echo '</td>';
+  echo '</tr><tr>';
+  echo '<td width="15%"><label for="exhibit_move_location">To Location:</label></td>';
+  echo '<td>';
+  $exhibit_location = new exhibit_location();
+  $exhibit_location->generate_exhibit_location("exhibit_move_location");
+  echo '<td>';
+  echo '</tr><tr>';
+  echo '  <td><label for="exhibit_move_date" class="short">Movement Date:</label></td>';
+  echo '  <td><input type="text" style="width:130px; height:20px" name="exhibit_move_date" style="width:150px" value="';
+    echo date('Y-m-d H:i');
+  echo '"><i>(yyyy-mm-dd hh:mm)</td>';
+  echo '</tr><tr>';
+
+   
+?>
+
+  <td></td><td>
+  <div>
+    <input type="hidden" name="exhibit_count" value="<?php echo $i; ?>">
+    <input type="hidden" name="case_id" value="<?php echo $case_id; ?>"> 
+    <input type="hidden" name="erid" value="<?php echo $erid; ?>"> 
+    <input type="submit" name="Submit" 	value="Submit" class="button"> 
+    <input type="button" name="cancel" value="Cancel" class="button"onclick="location.href='./index.php?cmd=ers&id=<?php echo $case_id?>&erid=<?php echo $erid?>'">
+  </div>
+  </td>
+
+<?php 
+	echo '</tr></tbody></table>';
+	echo '</div>';
+?>
+<br><br>
+
+
+
+    <script src="./_style/js/formValidation.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $('#exhibit_return_date').datepicker();
+      $('form[name="Form_exhibit_return"]').submit(function() {
+        var reason = "";
+            reason += validateEmpty($("#exhibit_return_member"));
+            reason += validateEmpty($("#exhibit_released_to"));
+        if (reason != "") {
+          alert("Some fields need correction:\n" + reason);
+          return false;
+        }    
+
+      });
+    });
+    </script> 
+
+
+
+	<?php
+	echo '</form>';
+} else {
+	echo '<h2>Move Exhibit(s) for '.$exhibit_report->get_value("exhibit_report_number", $erid).'</h2>';
+	echo '<div class="dCaseInfo">';
+	echo '<p><Br>No more Exhibit(s) can be moved.  The exhibit(s) are probably returned</p>';
+  echo '</div><br><br>';
+
+}
+	
+//include('./action/print1625_form.php');
+	
+?>
+
+
+

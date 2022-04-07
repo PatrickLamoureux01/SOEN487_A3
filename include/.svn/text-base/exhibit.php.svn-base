@@ -1,0 +1,154 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit {
+
+	function exhibit() {
+
+	}
+
+
+	function number_of_rows($tbcol, $value) {
+		
+		$select = "select * from exhibit where $tbcol = '$value'";
+		$query = mysql_query($select);
+		return mysql_num_rows($query);
+		
+	}
+
+	function create_exhibit($reportid) {
+
+		// Search if there is any exhibit exist under the report id
+		$select = "select * from exhibit where exhibit_report_id = '$reportid'";
+		$query = mysql_query($select);
+		$itemid = mysql_num_rows($query) + 1;
+		//$itemid = add_zero_as_placeholder("3", $itemid);
+		$select = "insert into exhibit(exhibit_report_id, exhibit_item_id) values ('$reportid','$itemid')";
+		$query = exec_to_system_log($select);
+		if (!$query) c_error('3','insert_exhibit()');
+		
+		$select = "select exhibit_id from exhibit where exhibit_report_id = '$reportid' and exhibit_item_id = '$itemid'";
+		$query = mysql_query($select);
+		$result = mysql_fetch_row($query);
+		
+		return $result;
+		
+	}
+
+	function delete_exhibit($id) {
+
+		$select = "update exhibit set delete_flag='1' where exhibit_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit()'); 
+
+	}
+
+	function list_exhibit_by_report_id($reportid) {
+
+                $i = 0;
+                $mylist[0][0]=0;
+                $select = "select * from exhibit where exhibit_report_id='$reportid'";
+                $query = mysql_query($select);
+                if (!$query) c_error('3','list_exhibit_by_report()');
+		
+				$mylist = fetch_results_to_list($query);
+
+                return $mylist;
+	}
+
+	function list_returned_exhibit_by_report_id($reportid, $return_status, $date) {
+
+                $i = 0;
+                $mylist[0][0]=0;
+                $select = "select * from exhibit where exhibit_report_id='$reportid' and exhibit_status = '$return_status' and exhibit_return_date = '$date'";
+                $query = mysql_query($select);
+                if (!$query) c_error('3','list_exhibit_by_report()');
+		
+				$mylist = fetch_results_to_list($query);
+
+                return $mylist;
+	}
+
+		function list_fwd_exhibit_by_report_id($reportid, $fwd_status) {
+
+                $i = 0;
+                $mylist[0][0]=0;
+                $select = "select * from exhibit where exhibit_report_id='$reportid' and exhibit_status = '$fwd_status'";
+                $query = mysql_query($select);
+                if (!$query) c_error('3','list_exhibit_by_report()');
+		
+				$mylist = fetch_results_to_list($query);
+
+                return $mylist;
+	}
+	
+	
+	function list_exhibit_id_by_report_id($reportid) {
+		
+			$select = "select exhibit_id from exhibit where exhibit_report_id='$reportid'";
+			$query = mysql_query($select);
+            if (!$query) c_error('3','list_exhibit_by_report()');
+		
+			$mylist = fetch_results_to_list($query);
+
+            return $mylist;
+			
+	}
+
+	function get_exhibit_id($reportid, $itemid) {
+
+		$select = "select exhibit_id from exhibit where exhibit_report_id='$reportid' and exhibit_item_id='$itemid'";
+		$query = mysql_query($select);
+		$result = mysql_fetch_row($query);
+		
+		return $result;
+	}
+	
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit set ".$tbl_col."='$value' where exhibit_id='$rowid'";
+//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) { c_error('3','exhibit set_value()');
+//		echo $select;
+		}
+	}
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit where exhibit_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','exhibit get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	function list_exhibit() {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit()');
+
+                $mylist = fetch_results_to_list($query);
+		
+		return $mylist;
+	}
+}
+?>

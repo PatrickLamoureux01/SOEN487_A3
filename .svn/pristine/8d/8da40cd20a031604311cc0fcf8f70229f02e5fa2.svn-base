@@ -1,0 +1,138 @@
+<?php
+include('header.php');
+
+if (isset($_POST["erid"])) $erid =$_POST["erid"];
+if (isset($_GET["erid"])) $erid = $_GET["erid"];
+
+$exhibit_report = new exhibit_report();
+$investigative_unit = new investigative_unit();
+$initiative = new initiative();
+$erp = new exhibit_report_priority();
+$member = new member();
+$exhibit_report_number = $exhibit_report->get_value("exhibit_report_number", $erid);
+$exhibit_report_pros = $exhibit_report->get_value("exhibit_report_pros", $erid);
+$exhibit_report_caption = $exhibit_report->get_value("exhibit_report_caption", $erid);
+$exhibit_report_investigative_unit = $investigative_unit->get_value("investigative_unit_name", $exhibit_report->get_value("exhibit_report_investigative_unit", $erid));
+$exhibit_report_entry_date = $exhibit_report->get_value("exhibit_report_entry_date", $erid);
+$exhibit_report_entry_person = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_assigned_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_assigned_member", $erid));
+$exhibit_report_initiative = $initiative->get_value("initiative_name", $exhibit_report->get_value("exhibit_report_initiative", $erid));
+$exhibit_report_investigator = $exhibit_report->get_value("exhibit_report_investigator", $erid);
+$exhibit_report_investigator_email = $exhibit_report->get_value("exhibit_report_investigator_email", $erid);
+$exhibit_report_priority = $erp->get_value("exhibit_report_priority_name", $exhibit_report->get_value("exhibit_report_priority", $erid));
+$exhibit_report_task = $exhibit_report->get_value("exhibit_report_task", $erid);
+$exhibit_report_status = $exhibit_report->get_value("exhibit_report_status", $erid);
+$exhibit_report_intake_member = $member->get_value("member_login", $exhibit_report->get_value("exhibit_report_intake_member", $erid));
+$exhibit_report_intake_date = $exhibit_report->get_value("exhibit_report_intake_date", $erid);
+$return_status = new return_status();
+$return_status_id = $return_status->get_return_status();
+//$return_date = $_GET["date"];
+$exhibit = new exhibit();
+$exhibit_list = $exhibit->list_exhibit_by_report_id($erid);
+$number_of_rows = $exhibit->number_of_rows("exhibit_report_id", $erid);
+$member = new member();
+
+
+$exhibit_type = new exhibit_type();
+$exhibit_location = new exhibit_location();
+$to_tcb = new to_tcb();
+$to_tcb_id = $to_tcb->get_to_tcb();
+
+
+$exhibit_released_to = $exhibit_list[0][19];
+$exhibit_return_date = $exhibit_list[0][18];
+
+?>
+<html>
+
+<style type="text/css">
+@media all
+{
+	.page-break { display:none; }
+}
+@media print {
+	.page-break {display: block; page-break-before: always; } 
+}
+
+table, tr, td{
+ font-family: Arial, Helvetica, sans-serif;
+ font-size: 7pt;
+ padding: 0px 0px 0px 0px;
+ 
+}
+
+</style>
+
+<body>
+<?php 
+    for ($i=0; $i < count($exhibit_list); $i++) {
+       
+		$exhibit_report_num = $exhibit_report->get_value("exhibit_report_number", $exhibit_list[$i][1]);
+		$item_num = add_zero_as_placeholder("3", $exhibit_list[$i][2]);
+		$exhibit_number = $exhibit_report_num."-".$item_num;
+		$exhibit_original_item = $exhibit_list[$i][12];
+		$exhibit_status_type = new exhibit_status_type();
+		echo '<table cellspacing="1" border="0">';
+			echo '<tr>';
+					echo '<td colspan="2" style="padding-left: 3px">';
+					echo '<b>Tech Crime Unit Exhibit #: </b>';
+					echo $exhibit_number;
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="padding-left: 3px" colspan="2">';
+					echo '<img src="barcode/html/image.php?code=code39&amp;o=1&amp;dpi=72&amp;t=16&amp;r=1&amp;rot=0&amp;text='.$exhibit_number.'&amp;f1=-1&amp;f2=8&amp;a1=&amp;a2=&amp;a3=" alt="CSER Exhibit #" />';
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="padding-left: 3px"  colspan="2">';
+					echo '<b>Caption: </b>';
+					echo $exhibit_report_caption;
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="text-align: left; padding-left: 3px">';
+					echo '<b>Original Exhibit #: </b>';
+					echo $exhibit_list[$i][12];
+					echo '</td>';
+					echo '<td style="text-align: left;  padding-left: 20px">';
+					echo '<b>Type: </b>';
+					echo $exhibit_type->get_value("exhibit_type_name", $exhibit_list[$i][4]);
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="text-align: left; padding-left: 3px" valign="top">';
+					echo '<b>Make: </b>';
+					//echo '</td>';
+					//echo '<td>';
+					echo $exhibit_list[$i][6];
+					echo '</td>';
+					echo '<td style="text-align: left; padding-left: 20px">';
+					echo '<b>Model: </b>';
+					//echo '</td>';
+					//echo '<td>';
+					echo $exhibit_list[$i][7];
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="text-align: left;  padding-left: 3px" colspan="2">';
+					echo '<b>Serial: </b>';
+					$serialnumber = $exhibit_list[$i][8];
+					echo $serialnumber;
+					echo '</td>';
+			echo '</tr>';
+			echo '<tr>';
+					echo '<td style="text-align: left; padding-left: 3px" colspan="2">';
+					echo '<b>CASE #: </b>';
+					echo $exhibit_report_pros;
+					echo '</td>';
+			echo '</tr>';
+	echo '</table>';
+	// DO NOT PRINT PAGE BREAK in the LAST PAGE	
+	if ($i != (count($exhibit_list) - 1)) {
+		echo '<div class="page-break"></div>';
+	}
+    }
+?>
+</body>
+</html>

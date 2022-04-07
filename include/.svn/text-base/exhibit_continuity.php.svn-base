@@ -1,0 +1,177 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class exhibit_continuity {
+
+	function exhibit_continuity() {
+
+	}
+
+	function insert_exhibit_continuity_for_return($c_date, $c_status, $c_exhibit, $c_member, $released_to, $actual_date, $actual_member) {
+	// $exhibit_return_date, $exhibit_status_id, $exhibit_id, $exhibit_return_member, $exhibit_released_to, date("Y-m-d H:m:s"), $_SESSION["mid"], "1"
+		
+		$select = "insert into exhibit_continuity(exhibit_continuity_date, exhibit_continuity_status, exhibit_continuity_exhibit_id, exhibit_continuity_member, exhibit_continuity_release_member, exhibit_continuity_actual_date,exhibit_continuity_actual_member) values ('$c_date', '$c_status', '$c_exhibit', '$c_member', '$released_to', '$actual_date','$actual_member')";
+
+		//echo $select;
+		$query = exec_to_system_log($select);
+		if (!$query) c_error('3','insert_exhibit_continuity()');
+	}
+	
+	
+	
+	function insert_exhibit_continuity($c_date, $c_status, $c_exhibit, $c_member, $c_location, $actual_date, $actual_member, $is_it_return, $released_to) {
+		$select = "insert into exhibit_continuity(exhibit_continuity_date, exhibit_continuity_status, exhibit_continuity_exhibit_id, exhibit_continuity_member, exhibit_continuity_location, exhibit_continuity_actual_date,exhibit_continuity_actual_member, exhibit_continuity_release_member) values ('$c_date', '$c_status', '$c_exhibit', '$c_member', '$c_location','$actual_date','$actual_member','$released_to')";
+
+	//	echo $select;
+		$query = exec_to_system_log($select);
+		if (!$query) c_error('3','insert_exhibit_continuity()');
+	}
+
+	function check_last_location($eid, $location) {
+
+		$select = "select exhibit_continuity_date, exhibit_continuity_location, exhibit_continuity_id from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid' and exhibit_continuity_id = (select MAX(exhibit_continuity_id) from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid')";
+	//	echo $select;
+		$query = exec_to_system_log($select);
+		$result = mysql_fetch_row($query);
+		
+	//	echo $status;
+	//	echo $result[1];
+		if ($location == $result[1]) {
+			
+			return true;
+		} else {
+			
+			return false;
+		}
+		
+		
+	}
+	
+	function check_last_status($eid, $status) {
+		$select = "select exhibit_continuity_date, exhibit_continuity_status, exhibit_continuity_id from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid' and exhibit_continuity_id = (select MAX(exhibit_continuity_id) from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid')";
+	//	echo $select;
+		$query = exec_to_system_log($select);
+		$result = mysql_fetch_row($query);
+		
+	//	echo $status;
+	//	echo $result[1];
+		if ($status == $result[1]) {
+			
+			return true;
+		} else {
+			
+			return false;
+		}
+		
+	}
+	
+	function been_to_tcb($eid, $tcb_id) {
+		$select = "select exhibit_continuity_status from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid' and exhibit_continuity_status = '$tcb_id'";
+		$query = mysql_query($select);
+		$fetch = mysql_fetch_row($query);
+
+		if ($fetch[0] == $tcb_id) {
+			return true;
+			
+		} else {
+			return false;
+		}
+	}
+	
+	function delete_exhibit_continuity($id) {
+
+		$select = "update exhibit_continuity set delete_flag='1' where exhibit_continuity_id='$id'";
+		$query = exec_to_system_log($select);
+		
+                if (!$query) c_error('3','delete_exhibit_continuity()'); 
+
+	}
+
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update exhibit_continuity set ".$tbl_col."='$value' where exhibit_continuity_id='$rowid'";
+		//echo $select;
+		$query = exec_to_system_log($select);
+
+		if (!$query) c_error('3','investigative unit set_value()');
+
+	}
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from exhibit_continuity where exhibit_continuity_id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','investigative unit get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	function list_exhibit_continuity($eid) {
+
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid' order by exhibit_continuity_date asc";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_continuity()');
+
+		$mylist = fetch_results_to_list($query);
+
+		return $mylist;
+	}
+	
+	function list_exist ($eid) {
+		
+		$i = 0;
+		$mylist[0][0]=0;
+		$select = "select * from exhibit_continuity where exhibit_continuity_exhibit_id = '$eid' order by exhibit_continuity_date asc";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','list_exhibit_continuity()');
+
+		$num = mysql_num_rows($query);
+
+		if ($num > 0) {
+			
+			return true;
+		} else {
+			
+			return false;
+		}
+		
+	}
+	
+	function generate_combo_box($select_name) {
+		
+		$select = "select exhibit_continuity_id, exhibit_continuity_name from exhibit_continuity order by exhibit_continuity_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box($select_name, $mylist);
+	}
+	
+	function generate_combo_box_select($select_name, $id) {
+
+		$select = "select exhibit_continuity_id, exhibit_continuity_name from exhibit_continuity order by exhibit_continuity_name";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','generate_combo_box()');
+		
+		$mylist = fetch_results_to_list($query);
+		generate_cmb_box_select($select_name, $mylist, $id);
+      
+		
+	}
+}
+?>

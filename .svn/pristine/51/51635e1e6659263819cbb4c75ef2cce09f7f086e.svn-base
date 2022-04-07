@@ -1,0 +1,49 @@
+<?php
+
+//include('./include/member.php');
+//include('./include/member_privilege');
+
+$exhibit_location = new exhibit_location();
+
+$mode = "New";
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+
+		$elid = $_POST['elid'];
+		$exhibit_location_name = $exhibit_location->get_value('exhibit_location_name', $elid);
+		$exhibit_location_other = $exhibit_location->get_value('exhibit_location_other', $elid);
+		
+	}
+	
+}
+
+?>
+
+
+  <h2><?php echo $mode; ?> Exhibit Location</h2>
+
+
+<form method="post" action="./location/location_processor.php">
+<fieldset class="submitform">
+<label for="exhibit_location_name">Exhibit Location Name</label>
+	<input type="text" name="exhibit_location_name" value="<?php if (isset($exhibit_location_name)) echo $exhibit_location_name; ?>">
+<label for="exhibit_location_other">Description</label>
+	<input type="text" name="exhibit_location_other" value="<?php if (isset($exhibit_location_other)) echo $exhibit_location_other; ?>">
+
+  <?php if ($mode == "Edit") { ?>
+    <input type="hidden" name="mode" value="edit">
+    <input type="hidden" name="elid" value="<?php echo $_POST["elid"]; ?>">
+  	<p><br><label for="Submit"></label>
+    <input type="submit" value="Update Exhibit Location" name="Submit" class="button"/>
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=sel&elid=<?php echo $elid; ?>'" />
+  <?php } else {?>
+  	<br><br><br><label for="Submit"></label>
+	<input type="submit" value="Add Exhibit Location" class="button">
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=del'" />
+  <?php } ?>
+
+</fieldset>
+</form>

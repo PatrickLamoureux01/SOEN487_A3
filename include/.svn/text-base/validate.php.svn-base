@@ -1,0 +1,59 @@
+<?php
+// http://www.codewalkers.com/c/a/Miscellaneous/Writing-a-Basic-Authentication-System-in-PHP/3/
+include('../include/config.inc');
+include('../include/common.php');
+include('../include/db.php');
+include('../include/member.php');
+include('../include/member_privilege.php');
+
+ 
+  
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  }
+  
+$user = $_POST["userid"];
+$pass = sha1($_POST["password"]);
+
+$member = new member();
+$validate = $member->validate_member($_POST["userid"], $_POST["password"]);
+$memberid = $member->get_member_id($_POST["userid"]);
+
+if ($validate == "1") {
+
+	session_start();
+	header("Cache-control: private");
+	$_SESSION["User"] = $_POST["userid"];
+	$_SESSION["mid"] = $memberid;
+	$member->set_value("member_login_date", date("Y-m-d H:i:s"), $memberid);
+	$member->set_value("member_ip", $_SERVER["REMOTE_ADDR"], $memberid);
+	$member = new member();
+	$mylist = $member->member_privilege($_POST["userid"]);
+	if (isset($mylist[0][0])) {
+		$_SESSION["ac"] = $mylist[0][0];
+	}
+	if (isset($mylist[0][1])) {
+		$_SESSION["acl"] = $mylist[0][1];
+	}
+	$_SESSION["grantstatus"] = "grant";
+	header("Location: ".$_POST["referer"]);
+//	echo '<meta http-equiv="refresh" content="0;url='.$_SERVER["HTTP_REFERER"].'">';
+	//  echo "Access Granted: Welcome, $user!";
+} 
+else
+{
+//  echo "Access Denied: Invalid Credentials.";
+
+	header("Location: ../index.php?status=1001");
+}
+?>

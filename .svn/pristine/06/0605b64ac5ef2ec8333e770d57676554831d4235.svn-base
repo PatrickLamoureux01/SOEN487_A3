@@ -1,0 +1,57 @@
+<?php
+session_start();
+// This header will verify that the user session is granted.
+include('./include/case_info.php');
+include('./include/common.php');
+include('./include/config.inc');
+include('./include/db.php');
+include('./include/exhibit_location.php');
+include('./include/exhibit_report_counter.php');
+include('./include/exhibit_report_priority.php');
+include('./include/exhibit_report_status.php');
+include('./include/exhibit_report.php');
+include('./include/exhibit_status_type.php');
+include('./include/exhibit_type.php');
+include('./include/exhibit.php');
+include('./include/initiative.php');
+include('./include/investigative_unit.php');
+include('./include/member_privilege.php');
+include('./include/member.php');
+include('./include/files.php');
+include('./include/exhibit_continuity.php');
+include('./include/return_status.php');
+include('./include/to_tcb.php');
+include('./include/version.php');
+
+
+//include('./include/system_log.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+if (isset($_SESSION["User"])) {
+	header("Cache-control: private");
+	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">';
+
+	// validate user access level
+} else {
+	// except for the index page that's not authorized, redirect everyone else to index.php login page
+	$full_path = $relative_path.$_SERVER["PHP_SELF"];
+/*	if ($_SERVER["PHP_SELF"] != $full_path) {
+		header("Location: ./index.php");
+	}
+*/	
+}
+?>

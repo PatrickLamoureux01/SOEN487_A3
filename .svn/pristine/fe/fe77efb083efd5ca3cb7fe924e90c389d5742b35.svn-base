@@ -1,0 +1,52 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/exhibit_type.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$exhibit_type = new exhibit_type();
+$exhibit_type_name = $_POST['exhibit_type_name'];
+$exhibit_type_other = $_POST['exhibit_type_other'];
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+
+		$etid = $_POST['etid'];
+		$exhibit_type->set_value('exhibit_type_name', $exhibit_type_name, $etid);
+		$exhibit_type->set_value('exhibit_type_other', $exhibit_type_other, $etid);
+	}
+} else {
+
+		$exhibit_type->insert_exhibit_type($exhibit_type_name, $exhibit_type_other);
+}
+
+echo '<meta http-equiv="refresh" content="0;url=../index.php?cmd=det">';
+
+?>

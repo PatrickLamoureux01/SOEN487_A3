@@ -1,0 +1,56 @@
+<?php
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+session_start();
+include('../include/config.inc');
+include('../include/db.php');
+include('../include/common.php');
+include('../include/initiative.php');
+
+$connection = new db();
+$connection->db_connect($db_host, $db_username, $db_password);
+$connection->db_select($db_name);
+
+  //This stops SQL Injection in POST vars 
+  foreach ($_POST as $key => $value) { 
+    $_POST[$key] = mysql_real_escape_string($value); 
+  } 
+
+  //This stops SQL Injection in GET vars 
+  foreach ($_GET as $key => $value) { 
+    $_GET[$key] = mysql_real_escape_string($value); 
+  } 
+
+
+$initiative = new initiative();
+$initiative_name = $_POST['initiative_name'];
+$initiative_other = $_POST['initiative_other'];
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+
+		$iid = $_POST['iid'];
+		$initiative->set_value('initiative_name', $initiative_name, $iid);
+		$initiative->set_value('initiative_other', $initiative_other, $iid);
+	}
+} else {
+
+		$initiative->insert_initiative($initiative_name, $initiative_other);
+}
+
+if ($_SERVER["SERVER_PORT"] != "80") {
+	echo '<meta http-equiv="refresh" content="0;url=http://'.$_SERVER["SERVER_NAME"].':'.$_SERVER["SERVER_PORT"].'/index.php?cmd=di">';
+} else {
+	echo '<meta http-equiv="refresh" content="0;url=http://'.$_SERVER["SERVER_NAME"].'/index.php?cmd=di">';
+}
+
+?>

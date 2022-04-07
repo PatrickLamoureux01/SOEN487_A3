@@ -1,0 +1,49 @@
+<?php
+
+//include('./include/member.php');
+//include('./include/member_privilege');
+
+$exhibit_type = new exhibit_type();
+
+$mode = "New";
+
+
+if (isset($_POST["mode"])) {
+	if ($_POST["mode"] == "edit") {
+		$mode = "Edit";
+
+		$etid = $_POST['etid'];
+		$exhibit_type_name = $exhibit_type->get_value('exhibit_type_name', $etid);
+		$exhibit_type_other = $exhibit_type->get_value('exhibit_type_other', $etid);
+		
+	}
+	
+}
+
+?>
+
+
+  <h2><?php echo $mode; ?> Exhibit Type</h2>
+
+
+<form method="post" action="./exhibit_type/exhibit_type_processor.php">
+<fieldset class="submitform">
+<label for="exhibit_type_name">Exhibit Type Name</label>
+	<input type="text" name="exhibit_type_name" value="<?php if (isset($exhibit_type_name)) echo $exhibit_type_name; ?>">
+<label for="exhibit_type_other">Description</label>
+	<input type="text" name="exhibit_type_other" value="<?php if (isset($exhibit_type_other)) echo $exhibit_type_other; ?>">
+
+  <?php if ($mode == "Edit") { ?>
+    <input type="hidden" name="mode" value="edit">
+    <input type="hidden" name="etid" value="<?php echo $_POST["etid"]; ?>">
+  	<p><br><label for="Submit"></label>
+    <input type="submit" value="Update Exhibit Type" name="Submit" class="button"/>
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=set&etid=<?php echo $etid; ?>'" />
+  <?php } else {?>
+  	<br><br><br><label for="Submit"></label>
+	<input type="submit" value="Add Exhibit Type" class="button">
+    <input type="button" value="Cancel" name="cancel" class="button" onclick="location.href='./index.php?cmd=det'" />
+  <?php } ?>
+
+</fieldset>
+</form>

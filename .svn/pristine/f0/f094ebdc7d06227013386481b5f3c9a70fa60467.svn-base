@@ -1,0 +1,163 @@
+<?php 
+
+// This is the template for EEMS
+// Created by Don Lee
+//
+// These codes belongs to the property of K Division Tech Crime
+//
+// File Name:
+//
+// Description:
+//
+//
+//
+
+class files {
+
+	function files() {
+
+	}
+
+
+	function insert_files($fileName, $fileSize, $fileType, $content) {
+
+	$select = "INSERT INTO files (name, size, type, content ) ".
+	"VALUES ('$fileName', '$fileSize', '$fileType', '$content')";
+
+		$query = mysql_query($select);
+		echo mysql_insert_id();
+		
+		$returnparm[0] = mysql_insert_id();
+
+		if ($query) { 
+			$returnparm[1] = "1";
+			to_system_log('add files "'.$fileName.'" to file Database');		
+			return $returnparm; 
+		} else { 
+			$returnparm[1] = "0";	
+			return 0; 
+		};
+		
+		
+	}
+
+	function delete_files($id) {
+
+		$select = "update files set delete_flag='1' where id='$id'";
+		$query = mysql_query($select);
+		
+                if (!$query) c_error('3','delete_exhibit_location()'); 
+
+	}
+	
+	function set_value($tbl_col, $value, $rowid) {
+
+		$select = "update files set ".$tbl_col."='$value' where id='$rowid'";
+//echo $select;
+		$query = mysql_query($select);
+
+		if (!$query) c_error('3','exhibit set_value()');
+
+	}
+
+	function get_value($tbl_col, $id) {
+		
+		$select = "select ".$tbl_col." from files where id = '$id'";
+		$query = mysql_query($select);
+		if (!$query) c_error('3','exhibit get_value()');
+			
+		$result = mysql_fetch_row($query);
+
+		return $result[0];
+				
+	}
+	
+	function show_exhibit_report_files($erid) {
+    echo '<div class="dCaseInfo mrg-1">';
+    echo '<table>';
+    
+    $query = "SELECT id, name, file_category FROM files where exhibit_report_id = '$erid' and exhibit_id = 0  and delete_flag = '0'";
+  	$result = mysql_query($query) or die('Error, query failed');
+  
+    if(mysql_num_rows($result) == 0){
+	  	echo "<tr><td><p>No Attachments found for this CSER Exhibit Report <br></td></tr>";
+  	} else {
+    	while(list($id, $name, $category) = mysql_fetch_array($result)){
+       	echo '<tr><td width=130><strong>File Attatchment:</strong></td>';
+       	echo '<td>'.$category.' : <a href="./exhibit_report/exhibit_report_download.php?id='.$id.'" target="_blank">'.$name.'</a></td>';
+		echo '</tr>';
+      }
+    }
+
+    echo '</table>';
+    echo '</div>';
+
+	
+
+	}
+
+	
+	function show_exhibit_files($exhibit_id) {
+  
+    echo '<div class="dCaseInfo mrg-5">';
+    echo '<table>';
+    
+    $query = "SELECT id, name, file_category, content FROM files where exhibit_id = '$exhibit_id' and delete_flag = '0'";
+    $result = mysql_query($query) or die('Error, query failed');
+
+  	if(mysql_num_rows($result) == 0){
+	  	echo "<tr><td><p>No Attachments found for this Exhibit <br></td></tr>";
+  	} else {
+      while(list($id, $name, $category, $content) = mysql_fetch_array($result)){
+        echo '<tr><td width=130><strong>File Attatchment:</strong></td><td>'.$category.' : <a href="./exhibit/exhibit_download.php?id='.$id.'" target="_blank">'.$name.'</a> </td></tr>';
+      }
+    }
+
+    echo '</table>';
+    echo '</div>';
+
+  
+  
+  
+  /*
+  echo '<p>';
+	echo '<h2>Exhibit Attachments</h2>';
+	echo '<hr style="margin:-11px 0px 8px 0px;">';
+		
+	$query = "SELECT id, name, file_category FROM files where exhibit_id = '$exhibit_id'";
+	$result = mysql_query($query) or die('Error, query failed');
+	if(mysql_num_rows($result) == 0)
+	{
+		echo "<p>No Attachments found for this Exhibit <br>";
+	} else {
+	?>
+	<table style="width: 400px; margin-left: auto; margin-right:auto">
+	<tr>
+	<th>File Category</th><th>File Name</th>
+	</tr>
+	<?php
+	while(list($id, $name, $category) = mysql_fetch_array($result))
+	{
+	?>
+	<tr>
+	<td style="width:100px; text-align: center">
+	<?php echo $category; ?>	
+	</td>
+	<td style="width:300px">
+	<a href="./exhibit/exhibit_download.php?id=<?php echo $id;?>" target="_blank"><?php echo $name;?></a> <br>
+	</td>
+	</tr>
+	<?php
+	}
+	?>
+	</table>
+	<br><br>
+	<hr style="margin:-11px 0px 8px 0px;">
+	<br><br>
+	<?php 
+	}		
+	*/
+	}
+	
+} 
+?>
