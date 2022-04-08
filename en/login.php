@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<?php include_once('../include/config.inc'); ?>
+<?php include_once('../include/config.php'); ?>
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,66 +36,27 @@
                 <p class="center"><i>LETS GETAWAY</i></p>
               </div>
               <div class="border-left col-lg-7">
-
-
-                <form class="user p-5 m-0" action="../include/validate.php" method="post">
-                  <fieldset class="CaseInformation">
-                    <div class="form-group m-0">
-                      <label for="userid">Email</label>
-                    </div>
-                    <div class="form-group">
-                      <input class="form-control form-control-user" name="userid" id="userid" type="text" placeholder="User ID">
-                    </div>
-
-                    <div class="form-group m-0">
-                      <label for="password">Password</label>
-                    </div>
-                    <div class="form-group">
-                      <input class="form-control form-control-user" name="password" id="password" type="password" placeholder="Password">
-                    </div>
-
-                    <div class="form-group">
-                      <label for="Submit" class="d-block align-right"></label>
-                    </div>
-
-                    <div class="form-group">
-                      <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
-                    </div>
-
-                    <div class="form-group">
-                      <p style="text-align:center;">New user? Sign up now!</p>
-                      <button class="btn btn-primary btn-block" onclick="redirect()" name="signup" type="button">Sign up</button>
-                    </div>
+                <form class="user p-5 m-0" action="../Controller/validateLogin.php" method="post">
+                  <div class="form-group m-0">
+                    <label for="email">Email</label>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control form-control-user" name="email" id="email" type="text" placeholder="Email">
+                  </div>
+                  <div class="form-group m-0">
+                    <label for="password">Password</label>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control form-control-user" name="password" id="password" type="password" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
+                  </div>
+                  <div class="form-group">
+                    <p style="text-align:center;">New user? Sign up now!</p>
+                    <button class="btn btn-primary btn-block" onclick="redirect()" name="signup" type="button">Sign up</button>
+                  </div>
               </div>
-
-              <?php
-              if (isset($_GET["status"])) {
-
-                switch ($_GET["status"]) {
-                  case "1001":
-                    echo "<div align='middle'><font color='red'>INVALID USERNAME/PASSWORD!</font></div>";
-                    break;
-                  case "2001":
-                    echo "<div align='middle'><font color='red'>PLEASE LOGIN!</font></div>";
-                    break;
-                  case "3001":
-                    echo "<div align='middle'><font color='red'>PLEASE LOG IN AS TEAM LEAD</font></div>";
-                    break;
-                  case "4001":
-                    echo "<div align='middle'><font color='red'>PLEASE LOGIN AS CFA</font></div>";
-                    break;
-                  case "5001":
-                    echo "<div align='middle'><font color='red'>PLEASE LOGIN AS ADMINISTRATOR</font></div>";
-                    break;
-                  case "6001":
-                    echo "<div align='middle'><font color='red'>PLEASE LOGIN AS ADMINISTRATOR OR TEAM LEAD</font></div>";
-                    break;
-                }
-              }
-              ?>
-
-              </fieldset>
-
               </form>
             </div>
           </div>
@@ -108,6 +69,23 @@
   </div> <!-- outer row-->
 
   </div> <!-- container -->
+  <!-- Account created successfully -->
+  <div class="toast-container">
+    <div class="toast text-white bg-success" id="accountToast">
+      <div class="toast-body">
+        Account created successfully
+      </div>
+    </div>
+  </div>
+
+  <!-- Invalid user/pass -->
+  <div class="toast-container">
+    <div class="toast text-white bg-danger" id="invalidToast">
+      <div class="toast-body">
+        Invalid username/password!
+      </div>
+    </div>
+  </div>
 
   <!-- Bootstrap core JavaScript-->
   <link rel="stylesheet" href="../bootstrap/css/sb-admin-2.css" />
@@ -126,9 +104,23 @@
   <!-- Custom scripts for all pages-->
   <script src="../bootstrap/js/sb-admin-2.min.js"></script>
   <script>
+    $(document).ready(function() {
+      if (window, location.href.indexOf('1000') > -1) {
+        $("#accountToast").toast({
+          delay: 1400
+        });
+        $('#accountToast').toast('show');
+      }
+      if (window, location.href.indexOf('2000') > -1) {
+        $("#invalidToast").toast({
+          delay: 1400
+        });
+        $('#invalidToast').toast('show');
+      }
+    });
 
     function redirect() {
-      window.location.href="signup.php";
+      window.location.href = "signup.php";
     }
   </script>
 </body>

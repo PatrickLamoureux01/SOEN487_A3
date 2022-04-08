@@ -172,17 +172,7 @@ error_reporting(E_ALL ^ E_NOTICE);
 
     <script>
         $(document).ready(function() {
-            if (window.location.href.indexOf('1000') > -1) {
-                $("#dbErrorToast").toast({
-                    delay: 1400
-                });
-                $('#dbErrorToast').toast('show');
-            } else if (window.location.href.indexOf('2000') > -1) {
-                $("#alreadyExistsToast").toast({
-                    delay: 1400
-                });
-                $('#alreadyExistsToast').toast('show');
-            } else if (window, location.href.indexOf('3000') > -1) {
+            if (window, location.href.indexOf('3000') > -1) {
                 $("#passwordToast").toast({
                     delay: 1400
                 });
