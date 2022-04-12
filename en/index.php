@@ -77,24 +77,11 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                 </a>
                 <div id="collapseTrips" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Trip Functions:</h6>
+                        <h6 class="collapse-header">Trip Functions</h6>
                         <a class="collapse-item" href="viewtrips.php">View My Trips</a>
                         <a class="collapse-item" href="createtrip.php">Create a Trip</a>
                         <a class="collapse-item" href="edittrip.php">Edit a Trip</a>
                         <a class="collapse-item" href="deletetrip.php">Delete a Trip</a>
-                    </div>
-                </div>
-            </li>
-            <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLogs" aria-expanded="true" aria-controls="collapseLogs">
-                    <i class="fas fa-scroll"></i>
-                    <span>Change Logs</span>
-                </a>
-                <div id="collapseLogs" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Logging Functions:</h6>
-                        <a class="collapse-item" href="view-logs.php">View Change Logs</a>
                     </div>
                 </div>
             </li>
@@ -132,8 +119,8 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">
                             <?php
-                            if (date('H') > "12") {
-                                echo "Good afternoon, $fullname!";
+                            if (date('H') >= "12") {
+                                echo "Good Afternoon, $fullname!";
                             } else {
                                 echo "Good Morning, $fullname!";
                             }
