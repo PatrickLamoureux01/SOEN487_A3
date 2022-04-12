@@ -38,4 +38,17 @@ class TripGateway extends Database
 
 		return $trip;
     }
+
+    public function get_trip_name_by_id($link,$id) {
+
+        $sql = "SELECT name from trips where id=?";
+		$select_stmt = mysqli_prepare($link, $sql);
+		mysqli_stmt_bind_param($select_stmt, 'i', $id);
+		mysqli_stmt_execute($select_stmt);
+		mysqli_stmt_bind_result($select_stmt, $name);
+		mysqli_stmt_fetch($select_stmt);
+		mysqli_stmt_close($select_stmt);
+
+		return $name;
+    }
 }

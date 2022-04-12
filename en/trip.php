@@ -346,13 +346,6 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
             </div>
         </div>
 
-        <!-- No Permission Toast -->
-        <div class="toast text-white-50 bg-dark" id="permissionToast" style="display:none;">
-            <div class="toast-body">
-                You do not have permission to do this!
-            </div>
-        </div>
-
         <!-- Bootstrap core JavaScript-->
         <script src="../bootstrap/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
@@ -377,13 +370,6 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
         $('#noteTable').DataTable();
     });
 
-    function displayToast() {
-        $('#permissionToast').show();
-        $("#permissionToast").toast({
-            delay: 1400
-        });
-        $('#permissionToast').toast('show');
-    }
 </script>
 
 </html>

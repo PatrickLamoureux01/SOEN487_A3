@@ -11,6 +11,7 @@ $status = 'danger';
 // If the form is submitted 
 if(isset($_POST['submit'])){ 
      
+    $fname = $_POST['name'];
     // Validate form input fields 
     if(empty($_FILES["file"]["name"])){ 
         $valErr .= 'Please select a file to upload.<br/>'; 
@@ -26,9 +27,9 @@ if(isset($_POST['submit'])){
         if(move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)){ 
              
             // Insert data into the database 
-            $sqlQ = "INSERT INTO drive_files (file_name,created) VALUES (?,NOW())"; 
+            $sqlQ = "INSERT INTO drive_files (given_name,file_name,created) VALUES (?,?,NOW())"; 
             $stmt = $link->prepare($sqlQ); 
-            $stmt->bind_param("s", $db_file_name); 
+            $stmt->bind_param("ss", $fname, $db_file_name); 
             $db_file_name = $fileName; 
             $insert = $stmt->execute(); 
              
