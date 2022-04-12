@@ -153,34 +153,20 @@ $trip = mysqli_fetch_array($tripObj);
             <!-- Basic Info -->
             <div class="row mt-1">
                 <div class="col">
-
-
                     <div class="card shadow py-2">
                         <div class="card-body m-0 p-0">
                             <div class="row text-center text-gray-800">
                                 <div class="col mr-2">
-                                    <span class="text-gray-600">CDP Received: </span> <?php print_r($currentCase['case_request_date']) ?>
+                                    <span class="text-gray-600"><b>Departure:</b> <?php echo($trip['depart_country']); ?> - <?php echo($trip['arrival_country']);?> on <?php echo($trip['start_date']);?></span> 
                                 </div>
                                 <div class="col">
-                                    <span class="text-gray-600">Lead Investigator:</span> <?php echo $currentCase['case_lead_investigator']; ?>
+                                    <span class="text-gray-600"><b>Return:</b> <?php echo $trip['arrival_country']; ?> - <?php echo($trip['depart_country']);?>  on <?php echo($trip['end_date']);?></span>
                                 </div>
-                                <div class="col">
-                                    <span class="text-gray-600">Lead CFA:</span> <?php echo $currentCase['case_lead_cfa']; ?>
-                                </div>
-                                <div class="col">
-                                    <span class="text-gray-600">Back-Up CFA: </span> <?php echo $currentCase['case_backup_cfa']; ?>
-                                </div>
-                                <div class="col">
-                                    <span class="text-gray-600">Status: </span> <?php echo $currentCase['case_status']; ?>
-                                </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
 
             <!-- DataTales Example -->
             <div class="card shadow">
@@ -188,246 +174,30 @@ $trip = mysqli_fetch_array($tripObj);
 
                     <a href="#case4" class="d-block card-header py-3 bg-white active" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="case3">
 
-                        <h6 class="m-0 text-primary m-0">Tasks in progress: <?php echo ($numInprogTasks); ?></h6>
+                        <h6 class="m-0 text-primary m-0">Weather in <?php echo($trip['depart_country']); ?></h6>
                     </a>
+                        <?php 
 
-                    <div class="collapse show" id="case4">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover " id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th class="status-width">Status</th>
-                                        <th class="desc-width">Task Description</th>
-                                        <th>Lead CFA</th>
-                                        <th>Due Date</th>
-                                        <th>Evidence linked</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <?php
-
-                                    if (empty($inprogressTasks)) {
-                                        echo ('<tr>
-                      <td>   </td>
-                      <td> There are no tasks in progress. </td>
-                    </tr>');
-                                    }
-
-                                    foreach ($inprogressTasks as $task) {
-
-                                        $fetch_evidence =  $evidence->get_evidence_name($task['evidence_linked'], $link);
-                                        if ($fetch_evidence == "/") {
-                                            $evidence_linked = "No evidence linked";
-                                        } else {
-                                            $evidence_linked = $fetch_evidence;
-                                        }
-
-                                        $duedate = strtotime($task['task_due_date']);
-                                        $date = date('Y/m/d');
-                                        $currentDate = strtotime($date);
-                                        $difference = ($duedate - $currentDate) / 86400;
-
-                                        if ($difference < 0) {
-                                            $badgeColour = "danger";
-                                            $overdue = true;
-                                        } else if ($difference < 7) {
-                                            $badgeColour = "danger";
-                                            $overdue = false;
-                                            $c++;
-                                        } else if ($difference < 30) {
-                                            $badgeColour = "warning";
-                                            $overdue = false;
-                                            $c++;
-                                        } else {
-                                            $badgeColour = "success";
-                                            $overdue = false;
-                                        }
-
-
-                                        if ($task['task_due_date'] == "0000-00-00") {
-                                            $badgeColour = "success";
-                                            $overdue = false;
-                                        }
-
-                                        //get calendar colour
-                                        $taskid = $task['task_id'];
-                                        // the following code will generate a random number for every event based on task id so we can differentiate task events from each other! to ensure that each task will have the same colour even after the page is refreshed, we will set a seed that is equal to the taskid.
-                                        srand($taskid);
-                                        $color = 'hsl(' . rand(0, 359) . ', 100%, 80%);';
-                                        //use hsl instead of rgb so we can make sure all the randomly generated colours are light
-
-                                        echo ('
-
-                        <tr class="clickable-row" data-href="seetask2.php');
-                                        echo ('?cid=' .  $_GET["cid"] . '&tid=' . $task['task_id']);
-                                        echo ('">
-                        <td> <a href="seetask2.php');
-                                        echo ('?cid=' . $_GET["cid"] . '&tid=' . $task['task_id']);
-                                        echo ('"class="btn btn-sm btn-');
-                                        echo ($badgeColour);
-                                        echo (' btn-circle"> <i class="fa fa-bell"></i> </a>');
-                                        if ($overdue) {
-                                            echo (' <i class="fa fa-exclamation text-red"></i>');
-                                        }
-                                        echo (' </td>
-                        <td class="w-descrip">');
-                                        echo ($task['task_type_id']);
-                                        echo (' </td>
-                        <td>');
-                                        echo ($task['task_lead_cfa']);
-                                        echo ('</td>
-                        <td>');
-                                        if ($task['task_due_date'] == "0000-00-00") {
-                                            echo (" Ongoing ");
-                                        } else {
-                                            echo ($task['task_due_date']);
-                                        }
-
-                                        echo ('</td>
-                        <td >');
-                                        echo $evidence_linked;
-                                        echo ('
-                        </td>
-                      </tr>');
-                                    }
-                                    ?>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+                            $str = file_get_contents("http://localhost/487a3/weather.php?param=".$trip['depart_city']);
+                            $json = json_decode($str, true);
+                            echo ("<h1>Current weather in ".$json['name']."</h1>");
+                            
+                        ?>
 
                     <a href="#case3" class="d-block card-header py-3 bg-white active" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="case3">
 
-                        <h6 class="m-0 text-primary m-0">Tasks to be started: <?php echo ($numGetstartTasks); ?></h6>
+                    <h6 class="m-0 text-primary m-0">Weather in <?php echo($trip['arrival_country']); ?></h6>
                     </a>
-
-                    <div class="collapse show" id="case3">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover " id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th class="status-width">Status</th>
-                                        <th class="desc-width">Task Description</th>
-                                        <th>Lead CFA</th>
-                                        <th>Due Date</th>
-                                        <th>Evidence linked</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <?php
-
-                                    if (empty($getstartedTasks)) {
-                                        echo ('<tr>
-                                <td></td>
-                                <td> There are no tasks to be started. </td>
-                              </tr>');
-                                    }
-
-                                    foreach ($getstartedTasks as $task) {
-
-
-                                        $fetch_evidence =  $evidence->get_evidence_name($task['evidence_linked'], $link);
-                                        if ($fetch_evidence == "/") {
-                                            $evidence_linked = "No evidence linked";
-                                        } else {
-                                            $evidence_linked = $fetch_evidence;
-                                        }
-
-                                        $duedate = strtotime($task['task_due_date']);
-                                        $date = date('Y/m/d');
-                                        $currentDate = strtotime($date);
-                                        $difference = ($duedate - $currentDate) / 86400;
-
-
-                                        if ($difference < 0) {
-                                            $badgeColour = "danger";
-                                            $overdue = true;
-                                        } else if ($difference < 7) {
-                                            $badgeColour = "danger";
-                                            $overdue = false;
-                                            $c++;
-                                        } else if ($difference < 30) {
-                                            $badgeColour = "warning";
-                                            $overdue = false;
-                                            $c++;
-                                        } else {
-                                            $badgeColour = "success";
-                                            $overdue = false;
-                                        }
-
-
-                                        if ($task['task_due_date'] == "0000-00-00") {
-                                            $badgeColour = "success";
-                                            $overdue = false;
-                                        }
-
-                                        //get calendar colour
-                                        $taskid = $task['task_id'];
-                                        // the following code will generate a random number for every event based on task id so we can differentiate task events from each other! to ensure that each task will have the same colour even after the page is refreshed, we will set a seed that is equal to the taskid.
-                                        srand($taskid);
-                                        $color = 'hsl(' . rand(0, 359) . ', 100%, 80%);';
-                                        //use hsl instead of rgb so we can make sure all the randomly generated colours are light
-
-                                        echo ('
-
-                        <tr class="clickable-row" data-href="seetask2.php');
-                                        echo ('?cid=' . $_GET["cid"]  . '&tid=' . $task['task_id']);
-                                        echo ('">
-                              <td> <a href="seetask2.php');
-                                        echo ('?cid=' . $_GET["cid"] . '&tid=' . $task['task_id']);
-                                        echo ('"class="btn btn-sm btn-');
-                                        echo ($badgeColour);
-                                        echo (' btn-circle"> <i class="fa fa-bell"></i> </a>');
-                                        if ($overdue) {
-                                            echo (' <i class="fa fa-exclamation text-red"></i>');
-                                        }
-                                        echo (' </td>
-                              <td class="w-descrip">');
-                                        echo ($task['task_type_id']);
-                                        echo (' </td>
-                              <td>');
-                                        echo ($task['task_lead_cfa']);
-                                        echo ('</td>
-                              <td>');
-                                        if ($task['task_due_date'] == "0000-00-00") {
-                                            echo (" Ongoing ");
-                                        } else {
-                                            echo ($task['task_due_date']);
-                                        }
-
-                                        echo ('</td>
-                        <td >');
-                                        echo $evidence_linked;
-                                        echo ('
-                        </td>
-                      </tr>');
-                                    }
-                                    ?>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
 
                 </div>
             </div>
 
-
-            <!-- Important Dates -->
-            <!-- unhide to see potential design for when this can become dynamic, for now the dates are hardcoded -->
-            <div hidden class="card shadow h-100 py-2 ">
+            <div class="card shadow h-100 py-2 ">
+            <a href="#docs" class="d-block card-header py-3 bg-white" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="docs">
+                    <h6 class="m-0 text-primary">Documents Uploaded</h6>
+                </a>
+                <div class="collapse" id="docs">
                 <div class="card-body">
-                    <div class="row mx-2">
-                        <div class="small text-primary text-uppercase mb-1 col">Important Dates</div>
-                        <div class="col text-right"> <a class="m-0 text-primary small" href="#"><i class="fa fa-plus"></i> New
-                                Event</a> </div>
-                    </div>
-
                     <hr class="sidebar-divider pb-0 mb-0">
 
                     <div class="container mt-3">
@@ -463,7 +233,7 @@ $trip = mysqli_fetch_array($tripObj);
             <!-- DataTales Example -->
             <div class="card shadow">
                 <a href="#caseComp" class="d-block card-header py-3 bg-white" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="caseComp">
-                    <h6 class="m-0 text-primary">Completed Tasks: <?php echo ($numCompletedTasks); ?></h6>
+                    <h6 class="m-0 text-primary">Events Scheduled</h6>
                 </a>
                 <div class="collapse" id="caseComp">
                     <div class="card-body">
