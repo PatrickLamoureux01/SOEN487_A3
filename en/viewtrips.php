@@ -149,7 +149,7 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                     </div> 
                     <div class="col text-right">
                       <div class="font-weight-bold text-uppercase mb-1">');
-                echo round((strtotime($trip['start_date']) - time()) / (60 * 60 * 24)) . " days remaining!";
+                echo round((strtotime($trip['start_date']) - time()) / (60 * 60 * 24) + 1) . " days remaining!";
                 echo ($case['case_status']);
                 echo ('</div>
                               <div class="small">Departure Date: ');
