@@ -1,6 +1,7 @@
 <?php
 require_once('../include/database.php');
 require_once('../Gateway/userGateway.php');
+require_once('../Gateway/tripGateway.php');
 session_start();
 $db = new Database();
 $link = $db->connect();
@@ -8,6 +9,10 @@ $link = $db->connect();
 $userGateway = new UserGateway();
 
 $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
+
+$tripGateway = new TripGateway();
+$tripObj = $tripGateway->get_trip_by_id($link, $_GET['tid']);
+$trip = mysqli_fetch_array($tripObj);
 
 ?>
 <!DOCTYPE html>
@@ -22,7 +27,7 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
     <meta name="author" content="">
 
 
-    <title>Trip: <?php echo $currentCase['case_name']; ?></title>
+    <title>Trip - <?php echo $trip['name']; ?></title>
 
     <!-- Custom fonts for this template-->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -72,19 +77,16 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTrips" aria-expanded="true" aria-controls="collapseTrips">
+                <a class="nav-link" href="../en/viewtrips.php">
                     <i class="fa-solid fa-plane-departure"></i>
-                    <span>Trips</span>
+                    <span>View My Trips</span>
                 </a>
-                <div id="collapseTrips" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Trip Functions</h6>
-                        <a class="collapse-item" href="viewtrips.php">View My Trips</a>
-                        <a class="collapse-item" href="createtrip.php">Create a Trip</a>
-                        <a class="collapse-item" href="edittrip.php">Edit a Trip</a>
-                        <a class="collapse-item" href="deletetrip.php">Delete a Trip</a>
-                    </div>
-                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../en/createtrip.php">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create a Trip</span>
+                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="../en/login.php">
@@ -105,18 +107,13 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
+                    <?php
 
-                    <?php if ($_SESSION["UserPrivilege"] == 2) {
-                        echo ('
+                    echo ('
               <div class="row">
-                <button class="btn text-xs py-1 btn-danger-nav" onclick="window.location.href=\'allCases2.php\'"> <i class="fa fa-arrow-left"> &nbsp </i>  View All Cases</button>
+                <button class="btn text-xs py-1 btn-danger-nav" onclick="window.location.href=\'viewtrips.php\'"> <i class="fa fa-arrow-left"> &nbsp </i>  My Trips</button>
               </div>');
-                    } else if ($_SESSION["UserPrivilege"] == 3) {
-                        echo ('
-              <div class="row">
-                <button class="btn text-xs py-1 btn-danger-nav" onclick="window.location.href=\'viewCases2.php\'"> <i class="fa fa-arrow-left"> &nbsp </i>  My Cases</button>
-              </div>');
-                    }
+
                     ?>
 
 
@@ -127,100 +124,28 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
 
                                     <?php
 
-                                    if ($currentCase['is_open'] == 0) {
-                                        echo ('<p class="text-danger">This case is closed and can no longer be modified. </p>');
-                                        echo ('<span class="fade-link" >Case #' . $currentCase['case_id'] . ' | ' . $currentCase['case_name'] . ' </span>');
-                                    } else {
-                                        echo ('Case #' . $currentCase['case_id'] . ' | ' . $currentCase['case_name']);
-                                    }
+
+                                    echo ('Trip #' . $trip['id'] . ' | ' . $trip['name']);
+
                                     ?>
                                 </h4>
 
                             </div>
-                            <div class="col pr-4 pt-4 text-right">
-                                <?php
-                                if ($_SESSION["UserPrivilege"] == 2) {
-                                    echo (' <a class="m-0 pt-4 font-weight-bold align-bottom text-primary small" href="editCase2.php?cid=');
-                                    echo ($_GET["cid"]);
-                                    echo ('"><i class="fa fa-pencil-alt"></i>  Edit Case</a>');
-                                }
-                                ?>
-                            </div>
                         </div>
                     </div>
-
-                    <!-- Build the top menu depending on case permission -->
-                    <?php
-                    if ($case_permission == 0 && $_SESSION["UserPrivilege"] != 2) {
-
-                    ?>
-
-                        <div class="border-0 m-0 py-0">
-                            <div class="row justify-content-around m-2 small">
-
-                                <a id="newtaskbutton" class="font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-plus"></i> Start New Task</a>
-
-                                <a id="newflashtaskbutton" class="font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-plus"></i> Create Custom Task Template</a>
-
-                                <a class="font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-plus"></i> Manage Evidence</a>
-
-                                <a class="font-weight-bold text-primary" href="./calendar.php?cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-pencil-alt"></i> Case Calendar </a>
-
-                                <a class="font-weight-bold text-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" type="button" aria-expanded="false"><i class="fa fa-download"></i> T2020 </a>
-
-
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item pt-0" href="report_download/tableheader2.php?cid=<?php echo $_GET["cid"]; ?>&cfa=<?php echo $_SESSION["cfa"]; ?>">My
-                                        T2020</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item py-0" href="report_download/tableheader3.php?cid=<?php echo $_GET["cid"]; ?>">All</a>
-                                </div>
-
-                                <a class="font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-file "></i> Integras report</a>
-
-                                <a hidden class="font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-balance-scale "></i> Disclosure report</a>
-
-                                <a class="m-0 font-weight-bold text-primary" onclick="displayToast()"><i class="fa fa-lock"></i> Close Case</a>
-
-                            </div>
-                        </div>
-                </div>
-
-            <?php
-                    } else { ?>
 
                 <div class="border-0 m-0 py-0">
                     <div class="row justify-content-around m-2 small">
 
-                        <a id="newtaskbutton" class="font-weight-bold text-primary" href="createtask3.php<?php echo ('?cid=' . $_GET["cid"]); ?>"><i class="fa fa-plus"></i> Start New Task</a>
+                        <a class="font-weight-bold text-primary" href="upload.php<?php echo ('?tid=' . $_GET["tid"]); ?>"><i class="fa fa-plus"></i> Upload Travel Documents</a>
 
-                        <a id="newflashtaskbutton" class="font-weight-bold text-primary" href="custom_flash_task2.php<?php echo ('?cid=' . $_GET["cid"]); ?>"><i class="fa fa-plus"></i> Create Custom Task Template</a>
+                        <a id="newflashtaskbutton" class="font-weight-bold text-primary" href="edittrip.php<?php echo ('?tid=' . $_GET["tid"]); ?>"><i class="fa-solid fa-pen"></i> Edit Trip Info</a>
 
-                        <a class="font-weight-bold text-primary" href="evidence.php?cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-plus"></i> Manage Evidence</a>
-
-                        <a hidden class="font-weight-bold text-primary" href="./calendar.php?cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-pencil-alt"></i> Case Calendar </a>
-
-                        <a class="font-weight-bold text-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" type="button" aria-expanded="false"><i class="fa fa-download"></i> T2020</a>
-
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item pt-0" href="report_download/tableheader2.php?cid=<?php echo $_GET["cid"]; ?>&cfa=<?php echo $_SESSION["cfa"]; ?>">My
-                                T2020</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item py-0" href="report_download/tableheader3.php?cid=<?php echo $_GET["cid"]; ?>">All</a>
-                        </div>
-
-                        <a class="font-weight-bold text-primary" href="report_download/integras.php?cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-file "></i> Integras report</a>
-
-                        <a hidden class="font-weight-bold text-primary" href="report_download/disclosure.php?cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-balance-scale "></i> Disclosure report</a>
-
-                        <a class="m-0 font-weight-bold text-primary" href="../case/case_processor2.php?type=close&cid=<?php echo $_GET["cid"]; ?>"><i class="fa fa-lock"></i> Close Case</a>
+                        <a class="font-weight-bold text-primary" href="deletetrip.php?tid=<?php echo $_GET["tid"]; ?>"><i class="fa-solid fa-trash"></i> Delete Trip</a>
 
                     </div>
                 </div>
             </div>
-        <?php
-                    }
-        ?>
 
         <div class="mb-4 mx-4">
             <hr class="sidebar-divider py-0 mt-2 mb-0 ">

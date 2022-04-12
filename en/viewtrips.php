@@ -48,61 +48,57 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
   <!-- Page Wrapper -->
   <div id="wrapper">
 
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-icon">
+                    <i class="fa-solid fa-earth-americas"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Welcome, <?php echo $fullname; ?>!</div>
+            </a>
 
-      <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-        <div class="sidebar-brand-icon">
-          <i class="fa-solid fa-earth-americas"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3">Welcome, <?php echo $fullname; ?>!</div>
-      </a>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
 
-      <!-- Divider -->
-      <hr class="sidebar-divider my-0">
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="index.php">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>LETS GETAWAY</span></a>
+            </li>
 
-      <!-- Nav Item - Dashboard -->
-      <li class="nav-item active">
-        <a class="nav-link" href="index.php">
-          <i class="fa-solid fa-globe"></i>
-          <span>LETS GETAWAY</span></a>
-      </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
 
-      <!-- Divider -->
-      <hr class="sidebar-divider">
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Actions
+            </div>
 
-      <!-- Heading -->
-      <div class="sidebar-heading">
-        Actions
-      </div>
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="../en/viewtrips.php">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    <span>View My Trips</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../en/createtrip.php">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create a Trip</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../en/login.php">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
 
-      <!-- Nav Item - Utilities Collapse Menu -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTrips" aria-expanded="true" aria-controls="collapseTrips">
-          <i class="fa-solid fa-plane-departure"></i>
-          <span>Trips</span>
-        </a>
-        <div id="collapseTrips" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Trip Functions</h6>
-            <a class="collapse-item" href="viewtrips.php">View My Trips</a>
-            <a class="collapse-item" href="createtrip.php">Create a Trip</a>
-            <a class="collapse-item" href="edittrip.php">Edit a Trip</a>
-            <a class="collapse-item" href="deletetrip.php">Delete a Trip</a>
-          </div>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="../en/login.php">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Logout</span>
-        </a>
-      </li>
-
-    </ul>
-    <!-- End of Sidebar -->
+        </ul>
+        <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">

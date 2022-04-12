@@ -71,19 +71,16 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTrips" aria-expanded="true" aria-controls="collapseTrips">
+                <a class="nav-link" href="../en/viewtrips.php">
                     <i class="fa-solid fa-plane-departure"></i>
-                    <span>Trips</span>
+                    <span>View My Trips</span>
                 </a>
-                <div id="collapseTrips" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Trip Functions</h6>
-                        <a class="collapse-item" href="viewtrips.php">View My Trips</a>
-                        <a class="collapse-item" href="createtrip.php">Create a Trip</a>
-                        <a class="collapse-item" href="edittrip.php">Edit a Trip</a>
-                        <a class="collapse-item" href="deletetrip.php">Delete a Trip</a>
-                    </div>
-                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../en/createtrip.php">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create a Trip</span>
+                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="../en/login.php">
