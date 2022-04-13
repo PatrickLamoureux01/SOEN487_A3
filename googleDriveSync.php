@@ -1,13 +1,14 @@
 <?php 
 // Include Google drive api handler class 
-include_once 'googleDriveAPI.class.php'; 
-     
+include_once 'googleDriveAPI.class.php';
+
 // Include database configuration file 
-require_once 'include/database.php'; 
+include_once('../487a3/include/database.php');
 
 $db = new Database();
 $link = $db->connect();
 
+//$fileGateway = new FileGateway();
  
 $statusMsg = ''; 
 $status = 'danger'; 
@@ -59,20 +60,25 @@ if(isset($_GET['code'])){
                         $drive_file_meta = $GoogleDriveApi->UpdateFileMeta($access_token, $drive_file_id, $file_meta); 
                          
                         if($drive_file_meta){ 
+
+                            $glink = "https://drive.google.com/open?id=".$drive_file_meta['id'];
                             // Update google drive file reference in the database 
-                            $sqlQ = "UPDATE drive_files SET google_drive_file_id=? WHERE id=?"; 
+                            $sqlQ = "UPDATE drive_files SET google_drive_file_id=?, link = ? WHERE id=?"; 
                             $stmt = $link->prepare($sqlQ); 
-                            $stmt->bind_param("si", $db_drive_file_id, $db_file_id); 
+                            $stmt->bind_param("ssi", $db_drive_file_id, $glink, $db_file_id); 
                             $db_drive_file_id = $drive_file_id; 
                             $db_file_id = $file_id; 
                             $update = $stmt->execute(); 
                              
+                            //$trip_id = $fileGateway->get_trip_id_by_google_drive_id($link,$db_drive_file_id);
                             unset($_SESSION['last_file_id']); 
                             unset($_SESSION['google_access_token']); 
                              
                             $status = 'success'; 
                             $statusMsg = '<p>File has been uploaded to Google Drive successfully!</p>'; 
                             $statusMsg .= '<p><a href="https://drive.google.com/open?id='.$drive_file_meta['id'].'" target="_blank">'.$drive_file_meta['name'].'</a>'; 
+
+                            
                         } 
                     } 
                 } catch(Exception $e) { 
@@ -90,7 +96,7 @@ if(isset($_GET['code'])){
      
     $_SESSION['status_response'] = array('status' => $status, 'status_msg' => $statusMsg); 
      
-    header("Location: ../487a3/en/upload.php"); 
+    header("Location: ../487a3/en/viewtrips.php?status=1001"); 
     exit(); 
 } 
 ?>

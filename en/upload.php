@@ -15,11 +15,12 @@ if (!empty($_SESSION['status_response'])) {
 
     unset($_SESSION['status_response']);
 }
-
+$trip_id = $_GET["tid"];
 $userGateway = new UserGateway();
 $tripGateway = new TripGateway();
 $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
-$tripname = $tripGateway->get_trip_name_by_id($link,$_GET["tid"]);
+$tripname = $tripGateway->get_trip_name_by_id($link,$trip_id);
+
 ?>
 <!DOCTYPE html>
 
@@ -33,7 +34,7 @@ $tripname = $tripGateway->get_trip_name_by_id($link,$_GET["tid"]);
     <meta name="author" content="">
 
 
-    <title>Trip - <?php echo $trip['name']; ?></title>
+    <title>Upload Documents - <?php echo $tripname; ?></title>
 
     <!-- Custom fonts for this template-->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -135,6 +136,8 @@ $tripname = $tripGateway->get_trip_name_by_id($link,$_GET["tid"]);
                                 <label>File</label>
                                 <input type="file" name="file" class="form-control">
                             </div>
+                            <input type="hidden" name="trip_id" id="trip_id" value="<?php echo $trip_id; ?>"/>
+                            
                             <div class="form-group">
                                 <input type="submit" class="form-control btn-primary" name="submit" value="Upload" />
                             </div>

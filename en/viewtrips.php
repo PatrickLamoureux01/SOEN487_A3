@@ -189,6 +189,15 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
     </div>
   </div>
   </div>
+
+    <!-- Doc Upload -->
+    <div class="toast-container">
+    <div class="toast text-white bg-success" id="docToast">
+      <div class="toast-body">
+        Document uploaded successfully!
+      </div>
+    </div>
+  </div>
   <!-- Scroll to Top Button-->
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
@@ -202,7 +211,20 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
     <!-- Custom scripts for all pages-->
     <script src="../bootstrap/js/sb-admin-2.min.js"></script>
     <script src="https://kit.fontawesome.com/0ce3f6901e.js" crossorigin="anonymous"></script>
+    <script>
+    $(document).ready(function() {
+      if (window, location.href.indexOf('1001') > -1) {
+        $("#docToast").toast({
+          delay: 1400
+        });
+        $('#docToast').toast('show');
+      }
+    });
 
+    function redirect() {
+      window.location.href = "signup.php";
+    }
+  </script>
 
 </body>
 

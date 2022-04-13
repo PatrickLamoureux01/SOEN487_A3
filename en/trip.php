@@ -2,6 +2,7 @@
 require_once('../include/database.php');
 require_once('../Gateway/userGateway.php');
 require_once('../Gateway/tripGateway.php');
+require_once('../Gateway/fileGateway.php');
 session_start();
 $db = new Database();
 $link = $db->connect();
@@ -13,6 +14,9 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
 $tripGateway = new TripGateway();
 $tripObj = $tripGateway->get_trip_by_id($link, $_GET['tid']);
 $trip = mysqli_fetch_array($tripObj);
+
+$fileGateway = new FileGateway();
+$fs = $fileGateway->get_files_by_id($link, $_GET['tid']);
 
 ?>
 <!DOCTYPE html>
@@ -139,6 +143,8 @@ $trip = mysqli_fetch_array($tripObj);
 
                             <a class="font-weight-bold text-primary" href="upload.php<?php echo ('?tid=' . $_GET["tid"]); ?>"><i class="fa fa-plus"></i> Upload Travel Documents</a>
 
+                            <a class="font-weight-bold text-primary" href="addevent.php<?php echo ('?tid=' . $_GET["tid"]); ?>"><i class="fa-solid fa-calendar-check"></i> Add Planned Event</a>
+
                             <a id="newflashtaskbutton" class="font-weight-bold text-primary" href="edittrip.php<?php echo ('?tid=' . $_GET["tid"]); ?>"><i class="fa-solid fa-pen"></i> Edit Trip Info</a>
 
                             <a class="font-weight-bold text-primary" href="deletetrip.php?tid=<?php echo $_GET["tid"]; ?>"><i class="fa-solid fa-trash"></i> Delete Trip</a>
@@ -223,33 +229,25 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
                         <div class="collapse" id="docs">
                             <div class="card-body">
                                 <hr class="sidebar-divider pb-0 mb-0">
-
                                 <div class="container mt-3">
+                                    <?php
+                                    if (mysqli_num_rows($fs) == 0) {
+                                        echo ('<p>There are no documents currently linked to this trip.</p>');
+                                    } else {
+                                        foreach ($fs as $doc) {
+                                            //var_dump($doc);
+                                            echo ('<div class="row py-1">');
+                                            echo ('<div class="col-sm-2 text-center">');
+                                            echo ('<a href="' . $doc['link'] . '" class="btn btn-square btn-info rounded-sm"> <strong class="text text-lg">' . $doc['id'] . '');
+                                            echo ('</strong></a> <br> Click to access');
+                                            echo ('</div>');
 
-                                    <div class="row py-1">
-                                        <div class="col-sm-2 text-center">
-                                            <button class="btn btn-square btn-info rounded-sm"> <strong class="text text-lg"> 14
-                                                </strong></button> <br> SEPT
-                                        </div>
-
-                                        <div class="col">
-                                            <p> See crown prosecutor about ITO review corrections and translation. Meeting with lead
-                                                investigator as well. 2pm</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="row py-1">
-
-                                        <div class="col-sm-2 text-center">
-                                            <button class="btn btn-square btn-info rounded-sm"> <strong class="text text-lg"> 23
-                                                </strong></button> <br>OCT
-                                        </div>
-
-                                        <div class="col">
-                                            <p> Meeting with Lead Investigator about Open Source Research on person X</p>
-                                        </div>
-                                    </div>
-
+                                            echo ('<div class="col">');
+                                            echo ('<p>' . $doc['given_name'] . '</p>');
+                                            echo ('</div></div>');
+                                        }
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
@@ -369,7 +367,6 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
 
         $('#noteTable').DataTable();
     });
-
 </script>
 
 </html>

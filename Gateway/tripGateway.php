@@ -41,7 +41,7 @@ class TripGateway extends Database
 
     public function get_trip_name_by_id($link,$id) {
 
-        $sql = "SELECT name from trips where id=?";
+        $sql = "SELECT name from trips where id = ?";
 		$select_stmt = mysqli_prepare($link, $sql);
 		mysqli_stmt_bind_param($select_stmt, 'i', $id);
 		mysqli_stmt_execute($select_stmt);

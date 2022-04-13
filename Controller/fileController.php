@@ -1,6 +1,7 @@
 <?php     
 // Include database configuration file 
-require_once '../include/database.php'; 
+require_once '../include/database.php';
+
 
 $db = new Database();
 $link = $db->connect();
@@ -12,6 +13,7 @@ $status = 'danger';
 if(isset($_POST['submit'])){ 
      
     $fname = $_POST['name'];
+    $trip_id = $_POST['trip_id'];
     // Validate form input fields 
     if(empty($_FILES["file"]["name"])){ 
         $valErr .= 'Please select a file to upload.<br/>'; 
@@ -27,9 +29,9 @@ if(isset($_POST['submit'])){
         if(move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)){ 
              
             // Insert data into the database 
-            $sqlQ = "INSERT INTO drive_files (given_name,file_name,created) VALUES (?,?,NOW())"; 
+            $sqlQ = "INSERT INTO drive_files (given_name,file_name,created,trip_id) VALUES (?,?,NOW(),?)"; 
             $stmt = $link->prepare($sqlQ); 
-            $stmt->bind_param("ss", $fname, $db_file_name); 
+            $stmt->bind_param("ssi", $fname, $db_file_name,$trip_id); 
             $db_file_name = $fileName; 
             $insert = $stmt->execute(); 
              
@@ -56,6 +58,6 @@ if(isset($_POST['submit'])){
  
 $_SESSION['status_response'] = array('status' => $status, 'status_msg' => $statusMsg); 
  
-header("Location: ../en/upload.php"); 
+header("Location: ../en/trip.php?tid=$trip_id"); 
 exit(); 
 ?>
