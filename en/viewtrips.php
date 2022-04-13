@@ -2,6 +2,7 @@
 require_once('../include/database.php');
 require_once('../Gateway/tripGateway.php');
 require_once('../Gateway/userGateway.php');
+require_once('../Gateway/fileGateway.php');
 session_start();
 
 $db = new Database();
@@ -10,6 +11,7 @@ $link = $db->connect();
 $tripGateway = new TripGateway();
 $trips = $tripGateway->get_all_trips($link);
 $userGateway = new UserGateway();
+$fileGateway = new FileGateway();
 
 $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
 
@@ -126,6 +128,9 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
               echo "<p class='center'><b>Unfortunately, you do not have any trips planned at the moment.</b></p>";
             } else {
               foreach ($trips as $trip) {
+
+                $fz = $fileGateway->get_files_by_id($link, $trip['id']);
+                $numDocs = mysqli_num_rows($fz);
                 echo ('<div class="col-xl-4 mb-4">
                 <a class="card shadow py-2 text-decoration-none" href="#">');
                 echo ('
@@ -158,8 +163,7 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                           <div class="small">End Date: ');
                 echo ($trip['end_date']);
                 echo ('</div>
-                          <div class="small text-danger font-weight-bold">Documents linked: ');
-                echo ($numDocs);
+                          <div class="small">Documents linked: '.$numDocs.'');
                 echo ('</div>
                     </div> 
                 </div>

@@ -18,6 +18,8 @@ $trip = mysqli_fetch_array($tripObj);
 $fileGateway = new FileGateway();
 $fs = $fileGateway->get_files_by_id($link, $_GET['tid']);
 
+$events = $tripGateway->get_all_events_by_trip_id($link, $_GET['tid']);
+
 ?>
 <!DOCTYPE html>
 
@@ -254,79 +256,37 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
 
                         <!-- DataTales Example -->
                         <div class="card shadow">
-                            <a href="#caseComp" class="d-block card-header py-3 bg-white" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="caseComp">
+                            <a href="#events" class="d-block card-header py-3 bg-white" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="events">
                                 <h6 class="m-0 text-primary">Events Scheduled</h6>
                             </a>
-                            <div class="collapse" id="caseComp">
+                            <div class="collapse" id="events">
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-sm table-hover " id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
-                                                    <th class="status-width">Status</th>
-                                                    <th class="desc-width">Task Description</th>
-                                                    <th>Lead CFA</th>
-                                                    <th>Due Date</th>
-                                                    <th>Evidence linked</th>
+                                                    <th class="status-width">Name</th>
+                                                    <th class="desc-width">Date & Time</th>
+                                                    <th>Location</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php
-
-                                                // if case has no tasks don\t go here
-                                                // var_dump($caseTasks);
-
-                                                foreach ($completedTasks as $task) {
-
-                                                    $fetch_evidence =  $evidence->get_evidence_name($task['evidence_linked'], $link);
-                                                    if ($fetch_evidence == "/") {
-                                                        $evidence_linked = "No evidence linked";
-                                                    } else {
-                                                        $evidence_linked = $fetch_evidence;
-                                                    }
-
-                                                    if (!empty($task['task_id'])) {
-
-                                                        $badgeColour = 'primary';
-                                                        //get calendar colour
-                                                        $taskid = $task['task_id'];
-                                                        srand($taskid);
-                                                        $color = 'hsl(' . rand(0, 359) . ', 100%, 80%);';
-
-                                                        echo ('
-
-                          <tr class="clickable-row" data-href="seetask2.php');
-                                                        echo ('?cid=' . $_GET["cid"]  . '&tid=' . $task['task_id']);
-                                                        echo ('">
-                          <td> <a href="seetask2.php');
-                                                        echo ('?cid=' . $_GET["cid"] . '&tid=' . $task['task_id']);
-                                                        echo ('"class="btn btn-sm btn-');
-                                                        echo ($badgeColour);
-                                                        echo (' btn-circle"> <i class="fa fa-bell"></i> </a> </td>
-                          <td class="w-descrip">');
-                                                        echo ($task['task_type_id']);
-                                                        echo ('</td>
-                          <td>');
-                                                        echo ($task['task_lead_cfa']);
-                                                        echo ('</td>
-                          <td>');
-                                                        if ($task['task_due_date'] == "0000-00-00") {
-                                                            echo (" Ongoing ");
-                                                        } else {
-                                                            echo ($task['task_due_date']);
-                                                        }
-                                                        echo ('</td>
-                          <td >');
-                                                        echo $evidence_linked;
-                                                        echo ('
-                          </td>
-                        </tr>');
-                                                    } else {
-
-                                                        echo ('<tr>
-                        <td>   </td>
-                        <td> There are no completed tasks. </td>
-                      </tr>');
+                                                if (mysqli_num_rows($events) == 0) {
+                                                    echo ('<p>There are no events scheduled for this trip.</p>');
+                                                } else {
+                                                    foreach ($events as $event) {
+                                                        echo ('<tr>');
+                                                        echo('<td>');
+                                                        echo($event['name']);
+                                                        echo('</td>');
+                                                        echo('<td>');
+                                                        echo($event['datetime']);
+                                                        echo('</td>');
+                                                        echo('<td>');
+                                                        echo($event['location']);
+                                                        echo('</td>');
+                                                        echo ('</tr>');
                                                     }
                                                 }
                                                 ?>
@@ -340,6 +300,15 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
                     </div>
 
 
+                </div>
+            </div>
+        </div>
+
+        <!-- Event added -->
+        <div class="toast-container">
+            <div class="toast text-white bg-success" id="eventToast">
+                <div class="toast-body">
+                    Event added successfully!
                 </div>
             </div>
         </div>
@@ -360,12 +329,14 @@ class='weather-icon' /></p><p> Feels like: " . $data['main']['temp'] . "°C</p>"
 
 
 <script>
-    $(document).ready(function() {
-        $(".clickable-row").click(function() {
-            window.location = $(this).data("href");
+$(document).ready(function() {
+      if (window, location.href.indexOf('1001') > -1) {
+        $("#eventToast").toast({
+          delay: 1400
         });
+        $('#eventToast').toast('show');
+      }
 
-        $('#noteTable').DataTable();
     });
 </script>
 

@@ -8,11 +8,11 @@ $db = new Database();
 $link = $db->connect();
 
 $tripGateway = new TripGateway();
-$tripObj = $tripGateway->get_trip_by_id($link, $_GET["tid"]);
-$trip = mysqli_fetch_assoc($tripObj);
+$trips = $tripGateway->get_all_trips($link);
 $userGateway = new UserGateway();
 
 $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
+$trip_id = $_GET['tid'];
 
 ?>
 <!DOCTYPE html>
@@ -27,7 +27,7 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
     <meta name="author" content="">
 
 
-    <title>Edit Trip</title>
+    <title>Add Event</title>
 
     <!-- Custom fonts for this template-->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -107,35 +107,24 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                 <div class="container-fluid">
 
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-3">
-                        <h1 class="h3 mb-0 text-gray-800">You are editing your <?php echo($trip['name']);?> trip!</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Add exciting events to your trip!</h1>
                     </div>
 
-                    <form method="post" action="../Controller/tripController.php">
+                    <form method="post" action="../Controller/eventController.php">
                         <div class="form-group">
-                            <label for="trip_name">Trip name</label>
-                            <input id="trip_name" name="trip_name" type="text" class="form-control" value="<?php echo($trip['name']);?>">
+                            <label for="name">Event name</label>
+                            <input id="name" name="name" type="text" class="form-control" placeholder="Enter your event's name">
                         </div>
                         <div class="form-group">
-                            <label for="dep_country">Where are you leaving from?</label>
-                            <select name="dep_country" id="dep_country" class="form-control" value="<?php echo($trip['depart_country']);?>"></select>
-                            
+                            <label for="datetime">Date & Time</label>
+                            <input type="datetime-local" name="datetime" id="datetime" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <label for="arv_country">Where are you going?</label>
-                            <select name="arv_country" id="arv_country" class="form-control" value="<?php echo($trip['arrival_country']);?>">
-                            </select>
+                            <label for="location">Location</label>
+                            <input type="text" name="location" id="location" class="form-control" placeholder="Enter your event's location"/>
                         </div>
-                        <div class="form-group">
-                            <label for="trip_start_date" class="my-1 mr-2">Trip start date</label>
-                            <input type="date" id="trip_start_date" name="trip_start_date" class="form-control" value="<?php echo($trip['start_date']);?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="trip_end_date" class="my-1 mr-2">Trip end date</label>
-                            <input type="date" id="trip_end_date" name="trip_end_date" class="form-control" value="<?php echo($trip['end_date']);?>">
-                        </div>
-                        <input type="hidden" id="action" name="action" value="edit"></input>
-                        <input type="hidden" id="tid" name="tid" value="<?php echo $_GET['tid'];?>"></input>
-                        <button name="submit" type="submit" class="btn btn-primary">Edit Trip</button>
+                        <input type="hidden" id="tid" name="tid" value="<?php echo $trip_id; ?>"></input>
+                        <button name="submit" type="submit" class="btn btn-primary">Add Event</button>
                     </form>
 
                     <!-- /.container-fluid -->

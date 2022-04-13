@@ -127,69 +127,26 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
                     <div class="row" style="text-align:center;">
                         <!-- Content Row -->
                         <div class="col-md-4">
-                            <i class="fa-solid fa-magnifying-glass" style="font-size:52px;"></i>
+                            <i class="fa-solid fa-plane-departure" style="font-size:52px;"></i>
                             <p></p>
-                            <p><strong>SEARCH FOR AN ALBUM</strong></p>
+                            <p><strong>VIEW MY TRIPS</strong></p>
                             <br>
                             <br>
-                            <p>Search for an album in the repository.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="search-album.php">Search for an album</a></button>
+                            <p>View your upcoming exciting trips!</p>
+                            <button type="button" class="btn btn-outline-info btn-block"><a href="viewtrips.php">View my trips!</a></button>
                         </div>
                         <div class="col-md-4" style="border-left:1px solid rgba(0,0,0,.1);height:250px">
-                            <i class="fas fa-compact-disc" style="font-size:52px;"></i>
+                            <i class="fa-solid fa-plus" style="font-size:52px;"></i>
                             <p></p>
-                            <p><strong>VIEW AN ALBUM</strong></p>
+                            <p><strong>CREATE A TRIP</strong></p>
                             <br>
                             <br>
-                            <p>Consult a list of active albums.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="view-album.php">View Album</a></button>
-                        </div>
-                        <div class="col-md-4" style="border-left:1px solid rgba(0,0,0,.1);height:250px">
-                            <i class="fas fa-plus" style="font-size:52px;"></i>
-                            <i class="fas fa-minus" style="font-size:52px;"></i>
-                            <p></p>
-                            <p><strong>CREATE/MODIFY AN ALBUM</strong></p>
-                            <br>
-                            <br>
-                            <p>Create and/or modify an album.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="create-album.php">Create Album</a></button>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="modify-album.php">Modify Album</a></button>
+                            <p>Start planning your next trip!</p>
+                            <button type="button" class="btn btn-outline-info btn-block"><a href="createtrip.php">Create a trip</a></button>
                         </div>
                     </div>
                     </br>
                     <hr>
-                    <div class="row" style="text-align:center;">
-                        <!-- Content Row -->
-                        <div class="col-md-4">
-                            <i class="fas fa-minus" style="font-size:52px;"></i>
-                            <p></p>
-                            <p><strong>DELETE AN ALBUM</strong></p>
-                            <br>
-                            <br>
-                            <p>Delete any active album.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="delete-album.php">Delete Album</a></button>
-                        </div>
-                        <div class="col-md-4" style="border-left:1px solid rgba(0,0,0,.1);height:250px">
-                            <i class="fas fa-plus" style="font-size:52px;"></i>
-                            <i class="fas fa-minus" style="font-size:52px;"></i>
-                            <p></p>
-                            <p><strong>UPDATE/DELETE ALBUM COVER</strong></p>
-                            <br>
-                            <br>
-                            <p>Add and/or delete an album cover.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="update-cover.php">Update Album Cover</a></button>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="delete-cover.php">Delete Album Cover</a></button>
-                        </div>
-                        <div class="col-md-4" style="border-left:1px solid rgba(0,0,0,.1);height:250px">
-                            <i class="fas fa-scroll" style="font-size:52px;"></i>
-                            <p></p>
-                            <p><strong>VIEW CHANGE LOGS</strong></p>
-                            <br>
-                            <br>
-                            <p>View change logs.</p>
-                            <button type="button" class="btn btn-outline-info btn-block"><a href="view-logs.php">View Change Logs</a></button>
-                        </div>
-                    </div>
                 </div>
                 <!-- /.container-fluid -->
 
@@ -221,6 +178,24 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
         </div>
     </div>
 
+    <!-- Trip edited successfully -->
+    <div class="toast-container">
+        <div class="toast text-white bg-success" id="tripEditToast">
+            <div class="toast-body">
+                Trip edited successfully
+            </div>
+        </div>
+    </div>
+
+        <!-- Trip deleted successfully -->
+        <div class="toast-container">
+        <div class="toast text-white bg-danger" id="tripDelToast">
+            <div class="toast-body">
+                Trip deleted successfully
+            </div>
+        </div>
+    </div>
+
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -242,6 +217,16 @@ $fullname = $userGateway->getFullName($link, $_SESSION['user_id']);
           delay: 1400
         });
         $('#tripToast').toast('show');
+      } else if (window, location.href.indexOf('1001') > -1) {
+        $("#tripEditToast").toast({
+          delay: 1400
+        });
+        $('#tripEditToast').toast('show');
+      } else if (window, location.href.indexOf('1002') > -1) {
+        $("#tripDelToast").toast({
+          delay: 1400
+        });
+        $('#tripDelToast').toast('show');
       }
     });
     </script>
